@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css" />
 
   <style>
-    /* small homepage-only tweaks */
+    /* homepage-only tweaks */
     .heroTitle{
       margin:0;
       letter-spacing:.14em;
@@ -61,6 +61,35 @@
       align-items:stretch;
     }
     .split > .panel{ flex:1; min-width: 260px; }
+
+    /* Compact input row */
+    .inputRow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      margin-top: 10px;
+    }
+    .inputRow .input{
+      flex: 1;
+      min-width: 240px;
+    }
+
+    /* Mini scroller box */
+    .scrollBox{
+      margin-top:12px;
+      border:1px solid rgba(255,204,102,.55);
+      border-radius: 14px;
+      padding: 10px 12px;
+      background: rgba(0,0,0,.18);
+      box-shadow: 0 0 18px rgba(255,204,102,.10);
+    }
+    .scrollText{
+      margin-top:6px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      font-weight:900;
+    }
   </style>
 </head>
 
@@ -89,7 +118,7 @@
 
       <div class="tickerBox" style="margin-top:10px;">
         <div class="tickerLabel">NEWS:</div>
-        <div class="tickerText" id="newsTicker">Loading feeds…</div>
+        <div class="tickerText" id="newsTicker">Loading Fallout headlines…</div>
       </div>
 
       <div class="split" style="margin-top:12px;">
@@ -107,40 +136,50 @@
         </div>
       </div>
 
+      <div class="btnrow" style="margin-top:12px;">
+        <button class="btn ghost" id="newsRefresh" type="button">↻ REFRESH HEADLINES</button>
+      </div>
+
       <p class="tiny" style="margin-top:10px;">
-        This will scroll through Fallout-related headlines (we’ll plug in real RSS feeds next).
+        Headlines pulled from Google News RSS search for “Fallout game news”.
       </p>
     </section>
 
-    <!-- WEATHER WIDGET -->
+    <!-- WEATHER WIDGET + LOCATION CHANGER -->
     <section class="panel" id="wxWidget">
-      <h2 class="h2">WEATHER WIDGET</h2>
+      <h2 class="h2">WASTELAND WEATHER</h2>
 
-      <div class="btnrow" style="align-items:stretch;">
+      <!-- location changer -->
+      <div class="inputRow">
+        <input id="wxInput" class="input" placeholder="Change location (City or ZIP) — press Enter" />
+        <button class="btn ghost" id="wxUseMyLoc" type="button">Use my location</button>
+        <button class="btn ghost" id="wxUseSaved" type="button">Use saved</button>
+      </div>
+      <p class="sub" id="wxStatus" style="margin-top:10px;">Awaiting terminal profile…</p>
+
+      <div class="btnrow" style="align-items:stretch; margin-top: 10px;">
         <div class="panel" style="flex:2;margin:0;">
           <div class="sub" id="wxLoc">LOCATION: —</div>
           <div class="h1" id="wxNow" style="font-size:18px;margin-top:8px;">NOW: —</div>
           <div class="sub" id="wxClock" style="margin-top:8px;">LOCAL TIME: —</div>
 
-          <div class="panel" style="margin-top:12px;">
+          <div class="scrollBox">
             <div class="tiny"><strong>SCROLL:</strong></div>
-            <div id="wxScroll" style="margin-top:6px;letter-spacing:.08em;text-transform:uppercase;font-weight:900;">
-              Awaiting terminal profile…
-            </div>
+            <div class="scrollText" id="wxScroll">—</div>
           </div>
         </div>
 
         <div class="panel" style="flex:1;margin:0;min-width:220px;">
           <div class="sub">ACTIONS</div>
           <div class="btnrow" style="margin-top:10px;">
-            <a class="btn" href="/weather/">▶ OPEN WEATHER</a>
+            <a class="btn" href="/weather/">▶ OPEN WEATHER TERMINAL</a>
             <button class="btn ghost" id="wxRefresh" type="button">↻ REFRESH</button>
           </div>
 
           <div class="panel" style="margin-top:12px;">
-            <div class="tiny">TIP</div>
+            <div class="tiny">NOTE</div>
             <div class="tiny" style="margin-top:6px;">
-              Set your location once in the Weather Terminal. This widget will follow it.
+              Location is saved on the visitor’s device (localStorage). Each user can set their own terminal location.
             </div>
           </div>
         </div>
@@ -157,7 +196,7 @@
         <a class="btn ghost" href="/archive/">▶ ARCHIVE</a>
       </div>
       <p class="tiny" style="margin-top:10px;">
-        Next: we’ll build Radio + Fan Art + more modules without cluttering the homepage.
+        Next: build Radio + Fan Art modules without cluttering the homepage.
       </p>
     </section>
 
@@ -169,54 +208,97 @@
   </main>
 
   <!-- =========================
-       NEWS TICKER (placeholder)
-       We’ll swap this to real RSS
+       NEWS TICKER (REAL RSS via Netlify Function)
        ========================= -->
   <script>
-    // For now: fake rotating headlines so the UI is alive.
-    // Next step: replace with a real RSS proxy via Netlify Function.
-    const demoNews = [
-      { title: "Bethesda transmission detected… standby for intel.", source: "SYSTEM", url: "#" },
-      { title: "Wasteland rumor: vault door activity reported.", source: "FIELD", url: "#" },
-      { title: "Enclave chatter intercepted. Verify authenticity.", source: "RELAY", url: "#" },
-      { title: "New radio signal discovered. Frequency unstable.", source: "RADIO", url: "#" }
-    ];
-
     const newsTicker = document.getElementById("newsTicker");
     const newsSource = document.getElementById("newsSource");
     const newsUpdated = document.getElementById("newsUpdated");
     const newsLink = document.getElementById("newsLink");
+    const newsRefresh = document.getElementById("newsRefresh");
 
+    let newsItems = [];
     let ni = 0;
+    let newsTimer = null;
+
     function stamp(){ return new Date().toLocaleString(); }
 
-    function rotateNews(){
-      const item = demoNews[ni];
-      newsTicker.textContent = item.title;
-      newsSource.textContent = item.source;
+    function showNewsItem(item){
+      newsTicker.textContent = `${(item.source || "SOURCE").toUpperCase()} — ${item.title || ""}`;
+      newsSource.textContent = (item.source || "—").toUpperCase();
       newsUpdated.textContent = stamp();
-      newsLink.href = item.url;
-      ni = (ni + 1) % demoNews.length;
+      newsLink.href = item.link || "#";
     }
-    rotateNews();
-    setInterval(rotateNews, 6500);
+
+    function startNewsRotation(){
+      if (newsTimer) clearInterval(newsTimer);
+
+      if (!newsItems.length) {
+        newsTicker.textContent = "No headlines available.";
+        newsSource.textContent = "—";
+        newsUpdated.textContent = stamp();
+        newsLink.href = "#";
+        return;
+      }
+
+      ni = 0;
+      showNewsItem(newsItems[ni]);
+
+      newsTimer = setInterval(() => {
+        ni = (ni + 1) % newsItems.length;
+        showNewsItem(newsItems[ni]);
+      }, 6500);
+    }
+
+    async function loadNews(){
+      newsTicker.textContent = "Loading Fallout headlines…";
+      newsSource.textContent = "—";
+      newsUpdated.textContent = stamp();
+      newsLink.href = "#";
+
+      try {
+        const res = await fetch("/.netlify/functions/fallout-news", { cache: "no-store" });
+        const data = await res.json();
+        newsItems = (data.items || []).slice(0, 20);
+        startNewsRotation();
+      } catch (e) {
+        newsTicker.textContent = "News feed offline. Try refresh.";
+        newsSource.textContent = "SYSTEM";
+        newsUpdated.textContent = stamp();
+        newsLink.href = "#";
+      }
+    }
+
+    newsRefresh?.addEventListener("click", loadNews);
+    loadNews();
   </script>
 
   <!-- =========================
-       HOMEPAGE WEATHER WIDGET
+       HOMEPAGE WEATHER WIDGET + LOCATION CHANGER
        ========================= -->
   <script>
-    const WX_KEY = "wt_weather_profile_v2"; // must match your /weather/ page
+    const WX_KEY = "wt_weather_profile_v2"; // must match /weather/
     let wxTimer = null;
     let clockTimer = null;
 
+    const elStatus = document.getElementById("wxStatus");
     const elLoc = document.getElementById("wxLoc");
     const elNow = document.getElementById("wxNow");
     const elClock = document.getElementById("wxClock");
     const elScroll = document.getElementById("wxScroll");
-    const btnRefresh = document.getElementById("wxRefresh");
+
+    const wxInput = document.getElementById("wxInput");
+    const wxRefresh = document.getElementById("wxRefresh");
+    const wxUseMyLoc = document.getElementById("wxUseMyLoc");
+    const wxUseSaved = document.getElementById("wxUseSaved");
 
     function safeJSON(raw){ try { return JSON.parse(raw); } catch { return null; } }
+
+    function saveProfile(p){ localStorage.setItem(WX_KEY, JSON.stringify(p)); }
+    function loadProfile(){
+      const raw = localStorage.getItem(WX_KEY);
+      return raw ? safeJSON(raw) : null;
+    }
 
     function formatTimeInZone(date, timeZone) {
       return new Intl.DateTimeFormat("en-US", {
@@ -279,6 +361,14 @@
       return { condition, threat };
     }
 
+    async function geocode(query){
+      const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=1&language=en&format=json`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (!data.results || !data.results.length) throw new Error("Location not found");
+      return data.results[0];
+    }
+
     async function fetchBundle(lat, lon){
       const url =
         `https://api.open-meteo.com/v1/forecast` +
@@ -313,20 +403,8 @@
       }, 7000);
     }
 
-    async function loadWidget(){
-      const raw = localStorage.getItem(WX_KEY);
-      const profile = raw ? safeJSON(raw) : null;
-
-      if (!profile || !profile.latitude || !profile.longitude){
-        elLoc.textContent = "LOCATION: —";
-        elNow.textContent = "NOW: —";
-        elScroll.textContent = "Set location in /weather/ first.";
-        elClock.textContent = "LOCAL TIME: —";
-        return;
-      }
-
-      elLoc.textContent = "LOCATION: " + (profile.name || "SAVED");
-
+    async function renderWidgetFromProfile(profile){
+      elStatus.textContent = "Pulling atmospheric data…";
       const bundle = await fetchBundle(profile.latitude, profile.longitude);
       const tz = bundle.timezone || "UTC";
       startClock(tz);
@@ -334,10 +412,13 @@
       const cw = bundle.current_weather;
       const tempF = Math.round(cw.temperature);
       const windMph = Math.round(cw.windspeed);
-
       const nowMapped = mapToWastelandFromCode(cw.weathercode, tempF, windMph, null);
-      elNow.textContent = `NOW: ${nowMapped.condition} • ${tempF}°F • WIND ${windMph} MPH • THREAT ${nowMapped.threat}`;
 
+      elLoc.textContent = "LOCATION: " + (profile.name || "SAVED");
+      elNow.textContent = `NOW: ${nowMapped.condition} • ${tempF}°F • WIND ${windMph} MPH • THREAT ${nowMapped.threat}`;
+      elStatus.textContent = "Signal stable. Live conversion active.";
+
+      // scroll lines: sunrise/sunset, moon, then 7-day forecast
       const moon = moonPhaseInfo(new Date());
       const sr = bundle.daily.sunrise?.[0] ? formatTimeInZone(new Date(bundle.daily.sunrise[0]), tz) : "—";
       const ss = bundle.daily.sunset?.[0] ? formatTimeInZone(new Date(bundle.daily.sunset[0]), tz) : "—";
@@ -362,15 +443,67 @@
       startScroller(lines);
     }
 
-    btnRefresh?.addEventListener("click", () => {
-      loadWidget().catch(() => {
-        elScroll.textContent = "Refresh failed. Open /weather/ to reset.";
-      });
+    async function loadWidget(){
+      const profile = loadProfile();
+      if (!profile || !profile.latitude || !profile.longitude){
+        elStatus.textContent = "Set location below (or in /weather/).";
+        elLoc.textContent = "LOCATION: —";
+        elNow.textContent = "NOW: —";
+        elClock.textContent = "LOCAL TIME: —";
+        elScroll.textContent = "—";
+        return;
+      }
+      await renderWidgetFromProfile(profile);
+    }
+
+    // Change location from homepage (enter)
+    wxInput?.addEventListener("keydown", async (e) => {
+      if (e.key === "Enter" && wxInput.value.trim()){
+        try{
+          elStatus.textContent = "Resolving location…";
+          const loc = await geocode(wxInput.value.trim());
+          const name = `${loc.name}${loc.admin1 ? ", " + loc.admin1 : ""}${loc.country ? ", " + loc.country : ""}`;
+          const profile = { name, latitude: loc.latitude, longitude: loc.longitude };
+          saveProfile(profile);
+          wxInput.value = "";
+          await renderWidgetFromProfile(profile);
+        } catch(err){
+          elStatus.textContent = err?.message || "Location change failed.";
+        }
+      }
     });
 
-    loadWidget().catch(() => {
-      elScroll.textContent = "Weather widget offline. Open /weather/ to reset.";
+    // Use my location
+    wxUseMyLoc?.addEventListener("click", () => {
+      if (!navigator.geolocation){
+        elStatus.textContent = "Auto-location not supported. Enter city/ZIP.";
+        return;
+      }
+      elStatus.textContent = "Scanning local coordinates…";
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        const profile = {
+          name: "LOCAL COORDINATES",
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude
+        };
+        saveProfile(profile);
+        await renderWidgetFromProfile(profile);
+      }, () => {
+        elStatus.textContent = "Location permission denied. Enter city/ZIP.";
+      }, { timeout: 8000 });
     });
+
+    // Use saved
+    wxUseSaved?.addEventListener("click", () => {
+      loadWidget().catch(() => elStatus.textContent = "Saved profile failed to load.");
+    });
+
+    // Refresh
+    wxRefresh?.addEventListener("click", () => {
+      loadWidget().catch(() => elStatus.textContent = "Refresh failed.");
+    });
+
+    loadWidget().catch(() => elStatus.textContent = "Weather widget offline.");
   </script>
 
 </body>
