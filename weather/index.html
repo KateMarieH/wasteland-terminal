@@ -5,12 +5,92 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Weather Terminal • Wasteland Terminal</title>
   <link rel="stylesheet" href="../style.css" />
-
   <style>
-    /* Amber + Green accents */
-    .accent-amber { color: #ffcc66; }
-    .border-amber { border-color: rgba(255,204,102,0.6); }
-    .glow-amber { text-shadow: 0 0 10px rgba(255,204,102,0.6); }
+    :root{
+      --amber:#ffcc66;
+      --amberDim: rgba(255,204,102,.55);
+      --amberBorder: rgba(255,204,102,.55);
+    }
+    .amber { color: var(--amber); }
+    .panel.amberBorder { border-color: var(--amberBorder); }
+    .badge {
+      display:inline-block; padding:6px 10px; border-radius:999px;
+      border:1px solid rgba(141,255,176,.45);
+      background: rgba(0,0,0,.25);
+      letter-spacing:.12em; text-transform:uppercase; font-weight:900; font-size:12px;
+    }
+    .badge.amberB { border-color: var(--amberBorder); color: var(--amber); }
+    .hero {
+      margin-top:14px;
+      border:1px solid rgba(141,255,176,.35);
+      border-radius: 14px;
+      padding: 14px;
+      background: linear-gradient(to bottom, rgba(0,0,0,.18), rgba(0,0,0,.08));
+      box-shadow: 0 0 18px rgba(141,255,176,.10);
+    }
+    .heroTop { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:flex-start; }
+    .condBig {
+      margin-top:10px;
+      font-size: 28px;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      font-weight: 900;
+      text-shadow: 0 0 18px rgba(141,255,176,.18);
+    }
+    .grid2 {
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .kpiBox {
+      border:1px solid rgba(141,255,176,.25);
+      border-radius: 12px;
+      padding: 12px;
+      background: rgba(0,0,0,.12);
+    }
+    .kLabel { color: rgba(141,255,176,.7); font-size: 11px; letter-spacing:.16em; text-transform:uppercase; }
+    .kValue { margin-top:6px; font-size: 18px; font-weight: 900; letter-spacing:.08em; text-transform:uppercase; }
+    .meter {
+      margin-top:10px;
+      height: 10px;
+      border-radius: 999px;
+      border:1px solid rgba(141,255,176,.35);
+      background: rgba(0,0,0,.25);
+      overflow:hidden;
+      box-shadow: inset 0 0 10px rgba(0,0,0,.45);
+    }
+    .bar { height:100%; width:0%; background: linear-gradient(90deg, rgba(141,255,176,.65), rgba(255,204,102,.75)); }
+    .row {
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    }
+    .btnSmall {
+      padding: 8px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(141,255,176,.35);
+      background: rgba(0,0,0,.20);
+      color: rgba(141,255,176,.9);
+      text-decoration:none;
+      font-weight:900;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      cursor:pointer;
+    }
+    .btnSmall:hover { box-shadow: 0 0 16px rgba(141,255,176,.20); }
+    .ticker2{
+      margin-top:14px;
+      border:1px solid var(--amberBorder);
+      border-radius: 14px;
+      padding: 12px 14px;
+      background: rgba(0,0,0,.18);
+      box-shadow: 0 0 18px rgba(255,204,102,.10);
+      display:flex; gap:10px; align-items:flex-start;
+    }
+    .ticker2 strong{ letter-spacing:.12em; text-transform:uppercase; }
+    @media (max-width: 760px){
+      .grid2{ grid-template-columns: 1fr; }
+      .condBig{ font-size: 22px; }
+    }
   </style>
 </head>
 
@@ -19,10 +99,9 @@
 
   <main class="wrap">
 
-    <!-- HEADER -->
-    <header class="panel top border-amber">
+    <header class="panel top amberBorder">
       <div>
-        <h1 class="h1 glow-amber">WEATHER TERMINAL</h1>
+        <h1 class="h1">WEATHER TERMINAL</h1>
         <p class="sub">Real-world conditions translated into wasteland threats.</p>
       </div>
       <div class="sys">
@@ -30,38 +109,53 @@
       </div>
     </header>
 
-    <!-- LOCATION INPUT -->
     <section class="panel">
-      <h2 class="h2 accent-amber">LOCATION INPUT</h2>
-      <input
-        id="locationInput"
-        class="input"
-        placeholder="Enter city or ZIP and press Enter"
-      />
+      <h2 class="h2 amber">LOCATION INPUT</h2>
+      <div class="row">
+        <input id="locationInput" class="input" placeholder="City or ZIP (press Enter)" style="flex:1; min-width:240px;" />
+        <button id="useMyLoc" class="btnSmall" type="button">Use my location</button>
+        <button id="useSaved" class="btnSmall" type="button">Use saved</button>
+      </div>
       <p class="sub" id="locationStatus">Awaiting coordinates…</p>
     </section>
 
-    <!-- READOUT -->
-    <section class="panel">
-      <h2 class="h2 accent-amber">ATMOSPHERIC READOUT</h2>
-
-      <div class="btnrow">
-        <div class="panel" style="flex:1">
-          <div class="sub">CONDITION</div>
-          <div class="h1" id="condition">—</div>
+    <section class="hero">
+      <div class="heroTop">
+        <div>
+          <span class="badge">ATMOSPHERIC STATUS</span>
+          <span class="badge amberB" id="badgeThreat">THREAT: —</span>
+          <div class="condBig" id="conditionBig">—</div>
+          <div class="sub" id="conditionSub">Stand by…</div>
         </div>
-        <div class="panel" style="flex:1">
-          <div class="sub">TEMPERATURE</div>
-          <div class="h1" id="temp">—</div>
-        </div>
-        <div class="panel" style="flex:1">
-          <div class="sub">WIND</div>
-          <div class="h1" id="wind">—</div>
+        <div style="min-width:220px;">
+          <div class="kLabel">RADS INDEX</div>
+          <div class="kValue" id="radsText">—</div>
+          <div class="meter"><div class="bar" id="radsBar"></div></div>
+          <div class="sub" style="margin-top:8px;">Simulated readout based on weather intensity.</div>
         </div>
       </div>
 
-      <div class="panel ticker border-amber" style="margin-top:14px">
-        <strong class="accent-amber">WASTELAND ALERT:</strong>
+      <div class="grid2">
+        <div class="kpiBox">
+          <div class="kLabel">TEMPERATURE</div>
+          <div class="kValue" id="temp">—</div>
+        </div>
+        <div class="kpiBox">
+          <div class="kLabel">WIND</div>
+          <div class="kValue" id="wind">—</div>
+        </div>
+        <div class="kpiBox">
+          <div class="kLabel">REAL CODE</div>
+          <div class="kValue" id="code">—</div>
+        </div>
+        <div class="kpiBox">
+          <div class="kLabel">LAST UPDATE</div>
+          <div class="kValue" id="updated">—</div>
+        </div>
+      </div>
+
+      <div class="ticker2">
+        <strong class="amber">WASTELAND ALERT:</strong>
         <span id="alertText">Stand by…</span>
       </div>
     </section>
@@ -69,55 +163,102 @@
   </main>
 
 <script>
-/* ---------------------------
-   WEATHER TERMINAL LOGIC
-   --------------------------- */
-
 const input = document.getElementById("locationInput");
 const status = document.getElementById("locationStatus");
-const conditionEl = document.getElementById("condition");
+
+const conditionBig = document.getElementById("conditionBig");
+const conditionSub = document.getElementById("conditionSub");
+const alertEl = document.getElementById("alertText");
+const badgeThreat = document.getElementById("badgeThreat");
+
 const tempEl = document.getElementById("temp");
 const windEl = document.getElementById("wind");
-const alertEl = document.getElementById("alertText");
+const codeEl = document.getElementById("code");
+const updatedEl = document.getElementById("updated");
 
-const STORAGE_KEY = "wt_weather_location";
+const radsText = document.getElementById("radsText");
+const radsBar = document.getElementById("radsBar");
 
-/* Fallout-style mapping */
+const btnMyLoc = document.getElementById("useMyLoc");
+const btnSaved = document.getElementById("useSaved");
+
+const STORAGE_KEY = "wt_weather_location_v2";
+
+const ALERT_POOL = [
+  "Deathclaw sighting unconfirmed. Maintain perimeter discipline.",
+  "Scavenger activity detected. Secure loose supplies.",
+  "Signal drift observed. Recalibrating antenna array…",
+  "Radroaches reported near water sources. Boil before use.",
+  "Brotherhood patrol route: intermittent. Do not rely on support."
+];
+
+function nowStamp(){
+  return new Date().toLocaleString();
+}
+
+function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+
+/* Fallout-style mapping with threat + rads */
 function mapToWasteland(weather) {
   const { weathercode, temperature, windspeed } = weather;
 
   let condition = "CALM SKIES";
+  let threat = "LOW";
   let alert = "Signal stable. Patrol activity nominal.";
+  let rads = 5;
+
+  const windy = windspeed >= 35;
 
   if ([95,96,99].includes(weathercode)) {
     condition = "RADSTORM DETECTED";
+    threat = "SEVERE";
     alert = "SEVERE RADIATION. SEEK IMMEDIATE SHELTER.";
+    rads = 85;
   } else if ([61,63,65,80,81,82].includes(weathercode)) {
     condition = "ACID RAIN";
+    threat = "ELEVATED";
     alert = "CORROSIVE PRECIPITATION. PROTECT EQUIPMENT.";
+    rads = 35;
   } else if ([45,48].includes(weathercode)) {
     condition = "RADCLOUDS";
+    threat = "MODERATE";
     alert = "LOW VISIBILITY. NAVIGATION IMPAIRED.";
-  } else if (windspeed > 35) {
+    rads = 22;
+  } else if (windy) {
     condition = "DUST FRONT";
+    threat = "ELEVATED";
     alert = "HIGH WINDS. AIRBORNE DEBRIS HAZARD.";
+    rads = 18;
   } else if (temperature >= 32) {
     condition = "HEAT HAZE";
+    threat = "MODERATE";
     alert = "EXTREME HEAT. HYDRATION ADVISED.";
+    rads = 10;
   } else if (temperature <= 0) {
     condition = "FROST WARNING";
+    threat = "MODERATE";
     alert = "SUBZERO CONDITIONS. REDUCED MOBILITY.";
+    rads = 8;
+  } else if ([1,2,3].includes(weathercode)) {
+    condition = "BROKEN SKIES";
+    threat = "LOW";
+    alert = "Cloud cover variable. Maintain watch.";
+    rads = 6;
   }
 
-  return { condition, alert };
+  // spice: add occasional flavor line
+  const flavor = ALERT_POOL[Math.floor(Math.random()*ALERT_POOL.length)];
+  const combined = threat === "SEVERE" ? alert : `${alert} ${flavor}`;
+
+  return { condition, threat, alert: combined, rads };
 }
 
 async function geocodeLocation(query) {
   const res = await fetch(
-    `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=1`
+    `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=1&language=en&format=json`
   );
   const data = await res.json();
-  if (!data.results) throw new Error("Location not found");
+  if (!data.results || !data.results.length) throw new Error("Location not found");
   return data.results[0];
 }
 
@@ -126,41 +267,90 @@ async function fetchWeather(lat, lon) {
     `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`
   );
   const data = await res.json();
+  if (!data.current_weather) throw new Error("Weather unavailable");
   return data.current_weather;
+}
+
+function render(locLabel, weather){
+  const mapped = mapToWasteland(weather);
+
+  status.textContent = `ACTIVE: ${locLabel}`;
+  conditionBig.textContent = mapped.condition;
+  badgeThreat.textContent = `THREAT: ${mapped.threat}`;
+  conditionSub.textContent = `WMO code ${weather.weathercode} • Live conversion active`;
+  alertEl.textContent = mapped.alert;
+
+  tempEl.textContent = Math.round(weather.temperature) + "°C";
+  windEl.textContent = Math.round(weather.windspeed) + " km/h";
+  codeEl.textContent = String(weather.weathercode);
+  updatedEl.textContent = nowStamp();
+
+  radsText.textContent = mapped.rads + " µSv/h";
+  radsBar.style.width = clamp(mapped.rads, 0, 100) + "%";
 }
 
 async function run(query) {
   status.textContent = "Resolving location…";
-
   const loc = await geocodeLocation(query);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(loc));
 
-  status.textContent = `ACTIVE: ${loc.name}, ${loc.country}`;
+  const locLabel = `${loc.name}${loc.admin1 ? ", " + loc.admin1 : ""}${loc.country ? ", " + loc.country : ""}`;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    name: locLabel,
+    latitude: loc.latitude,
+    longitude: loc.longitude
+  }));
+
+  status.textContent = "Pulling atmospheric data…";
   const weather = await fetchWeather(loc.latitude, loc.longitude);
-
-  const mapped = mapToWasteland(weather);
-
-  conditionEl.textContent = mapped.condition;
-  tempEl.textContent = Math.round(weather.temperature) + "°C";
-  windEl.textContent = Math.round(weather.windspeed) + " km/h";
-  alertEl.textContent = mapped.alert;
+  render(locLabel, weather);
 }
+
+/* Buttons */
+btnSaved.addEventListener("click", async () => {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (!saved) { alertEl.textContent = "No saved location. Enter city/ZIP."; return; }
+  const loc = JSON.parse(saved);
+  status.textContent = "Loading saved terminal profile…";
+  const weather = await fetchWeather(loc.latitude, loc.longitude);
+  render(loc.name, weather);
+});
+
+btnMyLoc.addEventListener("click", () => {
+  if (!navigator.geolocation) { alertEl.textContent = "Auto-location not supported."; return; }
+  status.textContent = "Scanning local coordinates…";
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    try {
+      const lat = pos.coords.latitude;
+      const lon = pos.coords.longitude;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ name: "LOCAL COORDINATES", latitude: lat, longitude: lon }));
+      const weather = await fetchWeather(lat, lon);
+      render("LOCAL COORDINATES", weather);
+    } catch (e) {
+      alertEl.textContent = "Auto-location failed. Enter city/ZIP.";
+    }
+  }, () => {
+    alertEl.textContent = "Location permission denied. Enter city/ZIP.";
+  }, { timeout: 8000 });
+});
 
 /* Input handling */
 input.addEventListener("keydown", (e) => {
   if (e.key === "Enter" && input.value.trim()) {
-    run(input.value.trim()).catch(err => {
-      alertEl.textContent = err.message;
-    });
+    run(input.value.trim()).catch(err => alertEl.textContent = err.message);
   }
 });
 
-/* Auto-load last location */
-const saved = localStorage.getItem(STORAGE_KEY);
-if (saved) {
-  const loc = JSON.parse(saved);
-  run(loc.name).catch(() => {});
-}
+/* Auto-load */
+(async () => {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (!saved) return;
+  try {
+    const loc = JSON.parse(saved);
+    status.textContent = "Restoring last terminal session…";
+    const weather = await fetchWeather(loc.latitude, loc.longitude);
+    render(loc.name, weather);
+  } catch {}
+})();
 </script>
 
 </body>
