@@ -84,7 +84,7 @@ body{
   display: inline-block;
   white-space: nowrap;
   padding-left: 100%;
-  animation: tickerScroll 45s linear infinite;
+  animation: tickerScroll 90s linear infinite;
   letter-spacing: .08em;
   text-transform: uppercase;
   font-weight: 900;
