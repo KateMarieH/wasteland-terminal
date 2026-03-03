@@ -1,275 +1,214 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Wasteland Terminal</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Wasteland Terminal</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-<div class="crt"></div>
+  <div class="crt"></div>
 
-<main class="wrap">
+  <main class="screen">
+    <!-- TOP HEADER (RobCo style) -->
+    <header class="block">
+      <div class="robco">
+        <div class="robcoLine">ROBCO INDUSTRIES UNIFIED OPERATING SYSTEM</div>
+        <div class="robcoLine">COPYRIGHT 2075–2077 ROBCO INDUSTRIES</div>
+        <div class="robcoLine">— WASTELAND TERMINAL NODE —</div>
+      </div>
 
-<!-- ================= HEADER ================= -->
-<header class="panel top">
-  <div>
-    <h1 class="heroTitle" id="terminalTitle">WASTELAND TERMINAL</h1>
-    <p class="heroTag">
-      <span class="monoStrong">Your personal terminal</span>
-      for weather, news, radio, and wastelander oddities.
-    </p>
-  </div>
+      <div class="rule">==============================================</div>
 
-  <div class="sys">
-    <div class="k">SYSTEM</div>
-    <div class="v">ONLINE</div>
-  </div>
-</header>
+      <!-- USER PROMPT (same page; no separate welcome screen) -->
+      <div class="row between">
+        <div>
+          <div class="title">WASTELAND TERMINAL</div>
+          <div class="sub">Your personal terminal for weather, news, music, and wastelander oddities.</div>
+        </div>
 
-<!-- ================= WASTELAND ALERTS (placeholder for later) ================= -->
-<section class="panel">
-  <div class="sub">WASTELAND ALERT</div>
-  <div class="monoStrong">
-    SIGNAL STABLE • NO IMMEDIATE THREATS DETECTED
-  </div>
-</section>
+        <div class="statusBox">
+          <div class="k">SYSTEM</div>
+          <div class="v">ONLINE</div>
+        </div>
+      </div>
 
-<!-- ================= FALLOUT NEWS ================= -->
-<section class="panel">
-<h2 class="h2 amber">FALLOUT HEADLINES</h2>
+      <div class="row">
+        <div class="kv"><span class="k">USER:</span> <span id="userName">WANDERER</span></div>
+        <div class="kv"><span class="k">LOCAL TIME:</span> <span id="localClock">—</span></div>
+      </div>
 
-<div class="tickerBox">
-  <div class="tickerLabel">NEWS:</div>
-  <div class="tickerTrack">
-    <div class="tickerType" id="newsTicker">Initializing news relay…</div>
-  </div>
-</div>
+      <div id="loginBar" class="loginBar">
+        <span class="k">IDENTIFICATION REQUIRED:</span>
+        <input id="nameInput" class="input" type="text" placeholder="ENTER CALLSIGN" maxlength="18" />
+        <button id="nameConfirm" class="btn">[ CONFIRM ]</button>
+        <button id="nameSkip" class="btn ghost">[ CONTINUE AS WANDERER ]</button>
+        <span class="tiny dim">Stored locally on this device.</span>
+      </div>
 
-<div class="split" style="margin-top:12px">
-  <div class="panel" style="margin:0">
-    <div class="tiny">SOURCE</div>
-    <div class="monoStrong" id="newsSource">—</div>
-  </div>
-  <div class="panel" style="margin:0">
-    <div class="tiny">LAST UPDATE</div>
-    <div class="monoStrong" id="newsUpdated">—</div>
-  </div>
-  <div class="panel" style="margin:0">
-    <div class="tiny">OPEN</div>
-    <a class="btn ghost" id="newsLink" target="_blank" rel="noopener">
-      ▶ VIEW STORY
-    </a>
-  </div>
-</div>
+      <div class="rule">----------------------------------------------</div>
+    </header>
 
-<div class="btnrow" style="margin-top:12px">
-  <button class="btn ghost" id="newsRefresh" type="button">↻ REFRESH</button>
-</div>
-</section>
+    <!-- MODULES (text-first, no modern cards) -->
+    <section class="grid">
+      <!-- LEFT: NEWS -->
+      <section class="block">
+        <div class="h">> NEWS FEED</div>
+        <div class="ruleSmall">--------------------------------</div>
 
-<!-- ================= WEATHER TERMINAL ================= -->
-<section class="panel">
-<h2 class="h2">WASTELAND WEATHER</h2>
+        <div class="tickerLine">
+          <span class="amber"><strong>NEWS:</strong></span>
+          <span id="newsTicker" class="mono">Initializing news relay…</span>
+        </div>
 
-<div class="inputRow">
-  <input id="wxInput" class="input" placeholder="City or ZIP — press Enter">
-  <button class="btn ghost" id="wxUseMyLoc" type="button">Use my location</button>
-  <button class="btn ghost" id="wxUseSaved" type="button">Use saved</button>
-</div>
+        <div class="ruleDots">::::::::::::::::::::::::::::::::</div>
 
-<p class="sub" id="wxStatus">Awaiting terminal profile…</p>
+        <div class="meta2col">
+          <div class="kv"><span class="k">SOURCE:</span> <span id="newsSource">—</span></div>
+          <div class="kv"><span class="k">LAST UPDATE:</span> <span id="newsUpdated">—</span></div>
+        </div>
 
-<div class="split" style="margin-top:10px">
-  <div class="panel" style="margin:0;flex:2">
-    <div class="sub" id="wxLoc">LOCATION: —</div>
-    <div class="h1" id="wxNow">NOW: —</div>
-    <div class="sub" id="wxClock">LOCAL TIME: —</div>
+        <div class="row gap">
+          <a class="btn ghost" id="newsLink" target="_blank" rel="noopener">[ OPEN STORY ]</a>
+          <button class="btn ghost" id="newsRefresh">[ REFRESH ]</button>
+        </div>
 
-    <div class="scrollBox">
-      <div class="tiny"><strong>SCROLL:</strong></div>
-      <div class="scrollText" id="wxScroll">—</div>
-    </div>
-  </div>
+        <div class="tiny dim" style="margin-top:8px;">
+          Tip: Hover is interactive. Content rotates slowly.
+        </div>
+      </section>
 
-  <div class="panel" style="margin:0;min-width:220px">
-    <div class="sub">ACTIONS</div>
-    <div class="btnrow" style="margin-top:10px">
-      <a class="btn" href="/weather/">▶ FULL WEATHER</a>
-      <button class="btn ghost" id="wxRefresh" type="button">↻ REFRESH</button>
-    </div>
-  </div>
-</div>
-</section>
+      <!-- CENTER: WEATHER -->
+      <section class="block">
+        <div class="h">> WEATHER TERMINAL</div>
+        <div class="ruleSmall">--------------------------------</div>
 
-<!-- ================= FOOTER ================= -->
-<footer class="foot">
-  <span>Unofficial Fallout fan terminal.</span>
-  <span class="dim">Hosted on Netlify.</span>
-</footer>
+        <div class="row gap wrap">
+          <input id="wxInput" class="input" placeholder="City or ZIP — press Enter" />
+          <button class="btn ghost" id="wxUseMyLoc">[ USE MY LOCATION ]</button>
+          <button class="btn ghost" id="wxUseSaved">[ USE SAVED ]</button>
+        </div>
 
-</main>
+        <div class="tiny dim" id="wxStatus" style="margin-top:8px;">Awaiting terminal profile…</div>
 
-<!-- ================= USER NAME / TERMINAL TITLE ================= -->
-<script>
-const NAME_KEY = "wt_user_name";
-const titleEl = document.getElementById("terminalTitle");
+        <div class="ruleDots">::::::::::::::::::::::::::::::::</div>
 
-const rawName = (localStorage.getItem(NAME_KEY) || "").trim();
-const name = rawName ? rawName.toUpperCase() : "WANDERER";
+        <div class="kv"><span class="k">LOCATION:</span> <span id="wxLoc">—</span></div>
+        <div class="bigLine" id="wxNow">NOW: —</div>
+        <div class="kv"><span class="k">LOCAL TIME:</span> <span id="wxClock">—</span></div>
 
-titleEl.textContent = `${name} — WASTELAND TERMINAL`;
-</script>
+        <div class="ruleDots">::::::::::::::::::::::::::::::::</div>
 
-<!-- ================= NEWS SCRIPT ================= -->
-<script>
-const newsTicker = document.getElementById("newsTicker");
-const newsSource = document.getElementById("newsSource");
-const newsUpdated = document.getElementById("newsUpdated");
-const newsLink = document.getElementById("newsLink");
-const newsRefresh = document.getElementById("newsRefresh");
+        <div class="kv"><span class="k">SCROLL:</span></div>
+        <div class="scrollLine mono" id="wxScroll">—</div>
 
-let headlines = [];
-let idx = 0;
+        <div class="row gap" style="margin-top:10px;">
+          <a class="btn" href="/weather/">[ FULL WEATHER ]</a>
+          <button class="btn ghost" id="wxRefresh">[ REFRESH ]</button>
+        </div>
+      </section>
 
-const TYPE_SPEED = 22;
-const HOLD_TIME = 15000;
-const FADE_TIME = 900;
-const BETWEEN_TIME = 350;
+      <!-- RIGHT: RADIO + SUPPORT -->
+      <section class="block">
+        <div class="h">> RADIO SIGNAL</div>
+        <div class="ruleSmall">--------------------------------</div>
 
-let typingTimer = null;
-let cycleTimer = null;
+        <div class="kv"><span class="k">SOURCE:</span> THE MYSTIC BROADCAST</div>
+        <div class="kv"><span class="k">TYPE:</span> AMBIENT / SLEEPY WASTELAND VIBES</div>
+        <div class="kv"><span class="k">STATUS:</span> STANDBY</div>
 
-function stamp(){ return new Date().toLocaleString(); }
+        <div class="ruleDots">::::::::::::::::::::::::::::::::</div>
 
-function shorten(text, max=120){
-  text = (text || "").trim();
-  return text.length > max ? text.slice(0, max-1) + "…" : text;
-}
+        <div class="row gap wrap">
+          <a class="btn" href="/radio/">[ RADIO TERMINAL ]</a>
+          <a class="btn ghost" href="https://www.youtube.com/@YOUR_CHANNEL_HERE" target="_blank" rel="noopener">[ OPEN YOUTUBE ]</a>
+        </div>
 
-function clearTimers(){
-  if (typingTimer) clearInterval(typingTimer);
-  if (cycleTimer) clearTimeout(cycleTimer);
-}
+        <div class="rule">----------------------------------------------</div>
 
-function typeLine(fullText, done){
-  let i = 0;
-  newsTicker.style.opacity = 1;
-  newsTicker.textContent = "";
-  typingTimer = setInterval(() => {
-    i++;
-    newsTicker.textContent = fullText.slice(0, i);
-    if (i >= fullText.length){
-      clearInterval(typingTimer);
-      done?.();
+        <div class="h">> WASTELAND ALERTS</div>
+        <div class="ruleSmall">--------------------------------</div>
+        <div class="mono" id="alertsLine">
+          SIGNAL STABLE. PATROL ACTIVITY NOMINAL. RADSTORM PROBABILITY: LOW.
+        </div>
+
+        <div class="rule">----------------------------------------------</div>
+
+        <div class="h">> SUPPORT</div>
+        <div class="ruleSmall">--------------------------------</div>
+        <div class="mono">
+          This terminal is <span class="amber"><strong>audience-supported</strong></span>.<br>
+          No ads. No tracking. Just vibes.
+        </div>
+        <div class="row gap" style="margin-top:10px;">
+          <a class="btn ghost" href="/support/">[ SUPPORT THE TERMINAL ]</a>
+          <a class="btn ghost" href="/about/">[ ABOUT ]</a>
+        </div>
+      </section>
+    </section>
+
+    <footer class="foot">
+      <div class="rule">==============================================</div>
+      <div class="tiny dim">
+        Unofficial Fallout fan terminal. Built for chill dashboards and daily check-ins. Hosted on Netlify.
+      </div>
+    </footer>
+  </main>
+
+  <!-- ===== USER NAME (single-page “welcome”) ===== -->
+  <script>
+    const USER_KEY = "wt_user_name";
+    const userNameEl = document.getElementById("userName");
+    const loginBar = document.getElementById("loginBar");
+    const nameInput = document.getElementById("nameInput");
+    const nameConfirm = document.getElementById("nameConfirm");
+    const nameSkip = document.getElementById("nameSkip");
+    const clockEl = document.getElementById("localClock");
+
+    function cleanName(s){
+      return (s || "")
+        .trim()
+        .replace(/\s+/g, " ")
+        .slice(0, 18);
     }
-  }, TYPE_SPEED);
-}
 
-function fadeOut(done){
-  newsTicker.style.opacity = 0;
-  cycleTimer = setTimeout(done, FADE_TIME);
-}
+    function setName(name){
+      const n = cleanName(name);
+      if(n){
+        localStorage.setItem(USER_KEY, n);
+        userNameEl.textContent = n.toUpperCase();
+        loginBar.style.display = "none";
+      }else{
+        userNameEl.textContent = "WANDERER";
+        loginBar.style.display = "";
+      }
+    }
 
-function startCycle(){
-  clearTimers();
-  if (!headlines.length){
-    newsTicker.textContent = "NO HEADLINES AVAILABLE";
-    return;
-  }
+    const saved = localStorage.getItem(USER_KEY);
+    setName(saved);
 
-  const item = headlines[idx];
-  const line = `${(item.source||"SOURCE").toUpperCase()} — ${shorten(item.title)}`;
+    nameConfirm.addEventListener("click", () => setName(nameInput.value));
+    nameInput.addEventListener("keydown", (e) => {
+      if(e.key === "Enter") setName(nameInput.value);
+    });
+    nameSkip.addEventListener("click", () => {
+      localStorage.removeItem(USER_KEY);
+      setName("");
+    });
 
-  newsSource.textContent = (item.source||"—").toUpperCase();
-  newsUpdated.textContent = stamp();
-  newsLink.href = item.link || "#";
+    // Local clock
+    function tick(){
+      clockEl.textContent = new Date().toLocaleString();
+      requestAnimationFrame(() => {});
+    }
+    setInterval(tick, 1000);
+    tick();
+  </script>
 
-  typeLine(line, () => {
-    cycleTimer = setTimeout(() => {
-      fadeOut(() => {
-        idx = (idx + 1) % headlines.length;
-        cycleTimer = setTimeout(startCycle, BETWEEN_TIME);
-      });
-    }, HOLD_TIME);
-  });
-}
-
-async function loadNews(){
-  try{
-    const r = await fetch("/.netlify/functions/fallout-news",{cache:"no-store"});
-    const d = await r.json();
-    if (!r.ok || !d.items?.length) throw new Error();
-    headlines = d.items.slice(0,12);
-    idx = 0;
-    startCycle();
-  }catch{
-    newsTicker.textContent = "NEWS FEED OFFLINE";
-    newsSource.textContent = "SYSTEM";
-    newsUpdated.textContent = stamp();
-  }
-}
-
-newsRefresh.onclick = loadNews;
-loadNews();
-</script>
-
-<!-- ================= WEATHER SCRIPT ================= -->
-<script>
-const WX_KEY="wt_weather_profile_v2";
-
-const wxLoc=document.getElementById("wxLoc");
-const wxNow=document.getElementById("wxNow");
-const wxClock=document.getElementById("wxClock");
-const wxScroll=document.getElementById("wxScroll");
-const wxStatus=document.getElementById("wxStatus");
-const wxInput=document.getElementById("wxInput");
-
-function save(p){localStorage.setItem(WX_KEY,JSON.stringify(p))}
-function load(){try{return JSON.parse(localStorage.getItem(WX_KEY))}catch{return null}}
-
-function map(code){
-  if([95,96,99].includes(code))return"RADSTORM";
-  if([61,63,65,80,81,82].includes(code))return"ACID RAIN";
-  if([45,48].includes(code))return"RADCLOUDS";
-  if([71,73,75,77].includes(code))return"ASHFALL";
-  return"CLEAR SKIES";
-}
-
-async function weather(lat,lon){
-  const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=sunrise,sunset&temperature_unit=fahrenheit&windspeed_unit=mph&timezone=auto`);
-  return r.json();
-}
-
-async function render(p){
-  wxStatus.textContent="Pulling atmospheric data…";
-  const d=await weather(p.latitude,p.longitude);
-  const cw=d.current_weather;
-  wxLoc.textContent="LOCATION: "+p.name;
-  wxNow.textContent=`NOW: ${map(cw.weathercode)} • ${Math.round(cw.temperature)}°F • WIND ${Math.round(cw.windspeed)} MPH`;
-  wxClock.textContent="LOCAL TIME: "+new Date().toLocaleTimeString();
-  wxScroll.textContent=`SUNRISE ${new Date(d.daily.sunrise[0]).toLocaleTimeString()} • SUNSET ${new Date(d.daily.sunset[0]).toLocaleTimeString()}`;
-  wxStatus.textContent="Signal stable.";
-}
-
-wxInput.onkeydown=async e=>{
-  if(e.key==="Enter"){
-    const q=wxInput.value.trim();
-    if(!q)return;
-    wxInput.value="";
-    const g=await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=1&format=json`);
-    const j=await g.json();
-    if(!j.results?.length){wxStatus.textContent="Location not found";return;}
-    const r=j.results[0];
-    const p={name:`${r.name}, ${r.country}`,latitude:r.latitude,longitude:r.longitude};
-    save(p); render(p);
-  }
-};
-
-const init=load();
-if(init) render(init);
-</script>
+  <!-- ===== KEEP YOUR EXISTING NEWS + WEATHER SCRIPTS BELOW ===== -->
+  <!-- Paste your NEWS script here (the one that calls /.netlify/functions/fallout-news) -->
+  <!-- Paste your WEATHER script here (open-meteo + your Fallout mapping) -->
 
 </body>
 </html>
