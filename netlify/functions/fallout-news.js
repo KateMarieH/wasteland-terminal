@@ -1,90 +1,114 @@
-// netlify/functions/fallout-news.js
-const FEED_URL =
-  "https://news.google.com/rss/search?q=Fallout+game+news&hl=en-US&gl=US&ceid=US:en";
+<script>
+const newsTicker = document.getElementById("newsTicker");
+const newsSource = document.getElementById("newsSource");
+const newsUpdated = document.getElementById("newsUpdated");
+const newsLink = document.getElementById("newsLink");
+const newsRefresh = document.getElementById("newsRefresh");
 
-function decodeEntities(str = "") {
-  return str
-    .replaceAll("&amp;", "&")
-    .replaceAll("&lt;", "<")
-    .replaceAll("&gt;", ">")
-    .replaceAll("&quot;", '"')
-    .replaceAll("&#39;", "'")
-    .replaceAll("&#8217;", "’")
-    .replaceAll("&#8230;", "…");
+let headlines = [];
+let idx = 0;
+
+// timing (ms)
+const TYPE_SPEED = 22;       // lower = faster typing
+const HOLD_TIME = 15000;     // wait 15 seconds after typing finishes
+const FADE_TIME = 900;       // fade out duration
+const BETWEEN_TIME = 350;    // small gap before next type begins
+
+let typingTimer = null;
+let cycleTimer = null;
+
+function stamp(){ return new Date().toLocaleString(); }
+
+function shorten(text, max=120){
+  return text.length > max ? text.slice(0, max-1) + "…" : text;
 }
 
-function pick(tag, block) {
-  const re = new RegExp(`<${tag}>([\\s\\S]*?)<\\/${tag}>`, "i");
-  const m = block.match(re);
-  return m ? m[1].trim() : "";
+function clearTimers(){
+  if (typingTimer) clearInterval(typingTimer);
+  if (cycleTimer) clearTimeout(cycleTimer);
+  typingTimer = null;
+  cycleTimer = null;
 }
 
-function pickSource(block) {
-  const m = block.match(/<source[^>]*>([\s\S]*?)<\/source>/i);
-  return m ? m[1].trim() : "";
-}
+function typeLine(fullText, onDone){
+  let i = 0;
+  newsTicker.style.opacity = 1;
+  newsTicker.textContent = "";
 
-function parseRss(xml) {
-  const itemMatches = xml.match(/<item>([\s\S]*?)<\/item>/gi) || [];
-  const items = [];
-
-  for (const itemXml of itemMatches) {
-    const title = decodeEntities(pick("title", itemXml));
-    const link = decodeEntities(pick("link", itemXml));
-    const pubDate = pick("pubDate", itemXml);
-    const source = decodeEntities(pickSource(itemXml)) || "Unknown";
-
-    if (!title || !link) continue;
-
-    items.push({
-      title,
-      link,
-      source,
-      pubDate,
-      ts: pubDate ? Date.parse(pubDate) : 0,
-    });
-  }
-
-  items.sort((a, b) => (b.ts || 0) - (a.ts || 0));
-  return items.slice(0, 30).map(({ ts, ...rest }) => rest);
-}
-
-exports.handler = async function handler() {
-  try {
-    const res = await fetch(FEED_URL, {
-      headers: {
-        "User-Agent": "WastelandTerminal/1.0 (+Netlify Function)",
-      },
-    });
-
-    if (!res.ok) {
-      return {
-        statusCode: 502,
-        headers: { "Content-Type": "application/json; charset=utf-8" },
-        body: JSON.stringify({ error: `Feed fetch failed: ${res.status}` }),
-      };
+  typingTimer = setInterval(() => {
+    i++;
+    newsTicker.textContent = fullText.slice(0, i);
+    if (i >= fullText.length){
+      clearInterval(typingTimer);
+      typingTimer = null;
+      onDone?.();
     }
+  }, TYPE_SPEED);
+}
 
-    const xml = await res.text();
-    const items = parseRss(xml);
+function fadeOut(onDone){
+  newsTicker.style.opacity = 0;
+  cycleTimer = setTimeout(() => onDone?.(), FADE_TIME);
+}
 
-    return {
-      statusCode: 200,
-      headers: {
-        "Content-Type": "application/json; charset=utf-8",
-        "Cache-Control": "public, max-age=600",
-      },
-      body: JSON.stringify({
-        feed: "Google News RSS (Fallout game news)",
-        count: items.length,
-        items,
-      }),
-    };
-  } catch (err) {
-    return {
-      statusCode: 500,
-      headers: { "Content-Type": "application/json; charset=utf-8" },
-      body: JSON.stringify({ error: err?.message || "Unknown error" }),
-    };
+function startCycle(){
+  clearTimers();
+
+  if (!headlines.length){
+    newsTicker.textContent = "NO HEADLINES AVAILABLE";
+    newsSource.textContent = "—";
+    newsUpdated.textContent = stamp();
+    newsLink.href = "#";
+    return;
   }
-};
+
+  // current item
+  const item = headlines[idx];
+  const line = `${(item.source || "SOURCE").toUpperCase()} — ${shorten(item.title || "", 120)}`;
+
+  // update meta panel
+  newsSource.textContent = (item.source || "—").toUpperCase();
+  newsUpdated.textContent = stamp();
+  newsLink.href = item.link || "#";
+
+  typeLine(line, () => {
+    // hold 15 seconds AFTER typing finishes
+    cycleTimer = setTimeout(() => {
+      fadeOut(() => {
+        // advance + next
+        idx = (idx + 1) % headlines.length;
+        cycleTimer = setTimeout(startCycle, BETWEEN_TIME);
+      });
+    }, HOLD_TIME);
+  });
+}
+
+async function loadNews(){
+  clearTimers();
+  newsTicker.style.opacity = 1;
+  newsTicker.textContent = "LOADING FALLOUT HEADLINES…";
+  newsSource.textContent = "—";
+  newsUpdated.textContent = stamp();
+  newsLink.href = "#";
+
+  try{
+    const r = await fetch("/.netlify/functions/fallout-news", { cache:"no-store" });
+    const d = await r.json();
+    if (!r.ok || !d.items?.length) throw new Error(d.error || "No headlines");
+
+    // keep it tight for terminal readability
+    headlines = d.items.slice(0, 12);
+    idx = 0;
+
+    startCycle();
+  }catch(e){
+    newsTicker.textContent = "NEWS FEED OFFLINE";
+    newsSource.textContent = "SYSTEM";
+    newsUpdated.textContent = stamp();
+    newsLink.href = "#";
+  }
+}
+
+newsRefresh.onclick = loadNews;
+loadNews();
+</script>
