@@ -1,114 +1,100 @@
-<script>
-const newsTicker = document.getElementById("newsTicker");
-const newsSource = document.getElementById("newsSource");
-const newsUpdated = document.getElementById("newsUpdated");
-const newsLink = document.getElementById("newsLink");
-const newsRefresh = document.getElementById("newsRefresh");
+// netlify/functions/fallout-news.js
+export default async (req, context) => {
+  try {
+    const FEED =
+      "https://news.google.com/rss/search?q=Fallout+game+news&hl=en-US&gl=US&ceid=US:en";
 
-let headlines = [];
-let idx = 0;
+    const res = await fetch(FEED, {
+      headers: {
+        // Google News sometimes blocks generic serverless requests without a UA
+        "User-Agent": "Mozilla/5.0 (WastelandTerminal; +https://wastelandterminal.com)",
+        "Accept": "application/rss+xml,application/xml,text/xml,*/*",
+      },
+    });
 
-// timing (ms)
-const TYPE_SPEED = 22;       // lower = faster typing
-const HOLD_TIME = 15000;     // wait 15 seconds after typing finishes
-const FADE_TIME = 900;       // fade out duration
-const BETWEEN_TIME = 350;    // small gap before next type begins
-
-let typingTimer = null;
-let cycleTimer = null;
-
-function stamp(){ return new Date().toLocaleString(); }
-
-function shorten(text, max=120){
-  return text.length > max ? text.slice(0, max-1) + "…" : text;
-}
-
-function clearTimers(){
-  if (typingTimer) clearInterval(typingTimer);
-  if (cycleTimer) clearTimeout(cycleTimer);
-  typingTimer = null;
-  cycleTimer = null;
-}
-
-function typeLine(fullText, onDone){
-  let i = 0;
-  newsTicker.style.opacity = 1;
-  newsTicker.textContent = "";
-
-  typingTimer = setInterval(() => {
-    i++;
-    newsTicker.textContent = fullText.slice(0, i);
-    if (i >= fullText.length){
-      clearInterval(typingTimer);
-      typingTimer = null;
-      onDone?.();
+    if (!res.ok) {
+      const t = await res.text();
+      return json(500, { error: `RSS fetch failed (${res.status})`, detail: t.slice(0, 300) });
     }
-  }, TYPE_SPEED);
-}
 
-function fadeOut(onDone){
-  newsTicker.style.opacity = 0;
-  cycleTimer = setTimeout(() => onDone?.(), FADE_TIME);
-}
+    const xml = await res.text();
 
-function startCycle(){
-  clearTimers();
+    // Minimal RSS parsing (no dependencies)
+    const items = parseRss(xml).slice(0, 20).map((it) => ({
+      title: it.title,
+      link: it.link,
+      source: it.source || guessSource(it.link),
+      pubDate: it.pubDate,
+    }));
 
-  if (!headlines.length){
-    newsTicker.textContent = "NO HEADLINES AVAILABLE";
-    newsSource.textContent = "—";
-    newsUpdated.textContent = stamp();
-    newsLink.href = "#";
-    return;
+    return json(200, { items, fetchedAt: new Date().toISOString() }, {
+      // cache a bit to avoid rate limits
+      "Cache-Control": "public, max-age=300",
+    });
+  } catch (e) {
+    return json(500, { error: "Function crashed", detail: String(e?.message || e) });
   }
+};
 
-  // current item
-  const item = headlines[idx];
-  const line = `${(item.source || "SOURCE").toUpperCase()} — ${shorten(item.title || "", 120)}`;
-
-  // update meta panel
-  newsSource.textContent = (item.source || "—").toUpperCase();
-  newsUpdated.textContent = stamp();
-  newsLink.href = item.link || "#";
-
-  typeLine(line, () => {
-    // hold 15 seconds AFTER typing finishes
-    cycleTimer = setTimeout(() => {
-      fadeOut(() => {
-        // advance + next
-        idx = (idx + 1) % headlines.length;
-        cycleTimer = setTimeout(startCycle, BETWEEN_TIME);
-      });
-    }, HOLD_TIME);
+function json(statusCode, body, headers = {}) {
+  return new Response(JSON.stringify(body), {
+    status: statusCode,
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      ...headers,
+    },
   });
 }
 
-async function loadNews(){
-  clearTimers();
-  newsTicker.style.opacity = 1;
-  newsTicker.textContent = "LOADING FALLOUT HEADLINES…";
-  newsSource.textContent = "—";
-  newsUpdated.textContent = stamp();
-  newsLink.href = "#";
-
-  try{
-    const r = await fetch("/.netlify/functions/fallout-news", { cache:"no-store" });
-    const d = await r.json();
-    if (!r.ok || !d.items?.length) throw new Error(d.error || "No headlines");
-
-    // keep it tight for terminal readability
-    headlines = d.items.slice(0, 12);
-    idx = 0;
-
-    startCycle();
-  }catch(e){
-    newsTicker.textContent = "NEWS FEED OFFLINE";
-    newsSource.textContent = "SYSTEM";
-    newsUpdated.textContent = stamp();
-    newsLink.href = "#";
-  }
+function decode(s = "") {
+  return s
+    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
 }
 
-newsRefresh.onclick = loadNews;
-loadNews();
-</script>
+function getTag(block, tag) {
+  const m = block.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, "i"));
+  return m ? decode(m[1].trim()) : "";
+}
+
+function parseRss(xml) {
+  const out = [];
+  const chunks = xml.match(/<item\b[\s\S]*?<\/item>/gi) || [];
+  for (const block of chunks) {
+    const title = getTag(block, "title");
+    let link = getTag(block, "link");
+
+    // Some feeds put the real link in guid
+    if (!link) link = getTag(block, "guid");
+
+    const pubDate = getTag(block, "pubDate");
+
+    // Google News often includes a <source> tag
+    const source = getTag(block, "source");
+
+    // Clean Google redirect links if present
+    link = cleanGoogleNewsLink(link);
+
+    if (title && link) out.push({ title, link, pubDate, source });
+  }
+  return out;
+}
+
+function cleanGoogleNewsLink(link = "") {
+  // Sometimes it is already a normal URL, sometimes it is a Google redirect.
+  // We won't overcomplicate — your UI just needs something clickable.
+  return link.trim();
+}
+
+function guessSource(link = "") {
+  try {
+    const u = new URL(link);
+    return u.hostname.replace(/^www\./, "");
+  } catch {
+    return "NEWS";
+  }
+}
