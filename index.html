@@ -17,7 +17,7 @@
       <div class="row between wrap">
         <div class="topLeft">
           <div class="title">WASTELAND TERMINAL</div>
-          <div class="sub"> YOUR GO TO TERMINAL FOR NEWS, WEATHER, MUSIC, & MORE.</div>
+          <div class="sub"> YOUR GO TO TERMINAL FOR NEWS, WEATHER, MUSIC, &amp; MORE.</div>
 
           <div class="kv compactLine">
             <span class="k">USER:</span> <span id="userName">WANDERER</span>
@@ -29,6 +29,13 @@
           <div class="statusBox">
             <div class="k">SYSTEM</div>
             <div class="v">ONLINE</div>
+          </div>
+
+          <!-- VISITOR COUNTER -->
+          <div class="visitorBox" aria-label="Visitor counter">
+            <div class="k">ALL-TIME VISITORS</div>
+            <div id="visitFlip" class="flipCounter" aria-live="polite"></div>
+            <div class="tiny dim">Local counter (per device)</div>
           </div>
 
           <div class="row gap wrap topLinks">
@@ -227,6 +234,78 @@
     function tick(){ clockEl.textContent = new Date().toLocaleString(); }
     setInterval(tick, 1000);
     tick();
+  </script>
+
+  <!-- ================= VISITOR COUNTER (LOCAL) ================= -->
+  <script>
+    // Local-only "unique visitors" (counts this device once)
+    const VIS_SEEN_KEY  = "wt_visit_seen_v1";
+    const VIS_COUNT_KEY = "wt_visit_count_v1";
+    const flipEl = document.getElementById("visitFlip");
+
+    function padDigits(n, width=6){
+      const s = String(Math.max(0, n|0));
+      return s.length >= width ? s.slice(-width) : ("0".repeat(width - s.length) + s);
+    }
+
+    function renderFlipDigits(str){
+      if(!flipEl) return;
+      flipEl.innerHTML = "";
+      for(const ch of str){
+        const d = document.createElement("div");
+        d.className = "flipDigit";
+        d.innerHTML = `<div class="old">${ch}</div><div class="new">${ch}</div>`;
+        flipEl.appendChild(d);
+      }
+    }
+
+    function flipTo(nextStr){
+      if(!flipEl) return;
+      if(!flipEl.children.length){
+        renderFlipDigits(nextStr);
+        return;
+      }
+
+      const digits = Array.from(flipEl.children);
+      for(let i=0; i<digits.length; i++){
+        const box = digits[i];
+        const oldEl = box.querySelector(".old");
+        const newEl = box.querySelector(".new");
+        const oldChar = oldEl.textContent;
+        const newChar = nextStr[i];
+
+        if(oldChar === newChar) continue;
+
+        newEl.textContent = newChar;
+        box.classList.remove("flip");
+        void box.offsetWidth; // reflow
+        box.classList.add("flip");
+
+        setTimeout(() => {
+          oldEl.textContent = newChar;
+          newEl.textContent = newChar;
+          box.classList.remove("flip");
+        }, 320);
+      }
+    }
+
+    (function initCounter(){
+      if(!flipEl) return;
+
+      // start display
+      renderFlipDigits("000000");
+
+      let count = parseInt(localStorage.getItem(VIS_COUNT_KEY) || "0", 10);
+      const seen = localStorage.getItem(VIS_SEEN_KEY);
+
+      if(!seen){
+        localStorage.setItem(VIS_SEEN_KEY, "1");
+        count = (isNaN(count) ? 0 : count) + 1;
+        localStorage.setItem(VIS_COUNT_KEY, String(count));
+      }
+
+      flipTo(padDigits(count, 6));
+    })();
   </script>
 
   <!-- ================= NEWS SCRIPT ================= -->
