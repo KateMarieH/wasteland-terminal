@@ -1,358 +1,266 @@
-/* =========================================================
-   WASTELAND TERMINAL — FULL STYLE.CSS
-   Blocky / vintage terminal look (amber + green)
-   ========================================================= */
-
 :root{
-  --bg: #050806;
-  --panel: rgba(0,0,0,.55);
-  --panel2: rgba(0,0,0,.35);
+  --bg:#020603;
+  --phosphor: rgba(141,255,176,.92);
+  --phosphor-dim: rgba(141,255,176,.68);
+  --phosphor-faint: rgba(141,255,176,.40);
 
-  --green: rgba(141,255,176,.95);
-  --greenDim: rgba(141,255,176,.70);
-  --greenSoft: rgba(141,255,176,.25);
+  --amber: rgba(255,204,102,.95);
+  --amber-dim: rgba(255,204,102,.70);
 
-  --amber: rgba(255,204,102,.92);
-  --amberDim: rgba(255,204,102,.70);
-  --amberSoft: rgba(255,204,102,.25);
+  --glow: 0 0 14px rgba(141,255,176,.16);
+  --glow-strong: 0 0 18px rgba(141,255,176,.24);
 
-  --border: rgba(141,255,176,.35);
-  --borderHard: rgba(141,255,176,.60);
-
-  --shadow: 0 0 18px rgba(141,255,176,.10);
+  --edge: rgba(141,255,176,.18);
+  --panel: rgba(0,0,0,.18);
 }
 
-/* ===== RESET / BASE ===== */
-*{ box-sizing:border-box; }
-html,body{ height:100%; }
+*{box-sizing:border-box}
+html,body{height:100%}
+
 body{
   margin:0;
-  background: radial-gradient(1200px 800px at 15% 0%, rgba(141,255,176,.08), transparent 55%),
-              radial-gradient(1000px 700px at 90% 20%, rgba(255,204,102,.06), transparent 55%),
-              var(--bg);
-  color: var(--green);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
-  letter-spacing:.06em;
+  background: radial-gradient(1100px 620px at 50% 20%, rgba(8,25,14,.85), var(--bg));
+  color: var(--phosphor);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  letter-spacing: .06em;
+  text-rendering: geometricPrecision;
 }
 
-a{ color: var(--green); text-decoration:none; }
-a:hover{ text-decoration:none; }
-
-.amber{ color: var(--amber); }
-
-/* ===== CRT OVERLAY ===== */
-.crt{ position:fixed; inset:0; pointer-events:none; z-index:2; }
-.crt::before{
-  content:"";
-  position:absolute;
-  inset:0;
+/* Subtle CRT overlay */
+.crt{
+  pointer-events:none;
+  position:fixed; inset:0;
   background:
+    linear-gradient(rgba(0,0,0,.0), rgba(0,0,0,.08)),
     repeating-linear-gradient(
       to bottom,
-      rgba(255,255,255,0.028),
-      rgba(255,255,255,0.028) 1px,
-      rgba(0,0,0,0) 2px,
-      rgba(0,0,0,0) 4px
+      rgba(0,0,0,.0) 0px,
+      rgba(0,0,0,.0) 2px,
+      rgba(0,0,0,.10) 3px
     );
-  mix-blend-mode: overlay;
-  opacity:.35;
-}
-.crt::after{
-  content:"";
-  position:absolute;
-  inset:-40px;
-  background: radial-gradient(closest-side, rgba(0,0,0,0), rgba(0,0,0,.35));
+  mix-blend-mode: multiply;
   opacity:.55;
 }
 
-/* ===== LAYOUT ===== */
-.wrap{
-  width:min(980px, 92vw);
-  margin: 28px auto 40px;
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-  position:relative;
-  z-index:1;
-}
-
-/* ===== PANELS ===== */
-.panel{
+/* Center the terminal like a monitor */
+.screen{
+  width: min(980px, calc(100% - 40px));
+  margin: 22px auto 40px;
+  padding: 22px 22px 28px;
+  border: 1px solid var(--edge);
   background: var(--panel);
-  border: 2px solid var(--border);
-  border-radius: 0;
-  padding: 14px 14px;
-  box-shadow: var(--shadow);
+  filter: drop-shadow(var(--glow));
 }
 
-.panel.top{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:14px;
+/* 3 columns on desktop, 1 column on mobile */
+.grid{
+  display:grid;
+  grid-template-columns: 1fr 1.15fr 0.9fr;
+  gap: 18px;
+  align-items:start;
+}
+@media (max-width: 1050px){
+  .grid{grid-template-columns: 1fr;}
 }
 
-/* ===== TYPOGRAPHY ===== */
-.heroTitle{
-  margin:0;
-  font-size:22px;
-  letter-spacing:.14em;
-  text-transform:uppercase;
-  font-weight:900;
-}
-.heroTag{
-  margin:.6rem 0 0;
-  color:rgba(141,255,176,.75);
-  letter-spacing:.06em;
-  line-height:1.35;
-}
-.monoStrong{
-  font-weight:900;
-  letter-spacing:.12em;
-  text-transform:uppercase;
+.block{
+  padding: 8px 4px;
+  min-width:0;
 }
 
-.h1{
-  margin:8px 0 0;
-  font-size:18px;
-  font-weight:900;
-  text-transform:uppercase;
-  letter-spacing:.12em;
+/* RobCo header */
+.robco{
+  text-align:center;
+  line-height: 1.35;
+  text-transform: uppercase;
 }
-.h2{
-  margin:0;
-  font-size:14px;
-  font-weight:900;
-  letter-spacing:.14em;
-  text-transform:uppercase;
+.robcoLine{
+  color: var(--phosphor-dim);
+  font-weight: 800;
+  font-size: 12px;
+}
+
+/* Text hierarchy */
+.title{
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .22em;
+  font-size: 20px;
 }
 .sub{
-  color: var(--greenDim);
-  font-size:12px;
-  letter-spacing:.10em;
-  text-transform:uppercase;
-}
-.dim{ color: rgba(141,255,176,.55); }
-.tiny{ font-size:12px; color: rgba(141,255,176,.65); }
-
-/* ===== SYSTEM BOX ===== */
-.sys{
-  min-width: 160px;
-  padding: 10px 12px;
-  border: 2px solid rgba(255,204,102,.55);
-  background: var(--panel2);
-  border-radius: 0;
-}
-.sys .k{
+  margin-top: 6px;
+  color: var(--phosphor-dim);
   font-size: 12px;
-  color: var(--amberDim);
+  letter-spacing: .10em;
+}
+.h{
   font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .18em;
+  font-size: 13px;
+}
+.bigLine{
+  margin-top: 8px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  font-size: 13px;
+  text-shadow: var(--glow);
+}
+
+/* ASCII rules */
+.rule, .ruleSmall, .ruleDots{
+  white-space: pre;
+  font-weight: 900;
+  letter-spacing: .04em;
+  user-select:none;
+}
+.rule{
+  margin: 10px 0;
+  color: var(--phosphor-faint);
+}
+.ruleSmall{
+  margin: 8px 0 10px;
+  color: var(--phosphor-faint);
+}
+.ruleDots{
+  margin: 10px 0;
+  color: rgba(255,204,102,.35);
+}
+
+/* rows */
+.row{
+  display:flex;
+  align-items:flex-start;
+  justify-content:flex-start;
+  gap: 12px;
+}
+.row.between{justify-content:space-between}
+.row.gap{gap:10px}
+.row.wrap{flex-wrap:wrap}
+
+/* status box */
+.statusBox{
+  text-align:right;
+  min-width: 120px;
+}
+
+/* key/values */
+.kv{
+  margin-top: 8px;
+  font-size: 12px;
+}
+.k{
+  color: var(--phosphor-dim);
+  font-weight: 900;
+}
+.v{
+  font-weight: 900;
+  letter-spacing: .18em;
+}
+
+/* small utilities */
+.tiny{font-size:11px}
+.dim{color: var(--phosphor-dim)}
+.amber{color: var(--amber)}
+.mono{font-weight:900}
+
+/* meta 2 columns */
+.meta2col{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+@media (max-width: 520px){
+  .meta2col{grid-template-columns: 1fr;}
+}
+
+/* Login bar prompt */
+.loginBar{
+  margin-top: 10px;
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap: 10px;
+}
+
+/* Inputs: compact, not full-width */
+.input{
+  background: rgba(0,0,0,.55);
+  border: 1px dashed rgba(141,255,176,.45);
+  color: var(--phosphor);
+  padding: 10px 10px;
+  font: inherit;
   letter-spacing: .14em;
   text-transform: uppercase;
-}
-.sys .v{
-  margin-top: 6px;
-  font-size: 14px;
-  font-weight: 900;
-  letter-spacing:.14em;
-  text-transform: uppercase;
-  color: var(--green);
-}
-
-/* ===== BUTTON ROW ===== */
-.btnrow{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  align-items:center;
-}
-
-/* ===== INPUTS ===== */
-.inputRow{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  align-items:center;
-  margin-top:10px;
-}
-.input{
-  flex:1;
-  min-width:220px;
-  background: rgba(0,0,0,.75);
-  color: var(--green);
-  border: 2px solid var(--borderHard);
-  border-radius: 0;
-  padding: 10px 12px;
-  font: inherit;
-  letter-spacing:.10em;
-  text-transform: uppercase;
-  outline:none;
-  box-shadow: inset 0 0 0 1px rgba(0,0,0,.6);
+  outline: none;
+  box-shadow: var(--glow);
+  flex: 0 1 320px;
+  max-width: 360px;
+  min-width: 220px;
 }
 .input::placeholder{
-  color: rgba(141,255,176,.45);
-  text-transform:none;
-  letter-spacing:.06em;
+  color: rgba(141,255,176,.40);
 }
 .input:focus{
-  border-color: rgba(180,255,205,.85);
-  box-shadow:
-    0 0 12px rgba(141,255,176,.35),
-    inset 0 0 0 1px rgba(0,0,0,.8);
+  border-color: rgba(255,204,102,.75);
+  box-shadow: 0 0 16px rgba(255,204,102,.12);
 }
 
-/* ===== FORCE TERMINAL BUTTONS (fixes white buttons) ===== */
-.btn,
-button,
-a.btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-
-  background: rgba(0,0,0,.85) !important;
-  color: var(--green) !important;
-
-  border: 2px solid var(--borderHard) !important;
-  border-radius: 0 !important;
-
-  padding: 10px 12px;
+/* Buttons: never white, Fallout hover */
+.btn{
+  display:inline-block;
+  background: rgba(0,0,0,.55);
+  border: 1px dashed rgba(141,255,176,.55);
+  color: var(--phosphor);
+  padding: 10px 10px;
+  text-decoration:none;
   font: inherit;
-  font-weight: 900;
-  letter-spacing:.12em;
-  text-transform: uppercase;
-
-  cursor:pointer;
-  user-select:none;
-
-  box-shadow:
-    inset 0 0 0 1px rgba(0,0,0,.6),
-    0 0 10px rgba(141,255,176,.12);
-  transition:
-    transform .08s ease,
-    box-shadow .14s ease,
-    background-color .14s ease,
-    border-color .14s ease,
-    color .14s ease;
-}
-
-.btn.ghost{
-  background: rgba(0,0,0,.45) !important;
-  border-color: rgba(141,255,176,.45) !important;
-}
-
-/* Fallout terminal hover highlight */
-.btn:hover,
-button:hover,
-a.btn:hover{
-  color: #020402 !important;
-  background: rgba(141,255,176,.92) !important;
-  border-color: rgba(200,255,220,.95) !important;
-  box-shadow:
-    0 0 14px rgba(141,255,176,.75),
-    0 0 26px rgba(141,255,176,.25),
-    inset 0 0 0 1px rgba(0,0,0,.85);
-  transform: translateY(-1px);
-}
-.btn:active,
-button:active,
-a.btn:active{
-  transform: translateY(0);
-  box-shadow:
-    0 0 10px rgba(141,255,176,.45),
-    inset 0 0 0 1px rgba(0,0,0,.85);
-}
-
-/* ===== NEWS BOX ===== */
-.tickerBox{
-  border: 2px solid var(--border);
-  background: rgba(0,0,0,.25);
-  padding: 12px 14px;
-  border-radius: 0;
-  box-shadow: var(--shadow);
-  display:flex;
-  gap:10px;
-  align-items:flex-start;
-}
-.tickerLabel{
-  color: var(--amber);
-  font-weight: 900;
   letter-spacing: .14em;
   text-transform: uppercase;
-  white-space:nowrap;
+  cursor:pointer;
+  box-shadow: var(--glow);
+  user-select:none;
+  white-space: nowrap;
+  flex: 0 0 auto; /* prevent stretching */
 }
-.tickerTrack{
-  width:100%;
-  overflow:hidden;
+.btn.ghost{
+  border-color: rgba(255,204,102,.45);
+  color: var(--amber);
 }
-.tickerType{
-  display:block;
-  white-space:nowrap;
-  overflow:hidden;
-  font-weight:900;
-  letter-spacing:.08em;
-  text-transform:uppercase;
-  color: var(--green);
-  opacity:1;
-  transition: opacity .8s ease;
+.btn:hover{
+  border-style: solid;
+  border-color: rgba(141,255,176,.95);
+  color: rgba(215,255,230,.98);
+  box-shadow: var(--glow-strong);
+  filter: brightness(1.05);
 }
+.btn.ghost:hover{
+  border-color: rgba(255,204,102,.90);
+  color: rgba(255,232,170,.98);
+}
+.btn:active{transform: translateY(1px);}
 
-/* blinking cursor */
-.tickerType::after{
-  content:"▮";
-  display:inline-block;
-  margin-left:8px;
-  color: rgba(255,204,102,.9);
-  animation: blink 1s steps(2, jump-none) infinite;
-}
-@keyframes blink{
-  0%,49%{ opacity:1; }
-  50%,100%{ opacity:0; }
-}
-
-/* ===== WEATHER SCROLL BOX ===== */
-.scrollBox{
-  margin-top:12px;
-  border:2px solid rgba(255,204,102,.45);
-  background: rgba(0,0,0,.25);
-  border-radius: 0;
-  padding: 10px 12px;
-  box-shadow: 0 0 16px rgba(255,204,102,.08);
-}
-.scrollText{
-  font-weight: 900;
-  letter-spacing:.12em;
-  text-transform: uppercase;
-  color: var(--green);
-}
-
-/* ===== SPLIT GRID ===== */
-.split{
-  display:flex;
-  gap:12px;
-  flex-wrap:wrap;
-  align-items:stretch;
-}
-.split>.panel{
-  flex:1;
-  min-width:260px;
-}
-
-/* ===== FOOTER ===== */
-.foot{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  padding: 6px 2px;
-  color: rgba(141,255,176,.55);
+/* Ticker line */
+.tickerLine{
+  line-height: 1.6;
   font-size: 12px;
-  letter-spacing:.08em;
-  text-transform: uppercase;
 }
 
-/* ===== SMALL SCREEN ===== */
-@media (max-width:560px){
-  .sys{ min-width:unset; width:100%; }
-  .panel.top{ flex-direction:column; }
-  .foot{ flex-direction:column; }
+/* Scroll forecast line */
+.scrollLine{
+  line-height: 1.7;
+  font-size: 12px;
+  color: rgba(141,255,176,.86);
+}
+
+/* Optional subtle flicker */
+@media (prefers-reduced-motion: no-preference){
+  .screen{ animation: flicker 7.2s infinite; }
+  @keyframes flicker{
+    0%, 100% { opacity: 1; }
+    48% { opacity: .988; }
+    50% { opacity: .965; }
+    52% { opacity: .992; }
+  }
 }
