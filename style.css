@@ -44,9 +44,9 @@ body{
 
 /* Center the terminal like a monitor */
 .screen{
-  width: min(980px, calc(100% - 40px));
+  width: min(1040px, calc(100% - 40px));
   margin: 22px auto 40px;
-  padding: 22px 22px 28px;
+  padding: 22px 22px 26px;
   border: 1px solid var(--edge);
   background: var(--panel);
   filter: drop-shadow(var(--glow));
@@ -55,7 +55,7 @@ body{
 /* 3 columns on desktop, 1 column on mobile */
 .grid{
   display:grid;
-  grid-template-columns: 1fr 1.15fr 0.9fr;
+  grid-template-columns: 1fr 1.15fr 0.95fr;
   gap: 18px;
   align-items:start;
 }
@@ -68,27 +68,24 @@ body{
   min-width:0;
 }
 
-/* RobCo header */
-.robco{
-  text-align:center;
-  line-height: 1.35;
-  text-transform: uppercase;
+/* Top layout helpers */
+.topRight{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap: 10px;
 }
-.robcoLine{
-  color: var(--phosphor-dim);
-  font-weight: 800;
-  font-size: 12px;
-}
+.topLinks{ justify-content:flex-end; }
 
 /* Text hierarchy */
 .title{
   font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: .22em;
-  font-size: 20px;
+  letter-spacing: .26em;
+  font-size: 22px;
 }
 .sub{
-  margin-top: 6px;
+  margin-top: 8px;
   color: var(--phosphor-dim);
   font-size: 12px;
   letter-spacing: .10em;
@@ -100,12 +97,20 @@ body{
   font-size: 13px;
 }
 .bigLine{
-  margin-top: 8px;
+  margin-top: 10px;
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: .14em;
   font-size: 13px;
   text-shadow: var(--glow);
+}
+.forecastLine{
+  margin-top: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  font-size: 12px;
+  color: rgba(141,255,176,.84);
 }
 
 /* ASCII rules */
@@ -116,15 +121,15 @@ body{
   user-select:none;
 }
 .rule{
-  margin: 10px 0;
+  margin: 12px 0;
   color: var(--phosphor-faint);
 }
 .ruleSmall{
-  margin: 8px 0 10px;
+  margin: 10px 0 12px;
   color: var(--phosphor-faint);
 }
 .ruleDots{
-  margin: 10px 0;
+  margin: 12px 0;
   color: rgba(255,204,102,.35);
 }
 
@@ -139,7 +144,6 @@ body{
 .row.gap{gap:10px}
 .row.wrap{flex-wrap:wrap}
 
-/* status box */
 .statusBox{
   text-align:right;
   min-width: 120px;
@@ -147,7 +151,7 @@ body{
 
 /* key/values */
 .kv{
-  margin-top: 8px;
+  margin-top: 10px;
   font-size: 12px;
 }
 .k{
@@ -157,6 +161,13 @@ body{
 .v{
   font-weight: 900;
   letter-spacing: .18em;
+}
+
+/* a tighter header info line */
+.compactLine{
+  margin-top: 12px;
+  font-size: 12px;
+  letter-spacing: .10em;
 }
 
 /* small utilities */
@@ -169,7 +180,7 @@ body{
 .meta2col{
   display:grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  gap: 10px;
 }
 @media (max-width: 520px){
   .meta2col{grid-template-columns: 1fr;}
@@ -177,14 +188,14 @@ body{
 
 /* Login bar prompt */
 .loginBar{
-  margin-top: 10px;
+  margin-top: 12px;
   display:flex;
   flex-wrap:wrap;
   align-items:center;
   gap: 10px;
 }
 
-/* Inputs: compact, not full-width */
+/* Inputs */
 .input{
   background: rgba(0,0,0,.55);
   border: 1px dashed rgba(141,255,176,.45);
@@ -207,22 +218,23 @@ body{
   box-shadow: 0 0 16px rgba(255,204,102,.12);
 }
 
-/* Buttons: never white, Fallout hover */
+/* Buttons (smaller font, more terminal-like) */
 .btn{
   display:inline-block;
   background: rgba(0,0,0,.55);
   border: 1px dashed rgba(141,255,176,.55);
   color: var(--phosphor);
-  padding: 10px 10px;
+  padding: 9px 10px;
   text-decoration:none;
   font: inherit;
-  letter-spacing: .14em;
+  font-size: 11px;          /* smaller */
+  letter-spacing: .16em;
   text-transform: uppercase;
   cursor:pointer;
   box-shadow: var(--glow);
   user-select:none;
   white-space: nowrap;
-  flex: 0 0 auto; /* prevent stretching */
+  flex: 0 0 auto;
 }
 .btn.ghost{
   border-color: rgba(255,204,102,.45);
@@ -247,12 +259,8 @@ body{
   font-size: 12px;
 }
 
-/* Scroll forecast line */
-.scrollLine{
-  line-height: 1.7;
-  font-size: 12px;
-  color: rgba(141,255,176,.86);
-}
+/* Footer */
+.foot{ margin-top: 16px; }
 
 /* Optional subtle flicker */
 @media (prefers-reduced-motion: no-preference){
