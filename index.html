@@ -1,125 +1,73 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Wasteland Terminal</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wasteland Terminal</title>
+<link rel="stylesheet" href="style.css">
 
-  <style>
-    /* ---------- HOMEPAGE-SPECIFIC STYLES ---------- */
+<style>
+/* ===== TERMINAL HERO ===== */
+.heroTitle{
+  margin:0;
+  font-size:22px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+}
+.heroTag{
+  margin:.6rem 0 0;
+  color:rgba(141,255,176,.75);
+  letter-spacing:.06em;
+}
+.monoStrong{font-weight:900;letter-spacing:.12em;text-transform:uppercase}
 
-    .heroTitle{
-      margin:0;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-      font-size: 22px;
-    }
-    .heroTag{
-      margin:.6rem 0 0;
-      color: rgba(141,255,176,.75);
-      letter-spacing:.06em;
-      line-height: 1.4;
-    }
-    .monoStrong{
-      font-weight: 900;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-    }
+/* ===== NEWS TICKER ===== */
+.tickerBox{
+  border:1px solid rgba(141,255,176,.35);
+  border-radius:14px;
+  padding:12px 14px;
+  background:rgba(0,0,0,.18);
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+  overflow:hidden;
+}
+.tickerLabel{
+  color:#ffcc66;
+  font-weight:900;
+  letter-spacing:.12em;
+  white-space:nowrap;
+}
+.tickerTrack{width:100%;overflow:hidden}
+.tickerScroll{
+  display:inline-block;
+  white-space:nowrap;
+  padding-left:100%;
+  animation:scrollLeft 45s linear infinite;
+  font-weight:900;
+  letter-spacing:.08em;
+}
+@keyframes scrollLeft{
+  from{transform:translateX(0)}
+  to{transform:translateX(-100%)}
+}
+.tickerTrack:hover .tickerScroll{animation-play-state:paused}
 
-    /* ---------- NEWS TICKER ---------- */
-
-    .tickerBox{
-      border: 1px solid rgba(141,255,176,.35);
-      border-radius: 14px;
-      padding: 12px 14px;
-      background: rgba(0,0,0,.18);
-      box-shadow: 0 0 18px rgba(141,255,176,.10);
-      display:flex;
-      gap:10px;
-      align-items:flex-start;
-      overflow:hidden;
-    }
-
-    .tickerLabel{
-      white-space:nowrap;
-      color: rgba(255,204,102,.85);
-      letter-spacing:.12em;
-      text-transform:uppercase;
-      font-weight: 900;
-    }
-
-    .tickerTrack{
-      position: relative;
-      overflow: hidden;
-      width: 100%;
-    }
-
-    .tickerScroll{
-      display: inline-block;
-      white-space: nowrap;
-      padding-left: 100%;
-      animation: tickerScroll 45s linear infinite;
-      letter-spacing:.08em;
-      text-transform: uppercase;
-      font-weight: 900;
-      color: rgba(141,255,176,.95);
-    }
-
-    @keyframes tickerScroll{
-      from { transform: translateX(0%); }
-      to { transform: translateX(-100%); }
-    }
-
-    .tickerTrack:hover .tickerScroll{
-      animation-play-state: paused;
-    }
-
-    .tiny{
-      font-size: 12px;
-      color: rgba(141,255,176,.65);
-    }
-
-    /* ---------- WEATHER WIDGET ---------- */
-
-    .inputRow{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-      margin-top:10px;
-    }
-    .inputRow .input{
-      flex:1;
-      min-width:240px;
-    }
-
-    .scrollBox{
-      margin-top:12px;
-      border:1px solid rgba(255,204,102,.55);
-      border-radius: 14px;
-      padding: 10px 12px;
-      background: rgba(0,0,0,.18);
-      box-shadow: 0 0 18px rgba(255,204,102,.10);
-    }
-    .scrollText{
-      margin-top:6px;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-      font-weight:900;
-    }
-
-    .split{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-      align-items:stretch;
-    }
-    .split > .panel{
-      flex:1;
-      min-width:260px;
-    }
-  </style>
+/* ===== WEATHER WIDGET ===== */
+.inputRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.inputRow .input{flex:1;min-width:220px}
+.scrollBox{
+  margin-top:12px;
+  border:1px solid rgba(255,204,102,.55);
+  border-radius:14px;
+  padding:10px 12px;
+  background:rgba(0,0,0,.18);
+}
+.scrollText{font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.tiny{font-size:12px;color:rgba(141,255,176,.65)}
+.split{display:flex;gap:12px;flex-wrap:wrap}
+.split>.panel{flex:1;min-width:260px}
+</style>
 </head>
 
 <body>
@@ -127,271 +75,187 @@
 
 <main class="wrap">
 
-  <!-- ================= HERO ================= -->
-  <header class="panel top">
-    <div>
-      <h1 class="heroTitle">WASTELAND TERMINAL</h1>
-      <p class="heroTag">
-        <span class="monoStrong">Your personal terminal</span> for weather, news, music, and wastelander oddities.
-      </p>
+<!-- ===== HERO ===== -->
+<header class="panel top">
+  <div>
+    <h1 class="heroTitle">WASTELAND TERMINAL</h1>
+    <p class="heroTag">
+      <span class="monoStrong">Your personal terminal</span>
+      for weather, news, music, and wastelander oddities.
+    </p>
+  </div>
+  <div class="sys">
+    <div class="k">SYSTEM</div>
+    <div class="v">ONLINE</div>
+  </div>
+</header>
+
+<!-- ===== FALLOUT NEWS ===== -->
+<section class="panel">
+<h2 class="h2" style="color:#ffcc66;">FALLOUT HEADLINES</h2>
+
+<div class="tickerBox">
+  <div class="tickerLabel">NEWS:</div>
+  <div class="tickerTrack">
+    <div class="tickerScroll" id="newsTicker">
+      Initializing news relay…
     </div>
-    <div class="sys">
-      <div class="k">SYSTEM</div>
-      <div class="v">ONLINE</div>
-    </div>
-  </header>
+  </div>
+</div>
 
-  <!-- ================= FALLOUT NEWS ================= -->
-  <section class="panel">
-    <h2 class="h2" style="color:#ffcc66;">FALLOUT HEADLINES</h2>
+<div class="split" style="margin-top:12px">
+  <div class="panel" style="margin:0">
+    <div class="tiny">SOURCE</div>
+    <div class="monoStrong" id="newsSource">—</div>
+  </div>
+  <div class="panel" style="margin:0">
+    <div class="tiny">LAST UPDATE</div>
+    <div class="monoStrong" id="newsUpdated">—</div>
+  </div>
+  <div class="panel" style="margin:0">
+    <div class="tiny">OPEN</div>
+    <a class="btn ghost" id="newsLink" target="_blank">▶ VIEW STORY</a>
+  </div>
+</div>
 
-    <div class="tickerBox" style="margin-top:10px;">
-      <div class="tickerLabel">NEWS:</div>
-      <div class="tickerTrack">
-        <div class="tickerScroll" id="newsTicker">
-          Loading Fallout headlines…
-        </div>
-      </div>
-    </div>
+<div class="btnrow" style="margin-top:12px">
+  <button class="btn ghost" id="newsRefresh">↻ REFRESH</button>
+</div>
+</section>
 
-    <div class="split" style="margin-top:12px;">
-      <div class="panel" style="margin:0;">
-        <div class="tiny">SOURCE</div>
-        <div class="monoStrong" id="newsSource">—</div>
-      </div>
-      <div class="panel" style="margin:0;">
-        <div class="tiny">LAST UPDATE</div>
-        <div class="monoStrong" id="newsUpdated">—</div>
-      </div>
-      <div class="panel" style="margin:0;">
-        <div class="tiny">OPEN</div>
-        <a class="btn ghost" id="newsLink" href="#" target="_blank" rel="noopener">
-          ▶ VIEW STORY
-        </a>
-      </div>
-    </div>
+<!-- ===== WEATHER WIDGET ===== -->
+<section class="panel">
+<h2 class="h2">WASTELAND WEATHER</h2>
 
-    <div class="btnrow" style="margin-top:12px;">
-      <button class="btn ghost" id="newsRefresh" type="button">↻ REFRESH HEADLINES</button>
-    </div>
-  </section>
+<div class="inputRow">
+  <input id="wxInput" class="input" placeholder="City or ZIP — press Enter">
+  <button class="btn ghost" id="wxUseMyLoc">Use my location</button>
+  <button class="btn ghost" id="wxUseSaved">Use saved</button>
+</div>
 
-  <!-- ================= WEATHER WIDGET ================= -->
-  <section class="panel" id="wxWidget">
-    <h2 class="h2">WASTELAND WEATHER</h2>
+<p class="sub" id="wxStatus">Awaiting terminal profile…</p>
 
-    <div class="inputRow">
-      <input id="wxInput" class="input" placeholder="Change location (City or ZIP) — press Enter" />
-      <button class="btn ghost" id="wxUseMyLoc">Use my location</button>
-      <button class="btn ghost" id="wxUseSaved">Use saved</button>
-    </div>
+<div class="split" style="margin-top:10px">
+<div class="panel" style="margin:0;flex:2">
+  <div class="sub" id="wxLoc">LOCATION: —</div>
+  <div class="h1" id="wxNow" style="font-size:18px">NOW: —</div>
+  <div class="sub" id="wxClock">LOCAL TIME: —</div>
 
-    <p class="sub" id="wxStatus" style="margin-top:10px;">Awaiting terminal profile…</p>
+  <div class="scrollBox">
+    <div class="tiny"><strong>SCROLL:</strong></div>
+    <div class="scrollText" id="wxScroll">—</div>
+  </div>
+</div>
 
-    <div class="btnrow" style="align-items:stretch; margin-top:10px;">
-      <div class="panel" style="flex:2;margin:0;">
-        <div class="sub" id="wxLoc">LOCATION: —</div>
-        <div class="h1" id="wxNow" style="font-size:18px;margin-top:8px;">NOW: —</div>
-        <div class="sub" id="wxClock" style="margin-top:8px;">LOCAL TIME: —</div>
+<div class="panel" style="margin:0;min-width:220px">
+  <div class="sub">ACTIONS</div>
+  <div class="btnrow" style="margin-top:10px">
+    <a class="btn" href="/weather/">▶ FULL WEATHER</a>
+    <button class="btn ghost" id="wxRefresh">↻ REFRESH</button>
+  </div>
+</div>
+</div>
+</section>
 
-        <div class="scrollBox">
-          <div class="tiny"><strong>SCROLL:</strong></div>
-          <div class="scrollText" id="wxScroll">—</div>
-        </div>
-      </div>
-
-      <div class="panel" style="flex:1;margin:0;min-width:220px;">
-        <div class="sub">ACTIONS</div>
-        <div class="btnrow" style="margin-top:10px;">
-          <a class="btn" href="/weather/">▶ OPEN WEATHER TERMINAL</a>
-          <button class="btn ghost" id="wxRefresh">↻ REFRESH</button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================= MODULES ================= -->
-  <section class="panel">
-    <h2 class="h2" style="color:#ffcc66;">MODULES</h2>
-    <div class="btnrow">
-      <a class="btn" href="/weather/">▶ WEATHER TERMINAL</a>
-      <a class="btn ghost" href="/radio/">▶ WASTELAND RADIO</a>
-      <a class="btn ghost" href="/fanart/">▶ FAN ART VAULT</a>
-      <a class="btn ghost" href="/archive/">▶ ARCHIVE</a>
-    </div>
-  </section>
-
-  <footer class="foot">
-    <span>Unofficial Fallout fan terminal.</span>
-    <span class="dim">Hosted on Netlify.</span>
-  </footer>
+<!-- ===== FOOTER ===== -->
+<footer class="foot">
+  <span>Unofficial Fallout fan terminal.</span>
+  <span class="dim">Hosted on Netlify.</span>
+</footer>
 
 </main>
 
-<!-- ================= NEWS TICKER SCRIPT ================= -->
+<!-- ===== NEWS SCRIPT ===== -->
 <script>
-  const newsTicker = document.getElementById("newsTicker");
-  const newsSource = document.getElementById("newsSource");
-  const newsUpdated = document.getElementById("newsUpdated");
-  const newsLink = document.getElementById("newsLink");
-  const newsRefresh = document.getElementById("newsRefresh");
+const newsTicker=document.getElementById("newsTicker");
+const newsSource=document.getElementById("newsSource");
+const newsUpdated=document.getElementById("newsUpdated");
+const newsLink=document.getElementById("newsLink");
+const newsRefresh=document.getElementById("newsRefresh");
 
-  function stamp(){ return new Date().toLocaleString(); }
+function stamp(){return new Date().toLocaleString()}
 
-  async function loadNews(){
-    newsTicker.textContent = "Loading Fallout headlines…";
-    newsSource.textContent = "—";
-    newsUpdated.textContent = stamp();
-    newsLink.href = "#";
+async function loadNews(){
+  newsTicker.textContent="Loading Fallout headlines…";
+  try{
+    const r=await fetch("/.netlify/functions/fallout-news",{cache:"no-store"});
+    const d=await r.json();
+    if(!r.ok||!d.items?.length) throw new Error("No headlines");
 
-    try{
-      const res = await fetch("/.netlify/functions/fallout-news", { cache:"no-store" });
-      const data = await res.json();
-      const items = (data.items || []).slice(0, 15);
+    const text=d.items.slice(0,15)
+      .map(i=>`${i.source.toUpperCase()} — ${i.title}`)
+      .join("   •   ");
 
-      if (!items.length){
-        newsTicker.textContent = "No Fallout news available.";
-        return;
-      }
+    const clone=newsTicker.cloneNode(true);
+    clone.textContent=text;
+    newsTicker.parentNode.replaceChild(clone,newsTicker);
 
-      const tickerText = items
-        .map(i => `${i.source.toUpperCase()} — ${i.title}`)
-        .join("   •   ");
-
-      const clone = newsTicker.cloneNode(true);
-      clone.textContent = tickerText;
-      newsTicker.parentNode.replaceChild(clone, newsTicker);
-
-      newsSource.textContent = "MULTIPLE SOURCES";
-      newsUpdated.textContent = stamp();
-      newsLink.href = items[0].link || "#";
-
-    }catch{
-      newsTicker.textContent = "News feed offline.";
-    }
+    newsSource.textContent="MULTIPLE SOURCES";
+    newsUpdated.textContent=stamp();
+    newsLink.href=d.items[0].link;
+  }catch(e){
+    newsTicker.textContent="NEWS FEED OFFLINE";
+    newsSource.textContent="SYSTEM";
+    newsUpdated.textContent=stamp();
   }
-
-  newsRefresh.addEventListener("click", loadNews);
-  loadNews();
+}
+newsRefresh.onclick=loadNews;
+loadNews();
 </script>
 
-<!-- ================= WEATHER SCRIPT ================= -->
+<!-- ===== WEATHER SCRIPT ===== -->
 <script>
-  const WX_KEY = "wt_weather_profile_v2";
-  let wxTimer = null;
-  let clockTimer = null;
+const WX_KEY="wt_weather_profile_v2";
+const wxLoc=document.getElementById("wxLoc");
+const wxNow=document.getElementById("wxNow");
+const wxClock=document.getElementById("wxClock");
+const wxScroll=document.getElementById("wxScroll");
+const wxStatus=document.getElementById("wxStatus");
+const wxInput=document.getElementById("wxInput");
 
-  const elStatus = document.getElementById("wxStatus");
-  const elLoc = document.getElementById("wxLoc");
-  const elNow = document.getElementById("wxNow");
-  const elClock = document.getElementById("wxClock");
-  const elScroll = document.getElementById("wxScroll");
+function save(p){localStorage.setItem(WX_KEY,JSON.stringify(p))}
+function load(){try{return JSON.parse(localStorage.getItem(WX_KEY))}catch{return null}}
 
-  const wxInput = document.getElementById("wxInput");
-  const wxRefresh = document.getElementById("wxRefresh");
-  const wxUseMyLoc = document.getElementById("wxUseMyLoc");
-  const wxUseSaved = document.getElementById("wxUseSaved");
+function map(code){
+  if([95,96,99].includes(code))return"RADSTORM";
+  if([61,63,65,80,81,82].includes(code))return"ACID RAIN";
+  if([45,48].includes(code))return"RADCLOUDS";
+  if([71,73,75,77].includes(code))return"ASHFALL";
+  return"CLEAR SKIES";
+}
 
-  function saveProfile(p){ localStorage.setItem(WX_KEY, JSON.stringify(p)); }
-  function loadProfile(){ try{ return JSON.parse(localStorage.getItem(WX_KEY)); }catch{ return null; } }
+async function weather(lat,lon){
+  const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=sunrise,sunset&temperature_unit=fahrenheit&windspeed_unit=mph&timezone=auto`);
+  return r.json();
+}
 
-  function formatTimeInZone(date, tz){
-    return new Intl.DateTimeFormat("en-US",{ timeZone:tz, hour:"numeric", minute:"2-digit", second:"2-digit"}).format(date);
+async function render(p){
+  wxStatus.textContent="Pulling atmospheric data…";
+  const d=await weather(p.latitude,p.longitude);
+  const cw=d.current_weather;
+  wxLoc.textContent="LOCATION: "+p.name;
+  wxNow.textContent=`NOW: ${map(cw.weathercode)} • ${Math.round(cw.temperature)}°F • WIND ${Math.round(cw.windspeed)} MPH`;
+  wxClock.textContent="LOCAL TIME: "+new Date().toLocaleTimeString();
+  wxScroll.textContent=`SUNRISE ${new Date(d.daily.sunrise[0]).toLocaleTimeString()} • SUNSET ${new Date(d.daily.sunset[0]).toLocaleTimeString()}`;
+  wxStatus.textContent="Signal stable.";
+}
+
+wxInput.onkeydown=async e=>{
+  if(e.key==="Enter"){
+    const q=wxInput.value.trim();
+    if(!q)return;
+    wxInput.value="";
+    const g=await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=1&format=json`);
+    const j=await g.json();
+    if(!j.results?.length){wxStatus.textContent="Location not found";return;}
+    const r=j.results[0];
+    const p={name:`${r.name}, ${r.country}`,latitude:r.latitude,longitude:r.longitude};
+    save(p); render(p);
   }
+};
 
-  function startClock(tz){
-    clearInterval(clockTimer);
-    const tick = ()=> elClock.textContent = "LOCAL TIME: " + formatTimeInZone(new Date(), tz);
-    tick(); clockTimer = setInterval(tick, 1000);
-  }
-
-  function moonPhase(){
-    const d = (Date.now()/86400000 + 4.867) % 29.53;
-    return d < 1 ? "NEW MOON" :
-           d < 7 ? "WAXING CRESCENT" :
-           d < 8 ? "FIRST QUARTER" :
-           d < 14 ? "WAXING GIBBOUS" :
-           d < 16 ? "FULL MOON" :
-           d < 22 ? "WANING GIBBOUS" :
-           d < 23 ? "LAST QUARTER" : "WANING CRESCENT";
-  }
-
-  function mapWasteland(code){
-    if ([95,96,99].includes(code)) return "RADSTORM";
-    if ([61,63,65,80,81,82].includes(code)) return "ACID RAIN";
-    if ([45,48].includes(code)) return "RADCLOUDS";
-    if ([71,73,75,77].includes(code)) return "ASHFALL";
-    return "CLEAR SKIES";
-  }
-
-  async function fetchWeather(lat, lon){
-    const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=sunrise,sunset&temperature_unit=fahrenheit&windspeed_unit=mph&timezone=auto`);
-    return r.json();
-  }
-
-  function startScroll(lines){
-    clearInterval(wxTimer);
-    let i = 0;
-    elScroll.textContent = lines[0];
-    wxTimer = setInterval(()=>{
-      i = (i+1)%lines.length;
-      elScroll.textContent = lines[i];
-    }, 7000);
-  }
-
-  async function render(profile){
-    elStatus.textContent = "Pulling atmospheric data…";
-    const d = await fetchWeather(profile.latitude, profile.longitude);
-    const cw = d.current_weather;
-    startClock(d.timezone);
-
-    elLoc.textContent = "LOCATION: " + (profile.name || "SAVED");
-    elNow.textContent = `NOW: ${mapWasteland(cw.weathercode)} • ${Math.round(cw.temperature)}°F • WIND ${Math.round(cw.windspeed)} MPH`;
-    elStatus.textContent = "Signal stable.";
-
-    startScroll([
-      `SUNRISE ${new Date(d.daily.sunrise[0]).toLocaleTimeString()}`,
-      `SUNSET ${new Date(d.daily.sunset[0]).toLocaleTimeString()}`,
-      `MOON PHASE: ${moonPhase()}`
-    ]);
-  }
-
-  async function setByQuery(q){
-    const g = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=1&format=json`);
-    const j = await g.json();
-    if (!j.results?.length) throw "Location not found";
-    const r = j.results[0];
-    const p = { name:`${r.name}, ${r.country}`, latitude:r.latitude, longitude:r.longitude };
-    saveProfile(p);
-    await render(p);
-  }
-
-  wxInput.addEventListener("keydown", e=>{
-    if (e.key==="Enter" && wxInput.value.trim()){
-      setByQuery(wxInput.value.trim()).catch(err=> elStatus.textContent = err);
-      wxInput.value="";
-    }
-  });
-
-  wxUseMyLoc.addEventListener("click", ()=>{
-    navigator.geolocation.getCurrentPosition(p=>{
-      const prof = { name:"LOCAL COORDINATES", latitude:p.coords.latitude, longitude:p.coords.longitude };
-      saveProfile(prof); render(prof);
-    });
-  });
-
-  wxUseSaved.addEventListener("click", ()=> {
-    const p = loadProfile();
-    if (p) render(p);
-  });
-
-  wxRefresh.addEventListener("click", ()=> {
-    const p = loadProfile();
-    if (p) render(p);
-  });
-
-  const init = loadProfile();
-  if (init) render(init);
+const init=load();
+if(init) render(init);
 </script>
 
 </body>
