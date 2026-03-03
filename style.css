@@ -73,3 +73,34 @@ body{
     0 0 18px rgba(141, 255, 176, .18);
   transform: translateY(-1px);
 }
+/* Continuous scrolling news ticker (Fallout style) */
+.tickerTrack {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+
+.tickerScroll {
+  display: inline-block;
+  white-space: nowrap;
+  padding-left: 100%;
+  animation: tickerScroll 45s linear infinite;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  font-weight: 900;
+  color: rgba(141,255,176,.95);
+}
+
+@keyframes tickerScroll {
+  from {
+    transform: translateX(0%);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+/* Pause scroll on hover (nice UX) */
+.tickerTrack:hover .tickerScroll {
+  animation-play-state: paused;
+}
