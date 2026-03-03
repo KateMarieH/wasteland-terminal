@@ -14,10 +14,10 @@
       --amber:#ffcc66;
       --amberDim: rgba(255,204,102,.65);
       --amberBorder: rgba(255,204,102,.55);
-      --panelSoft: rgba(0,0,0,.18);
     }
     .amber { color: var(--amber); }
     .panel.amberBorder { border-color: var(--amberBorder); }
+
     .badge {
       display:inline-block; padding:6px 10px; border-radius:999px;
       border:1px solid rgba(141,255,176,.45);
@@ -232,6 +232,7 @@
         </div>
       </div>
 
+      <!-- Ticker (rotates through extended forecast) -->
       <div class="ticker2">
         <strong>WASTELAND ALERT:</strong>
         <span id="alertText">Stand by…</span>
@@ -323,16 +324,13 @@ const forecastGrid = document.getElementById("forecastGrid");
 const btnMyLoc = document.getElementById("useMyLoc");
 const btnSaved = document.getElementById("useSaved");
 
-const STORAGE_KEY = "wt_weather_profile_v1";
+const STORAGE_KEY = "wt_weather_profile_v2";
 
 let tickerTimer = null;
 let clockTimer = null;
 
 function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
-
-function nowStamp(){
-  return new Date().toLocaleString();
-}
+function nowStamp(){ return new Date().toLocaleString(); }
 
 /* -------- Clock (timezone aware) -------- */
 function formatTimeInZone(date, timeZone) {
@@ -389,13 +387,8 @@ function moonPhaseInfo(date = new Date()) {
   return { name, age: age.toFixed(1), untilFull: Math.round(untilFull) };
 }
 
-/* -------- Fallout condition mapping --------
-   Open-Meteo weathercode reference (WMO):
-   0 clear, 1-3 partly/overcast, 45/48 fog, 51-57 drizzle,
-   61-67 rain, 71-77 snow, 80-82 showers, 95-99 thunderstorm
-*/
+/* -------- Fallout condition mapping -------- */
 function mapToWastelandFromCode(weathercode, tempF, windMph, pop){
-  // pop = precipitation probability max (%) for daily cards (optional)
   let condition = "CALM SKIES";
   let threat = "LOW";
   let detail = "Signal stable. Patrol activity nominal.";
@@ -404,40 +397,31 @@ function mapToWastelandFromCode(weathercode, tempF, windMph, pop){
 
   const windy = windMph >= 25;
 
-  // Thunderstorms -> Radstorm
   if ([95,96,99].includes(weathercode)) {
     condition = "RADSTORM";
     threat = "SEVERE";
     detail = "SEVERE RADIATION. SEEK SHELTER IMMEDIATELY.";
     rads = 85;
     visibility = "POOR";
-  }
-  // Rain/showers -> Acid rain (if heavy probability), otherwise irradiated drizzle
-  else if ([61,63,65,80,81,82].includes(weathercode)) {
+  } else if ([61,63,65,80,81,82].includes(weathercode)) {
     condition = (pop != null && pop >= 60) ? "ACID RAIN" : "TOXIC RAIN";
     threat = "ELEVATED";
     detail = "CORROSIVE PRECIPITATION. PROTECT EQUIPMENT.";
     rads = (pop != null && pop >= 60) ? 40 : 28;
     visibility = "REDUCED";
-  }
-  // Fog -> Radclouds
-  else if ([45,48].includes(weathercode)) {
+  } else if ([45,48].includes(weathercode)) {
     condition = "RADCLOUDS";
     threat = "MODERATE";
     detail = "LOW VISIBILITY. NAVIGATION IMPAIRED.";
     rads = 22;
     visibility = "LOW";
-  }
-  // Snow -> Ashfall / Whiteout
-  else if ([71,73,75,77].includes(weathercode)) {
+  } else if ([71,73,75,77].includes(weathercode)) {
     condition = "ASHFALL";
     threat = "MODERATE";
     detail = "PARTICULATE FALL. FILTER MASK ADVISED.";
     rads = 16;
     visibility = "REDUCED";
-  }
-  // Cloudy -> Broken skies
-  else if ([1,2,3].includes(weathercode)) {
+  } else if ([1,2,3].includes(weathercode)) {
     condition = "BROKEN SKIES";
     threat = "LOW";
     detail = "Cloud cover variable. Maintain watch.";
@@ -445,7 +429,6 @@ function mapToWastelandFromCode(weathercode, tempF, windMph, pop){
     visibility = "FAIR";
   }
 
-  // Wind overlay -> Dust front
   if (windy && threat !== "SEVERE") {
     condition = "DUST FRONT";
     threat = (threat === "LOW") ? "MODERATE" : "ELEVATED";
@@ -454,7 +437,6 @@ function mapToWastelandFromCode(weathercode, tempF, windMph, pop){
     visibility = "REDUCED";
   }
 
-  // Temperature overlays (if calm-ish)
   if (tempF >= 95 && threat !== "SEVERE") {
     condition = "HEAT HAZE";
     threat = (threat === "LOW") ? "MODERATE" : threat;
@@ -471,16 +453,7 @@ function mapToWastelandFromCode(weathercode, tempF, windMph, pop){
   return { condition, threat, detail, rads, visibility };
 }
 
-/* -------- Rotating ticker -------- */
-const FLAVOR_LINES = [
-  "Deathclaw sighting unconfirmed. Maintain perimeter discipline.",
-  "Scavenger activity detected. Secure loose supplies.",
-  "Radroach presence elevated near water sources. Boil before use.",
-  "Signal drift observed. Recalibrating antenna array…",
-  "Brotherhood patrol route intermittent. Do not rely on support.",
-  "Gunfire reported beyond the ridge. Avoid open ground."
-];
-
+/* -------- Rotating ticker (forecast-only) -------- */
 function startRotatingTicker(lines){
   if (tickerTimer) clearInterval(tickerTimer);
   if (!lines || !lines.length) {
@@ -492,7 +465,7 @@ function startRotatingTicker(lines){
   tickerTimer = setInterval(() => {
     i = (i + 1) % lines.length;
     alertEl.textContent = lines[i];
-  }, 4500);
+  }, 7000); // slow rotation
 }
 
 /* -------- API: Geocode + Forecast bundle -------- */
@@ -522,18 +495,15 @@ async function fetchBundle(lat, lon){
 
 /* -------- Render helpers -------- */
 function weekdayShort(yyyy_mm_dd, timeZone){
-  const d = new Date(yyyy_mm_dd + "T12:00:00"); // noon avoids DST edge issues
+  const d = new Date(yyyy_mm_dd + "T12:00:00");
   return new Intl.DateTimeFormat("en-US", { timeZone, weekday:"short" }).format(d);
 }
-
 function safeNum(x){ return (x === null || x === undefined || Number.isNaN(x)) ? null : x; }
 
 function pickNearestHourly(bundle){
-  // We requested humidity + pressure hourly; pick closest to "now" in the location timezone.
   const times = bundle.hourly?.time || [];
   if (!times.length) return { humidity: null, pressure: null };
 
-  // Use bundle.current_weather.time which is in local tz string like "2026-03-02T11:00"
   const target = bundle.current_weather?.time;
   if (!target) return { humidity: null, pressure: null };
 
@@ -545,7 +515,20 @@ function pickNearestHourly(bundle){
   return { humidity, pressure };
 }
 
-function renderForecast(bundle, windMph){
+function renderSunMoon(bundle){
+  const tz = bundle.timezone || "UTC";
+  const sr = bundle.daily.sunrise?.[0];
+  const ss = bundle.daily.sunset?.[0];
+
+  sunriseEl.textContent = sr ? formatTimeInZone(new Date(sr), tz) : "—";
+  sunsetEl.textContent  = ss ? formatTimeInZone(new Date(ss), tz) : "—";
+
+  const moon = moonPhaseInfo(new Date());
+  moonNameEl.textContent = moon.name.toUpperCase();
+  moonDetailEl.textContent = `Full moon in ~${moon.untilFull} days • Age ${moon.age}d`;
+}
+
+function renderForecastCards(bundle, windMph){
   forecastGrid.innerHTML = "";
   const tz = bundle.timezone || "UTC";
 
@@ -569,29 +552,41 @@ function renderForecast(bundle, windMph){
       <div class="fcDay">${weekdayShort(day, tz)} • ${day}</div>
       <div class="fcCond">${mapped.condition}</div>
       <div class="fcTemps">HI ${hi}° / LO ${lo}°</div>
-      <div class="fcPop">${pop === null ? "PRECIP —" : `PRECIP ${pop}%`}</div>
+      <div class="fcPop">${pop === null ? "PRECIP —" : `PRECIP ${Math.round(pop)}%`}</div>
     `;
     forecastGrid.appendChild(card);
   }
 }
 
-function renderSunMoon(bundle){
+function buildForecastTickerLines(bundle, windMph){
   const tz = bundle.timezone || "UTC";
-  const sr = bundle.daily.sunrise?.[0];
-  const ss = bundle.daily.sunset?.[0];
+  const days = bundle.daily.time;
+  const hiArr = bundle.daily.temperature_2m_max;
+  const loArr = bundle.daily.temperature_2m_min;
+  const popArr = bundle.daily.precipitation_probability_max;
+  const codeArr = bundle.daily.weathercode;
 
-  if (sr) sunriseEl.textContent = formatTimeInZone(new Date(sr), tz);
-  else sunriseEl.textContent = "—";
+  const lines = [];
+  for (let i = 0; i < Math.min(7, days.length); i++){
+    const day = days[i];
+    const hi = Math.round(hiArr[i]);
+    const lo = Math.round(loArr[i]);
+    const pop = safeNum(popArr?.[i]);
+    const code = codeArr[i];
 
-  if (ss) sunsetEl.textContent = formatTimeInZone(new Date(ss), tz);
-  else sunsetEl.textContent = "—";
+    const mapped = mapToWastelandFromCode(code, hi, windMph, pop);
+    const dow = weekdayShort(day, tz).toUpperCase();
 
-  const moon = moonPhaseInfo(new Date());
-  moonNameEl.textContent = moon.name.toUpperCase();
-  moonDetailEl.textContent = `Full moon in ~${moon.untilFull} days • Age ${moon.age}d`;
+    const line =
+      `${dow} • ${mapped.condition} • HI ${hi}° LO ${lo}°` +
+      `${pop === null ? "" : ` • PRECIP ${Math.round(pop)}%`}`;
+
+    lines.push(line);
+  }
+  return lines;
 }
 
-/* -------- Main run -------- */
+/* -------- Storage -------- */
 function saveProfile(profile){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
 }
@@ -601,15 +596,13 @@ function loadProfile(){
   try { return JSON.parse(raw); } catch { return null; }
 }
 
+/* -------- Main run -------- */
 async function runByQuery(query){
   status.textContent = "Resolving location…";
   const loc = await geocode(query);
-
   const locLabel = `${loc.name}${loc.admin1 ? ", " + loc.admin1 : ""}${loc.country ? ", " + loc.country : ""}`;
-
   const profile = { name: locLabel, latitude: loc.latitude, longitude: loc.longitude };
   saveProfile(profile);
-
   await runByProfile(profile);
 }
 
@@ -630,34 +623,30 @@ async function runByProfile(profile){
   const humidity = hourly.humidity;
   const pressure = hourly.pressure;
 
-  // Convert to wasteland mapping
-  const mapped = mapToWastelandFromCode(cw.weathercode, tempF, windMph, null);
+  const mappedNow = mapToWastelandFromCode(cw.weathercode, tempF, windMph, null);
 
-  conditionBig.textContent = mapped.condition;
-  badgeThreat.textContent = `THREAT: ${mapped.threat}`;
+  conditionBig.textContent = mappedNow.condition;
+  badgeThreat.textContent = `THREAT: ${mappedNow.threat}`;
   condDetail.textContent = `WMO ${cw.weathercode} • Live conversion active`;
-  radsText.textContent = `${mapped.rads} µSv/h`;
-  radsBar.style.width = clamp(mapped.rads, 0, 100) + "%";
+
+  radsText.textContent = `${mappedNow.rads} µSv/h`;
+  radsBar.style.width = clamp(mappedNow.rads, 0, 100) + "%";
 
   tempEl.textContent = `${tempF}°F`;
   windEl.textContent = `${windMph} mph`;
-  visEl.textContent = mapped.visibility;
+  visEl.textContent = mappedNow.visibility;
   pressEl.textContent = (pressure === null) ? "—" : `${Math.round(pressure)} hPa`;
   humidEl.textContent = (humidity === null) ? "—" : `${Math.round(humidity)}%`;
   updatedEl.textContent = nowStamp();
 
   renderSunMoon(bundle);
-  renderForecast(bundle, windMph);
+  renderForecastCards(bundle, windMph);
 
-  // Build rotating ticker lines (WeatherStar feel)
-  const moon = moonPhaseInfo(new Date());
+  // Ticker = extended forecast rotation (slow)
+  const forecastLines = buildForecastTickerLines(bundle, windMph);
   const tickerLines = [
-    mapped.detail,
-    `Active location: ${profile.name}`,
-    `Temp ${tempF}°F • Wind ${windMph} mph • Threat ${mapped.threat}`,
-    `Sunrise ${sunriseEl.textContent} • Sunset ${sunsetEl.textContent}`,
-    `Moon: ${moon.name} • Full in ~${moon.untilFull} days`,
-    ...FLAVOR_LINES
+    `NOW • ${mappedNow.condition} • ${tempF}°F • WIND ${windMph} MPH • THREAT ${mappedNow.threat}`,
+    ...forecastLines
   ];
   startRotatingTicker(tickerLines);
 }
@@ -666,7 +655,7 @@ async function runByProfile(profile){
 input.addEventListener("keydown", (e) => {
   if (e.key === "Enter" && input.value.trim()){
     runByQuery(input.value.trim()).catch(err => {
-      startRotatingTicker([err.message, ...FLAVOR_LINES]);
+      startRotatingTicker([err.message]);
     });
   }
 });
@@ -674,15 +663,15 @@ input.addEventListener("keydown", (e) => {
 btnSaved.addEventListener("click", () => {
   const p = loadProfile();
   if (!p){
-    startRotatingTicker(["No saved location. Enter city or ZIP.", ...FLAVOR_LINES]);
+    startRotatingTicker(["No saved location. Enter city or ZIP."]);
     return;
   }
-  runByProfile(p).catch(err => startRotatingTicker([err.message, ...FLAVOR_LINES]));
+  runByProfile(p).catch(err => startRotatingTicker([err.message]));
 });
 
 btnMyLoc.addEventListener("click", () => {
   if (!navigator.geolocation){
-    startRotatingTicker(["Auto-location not supported. Enter city or ZIP.", ...FLAVOR_LINES]);
+    startRotatingTicker(["Auto-location not supported. Enter city or ZIP."]);
     return;
   }
   status.textContent = "Scanning local coordinates…";
@@ -696,10 +685,10 @@ btnMyLoc.addEventListener("click", () => {
       saveProfile(profile);
       await runByProfile(profile);
     } catch (e){
-      startRotatingTicker(["Auto-location failed. Enter city or ZIP.", ...FLAVOR_LINES]);
+      startRotatingTicker(["Auto-location failed. Enter city or ZIP."]);
     }
   }, () => {
-    startRotatingTicker(["Location permission denied. Enter city or ZIP.", ...FLAVOR_LINES]);
+    startRotatingTicker(["Location permission denied. Enter city or ZIP."]);
   }, { timeout: 8000 });
 });
 
@@ -707,15 +696,11 @@ btnMyLoc.addEventListener("click", () => {
 (() => {
   const p = loadProfile();
   if (!p) {
-    // start a nice idle ticker
-    startRotatingTicker([
-      "Awaiting location input…",
-      ...FLAVOR_LINES
-    ]);
+    startRotatingTicker(["Awaiting location input…"]);
     return;
   }
   runByProfile(p).catch(() => {
-    startRotatingTicker(["Saved location could not be loaded. Enter city or ZIP.", ...FLAVOR_LINES]);
+    startRotatingTicker(["Saved location could not be loaded. Enter city or ZIP."]);
   });
 })();
 </script>
