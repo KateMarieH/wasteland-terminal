@@ -1,0 +1,8 @@
+[build]
+  publish = "."
+
+[[redirects]]
+  from = "/"
+  to = "/welcome.html"
+  status = 302
+  force = true
