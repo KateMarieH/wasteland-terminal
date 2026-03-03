@@ -11,15 +11,17 @@
   <div class="crt"></div>
 
   <main class="screen" role="main" aria-label="Wasteland Terminal">
+
     <!-- TOP BAR -->
     <header class="block topbar">
       <div class="row between wrap">
-        <div>
+        <div class="topLeft">
           <div class="title">WASTELAND TERMINAL</div>
           <div class="sub">Your personal terminal for weather, news, music, and wastelander oddities.</div>
+
           <div class="kv compactLine">
             <span class="k">USER:</span> <span id="userName">WANDERER</span>
-            <span class="k" style="margin-left:14px;">LOCAL TIME:</span> <span id="localClock">—</span>
+            <span class="k sep">LOCAL TIME:</span> <span id="localClock">—</span>
           </div>
         </div>
 
@@ -30,13 +32,20 @@
           </div>
 
           <div class="row gap wrap topLinks">
-            <a class="btn ghost" href="/support/">[ SUPPORT ]</a>
-            <a class="btn ghost" href="/about/">[ ABOUT ]</a>
+            <a class="btn ghost" href="/support/">[ SPARE SOME CAPS ]</a>
           </div>
         </div>
       </div>
 
-      <!-- Single-page identification prompt -->
+      <!-- TOP MENU (future pages) -->
+      <nav class="topMenu" aria-label="Terminal Navigation">
+        <a class="btn ghost" href="/about/">[ ABOUT ]</a>
+        <a class="btn ghost" href="/mods/">[ MOD SHOWCASE ]</a>
+        <a class="btn ghost" href="/fanart/">[ FAN ART VAULT ]</a>
+        <a class="btn ghost" href="/recs/">[ RECOMMENDATIONS ]</a>
+      </nav>
+
+      <!-- Same-page identification prompt -->
       <div id="loginBar" class="loginBar" aria-live="polite">
         <span class="k">IDENTIFICATION REQUIRED:</span>
         <input id="nameInput" class="input" type="text" placeholder="ENTER CALLSIGN" maxlength="18" />
@@ -85,43 +94,38 @@
           <button class="btn ghost" id="wxUseSaved" type="button">[ USE SAVED ]</button>
         </div>
 
-        <!-- Only shows errors / status; stays hidden when OK -->
+        <!-- only shown on errors / status -->
         <div class="tiny dim" id="wxStatus" style="margin-top:10px; display:none;"></div>
 
         <div class="ruleDots">::::::::::::::::::::::::::::::::</div>
 
         <div class="kv"><span class="k">LOCATION:</span> <span id="wxLoc">—</span></div>
-
-        <!-- Combined Now line -->
         <div class="bigLine" id="wxNow">NOW: —</div>
-
-        <!-- Rotating forecast line (no "SCROLL:" label) -->
         <div class="forecastLine mono" id="wxForecast">—</div>
 
         <div class="row gap wrap" style="margin-top:12px;">
-          <a class="btn" href="/weather/">[ FULL WEATHER ]</a>
           <button class="btn ghost" id="wxRefresh" type="button">[ REFRESH ]</button>
         </div>
       </section>
 
-      <!-- RADIO -->
+      <!-- SIGNALS -->
       <section class="block">
-        <div class="h">&gt; RADIO SIGNAL</div>
+        <div class="h">&gt; SIGNALS</div>
         <div class="ruleSmall">--------------------------------</div>
 
-        <div class="kv"><span class="k">MODE:</span> PRE-WAR TUNES</div>
+        <div class="kv"><span class="k">CHANNEL:</span> PRE-WAR TUNES</div>
         <div class="row gap wrap" style="margin-top:10px;">
           <a class="btn" href="/radio-prewar/">[ PLAY PRE-WAR TUNES ]</a>
         </div>
 
         <div class="ruleDots">::::::::::::::::::::::::::::::::</div>
 
-        <div class="kv"><span class="k">MODE:</span> SLEEPY AMBIENT / WASTELAND CAM</div>
+        <div class="kv"><span class="k">CHANNEL:</span> WASTELAND WEBCAM</div>
         <div class="kv dim" style="margin-top:6px;">SOURCE: THE MYSTIC BROADCAST</div>
 
         <div class="row gap wrap" style="margin-top:10px;">
-          <a class="btn" href="/radio/">[ OPEN AMBIENT TERMINAL ]</a>
-          <!-- replace this with your channel URL -->
+          <a class="btn" href="/webcam/">[ OPEN WEBCAM ]</a>
+          <!-- replace with your real channel link -->
           <a class="btn ghost" href="https://www.youtube.com/" target="_blank" rel="noopener">[ OPEN YOUTUBE ]</a>
         </div>
       </section>
@@ -130,13 +134,12 @@
 
     <footer class="foot">
       <div class="rule">==============================================</div>
-      <div class="tiny dim">
-        Unofficial Fallout fan terminal, built and managed by Lady Mystic.
-      </div>
+      <div class="tiny dim">Unofficial Fallout fan terminal, built and managed by Lady Mystic.</div>
     </footer>
+
   </main>
 
-  <!-- ================= USER NAME (same page) ================= -->
+  <!-- ================= USER NAME ================= -->
   <script>
     const USER_KEY = "wt_user_name_v2";
     const userNameEl = document.getElementById("userName");
@@ -147,8 +150,7 @@
     const clockEl = document.getElementById("localClock");
 
     function cleanName(s){
-      return (s || "")
-        .trim()
+      return (s || "").trim()
         .replace(/[^\w\s\-']/g, "")
         .replace(/\s+/g, " ")
         .slice(0, 18);
@@ -176,16 +178,11 @@
     }
 
     applyName(localStorage.getItem(USER_KEY) || "");
-
     nameConfirm.addEventListener("click", () => setName(nameInput.value));
-    nameInput.addEventListener("keydown", (e) => {
-      if(e.key === "Enter") setName(nameInput.value);
-    });
+    nameInput.addEventListener("keydown", (e) => { if(e.key==="Enter") setName(nameInput.value); });
     nameSkip.addEventListener("click", () => setName(""));
 
-    function tick(){
-      clockEl.textContent = new Date().toLocaleString();
-    }
+    function tick(){ clockEl.textContent = new Date().toLocaleString(); }
     setInterval(tick, 1000);
     tick();
   </script>
@@ -227,6 +224,7 @@
       let i = 0;
       newsTicker.style.opacity = 1;
       newsTicker.textContent = "";
+
       typingTimer = setInterval(() => {
         i++;
         newsTicker.textContent = fullText.slice(0, i);
@@ -245,6 +243,7 @@
 
     function startCycle(){
       clearTimers();
+
       if (!headlines.length){
         newsTicker.textContent = "NO HEADLINES AVAILABLE";
         newsSource.textContent = "—";
@@ -282,6 +281,7 @@
         const r = await fetch("/.netlify/functions/fallout-news", { cache:"no-store" });
         const d = await r.json();
         if (!r.ok || !d.items?.length) throw new Error(d.error || "No headlines");
+
         headlines = d.items.slice(0, 12);
         idx = 0;
         startCycle();
@@ -374,10 +374,7 @@
       catch{ return ""; }
     }
 
-    function stopRotate(){
-      if(rotateTimer) clearInterval(rotateTimer);
-      rotateTimer = null;
-    }
+    function stopRotate(){ if(rotateTimer) clearInterval(rotateTimer); rotateTimer=null; }
 
     function startRotate(lines){
       stopRotate();
@@ -389,7 +386,7 @@
       rotateTimer = setInterval(() => {
         rotateIdx = (rotateIdx + 1) % rotateLines.length;
         wxForecast.textContent = rotateLines[rotateIdx];
-      }, 6500); // slow rotate
+      }, 6500);
     }
 
     async function render(profile){
@@ -402,11 +399,9 @@
 
         wxLoc.textContent = profile.name;
 
-        // Combined NOW line
         wxNow.textContent =
           `NOW: ${mapWasteland(cw.weathercode)} • ${Math.round(cw.temperature)}°F • WIND ${Math.round(cw.windspeed)} MPH`;
 
-        // Build rotating forecast lines (no "SCROLL:" label)
         const sunrise = d.daily?.sunrise?.[0];
         const sunset  = d.daily?.sunset?.[0];
 
@@ -423,7 +418,7 @@
         }
 
         startRotate(lines);
-        showStatus(""); // hide status when OK
+        showStatus("");
       }catch(e){
         showStatus("Weather feed offline.");
         stopRotate();
@@ -438,53 +433,38 @@
       showStatus("Searching location…");
 
       const p = await geocodeName(q);
-      if(!p){
-        showStatus("Location not found.");
-        return;
-      }
+      if(!p){ showStatus("Location not found."); return; }
+
       saveProfile(p);
       render(p);
     });
 
     wxUseSaved?.addEventListener("click", () => {
       const p = loadProfile();
-      if(!p){
-        showStatus("No saved location.");
-        return;
-      }
+      if(!p){ showStatus("No saved location."); return; }
       render(p);
     });
 
     wxUseMyLoc?.addEventListener("click", () => {
-      if(!navigator.geolocation){
-        showStatus("Geolocation not supported.");
-        return;
-      }
+      if(!navigator.geolocation){ showStatus("Geolocation not supported."); return; }
       showStatus("Requesting device location…");
+
       navigator.geolocation.getCurrentPosition((pos) => {
-        const p = {
-          name: "DEVICE LOCATION",
-          latitude: pos.coords.latitude,
-          longitude: pos.coords.longitude
-        };
+        const p = { name:"DEVICE LOCATION", latitude:pos.coords.latitude, longitude:pos.coords.longitude };
         saveProfile(p);
         render(p);
-      }, () => {
-        showStatus("Permission denied.");
-      }, { enableHighAccuracy:false, timeout:8000 });
+      }, () => showStatus("Permission denied."), { enableHighAccuracy:false, timeout:8000 });
     });
 
     wxRefresh?.addEventListener("click", () => {
       const p = loadProfile();
-      if(!p){
-        showStatus("No saved location.");
-        return;
-      }
+      if(!p){ showStatus("No saved location."); return; }
       render(p);
     });
 
     const init = loadProfile();
     if(init) render(init);
   </script>
+
 </body>
 </html>
