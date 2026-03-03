@@ -116,8 +116,8 @@
         <div class="h">&gt; SIGNALS</div>
         <div class="ruleSmall">--------------------------------</div>
 
-        <!-- PRE-WAR TUNES + LIVE STREAM INFO -->
-        <div class="kv"><span class="k">CHANNEL:</span> PRE-WAR TUNES</div>
+        <!-- PRE-WAR RADIO -->
+        <div class="kv"><span class="k">CHANNEL:</span> PRE-WAR RADIO</div>
 
         <div class="ruleDots">::::::::::::::::::::::::::::::::</div>
 
@@ -141,12 +141,17 @@
           <span class="cc_streaminfo" data-type="maxlisteners" data-username="themysti">—</span>
         </div>
 
-        <div class="row gap wrap" style="margin-top:12px;">
-          <a class="btn"
-             href="https://radio.shoutcheap.com/tunein/themysti.pls"
-             target="_blank"
-             rel="noopener">[ TUNE IN ]</a>
+        <!-- Embedded player (no ugly controls) -->
+        <div class="radioControls">
+          <button class="btn" id="radioPlay" type="button">[ PLAY RADIO ]</button>
+          <button class="btn ghost" id="radioStop" type="button">[ STOP ]</button>
         </div>
+
+        <audio
+          id="radioPlayer"
+          src="https://radio.shoutcheap.com/proxy/themysti/stream"
+          preload="none">
+        </audio>
 
         <div class="ruleDots">::::::::::::::::::::::::::::::::</div>
 
@@ -163,7 +168,7 @@
           <a class="btn ghost"
              href="https://www.youtube.com/@themysticbroadcast"
              target="_blank"
-             rel="noopener">[ PAST LIVE STREAMS ]</a>
+             rel="noopener">[ OPEN YOUTUBE ]</a>
         </div>
       </section>
 
@@ -501,6 +506,41 @@
 
     const init = loadProfile();
     if(init) render(init);
+  </script>
+
+  <!-- ================= EMBEDDED RADIO CONTROLS ================= -->
+  <script>
+    const radio = document.getElementById("radioPlayer");
+    const playBtn = document.getElementById("radioPlay");
+    const stopBtn = document.getElementById("radioStop");
+
+    function setPlayLabelPlaying(){
+      playBtn.textContent = "[ SIGNAL LOCKED ]";
+      playBtn.classList.add("isPlaying");
+    }
+    function setPlayLabelStopped(){
+      playBtn.textContent = "[ PLAY RADIO ]";
+      playBtn.classList.remove("isPlaying");
+    }
+
+    playBtn.addEventListener("click", async () => {
+      try{
+        await radio.play();
+        setPlayLabelPlaying();
+      }catch(e){
+        playBtn.textContent = "[ CLICK TO ENABLE AUDIO ]";
+      }
+    });
+
+    stopBtn.addEventListener("click", () => {
+      radio.pause();
+      try{ radio.currentTime = 0; }catch(e){}
+      setPlayLabelStopped();
+    });
+
+    radio.addEventListener("pause", setPlayLabelStopped);
+    radio.addEventListener("ended", setPlayLabelStopped);
+    radio.addEventListener("playing", setPlayLabelPlaying);
   </script>
 
   <!-- ================= STREAM INFO WIDGET (Shoutcheap) ================= -->
