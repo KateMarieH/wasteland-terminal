@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Weather Terminal • Wasteland Terminal</title>
+  <link rel="stylesheet" href="../style.css" />
+
+  <style>
+    /* Amber + Green accents */
+    .accent-amber { color: #ffcc66; }
+    .border-amber { border-color: rgba(255,204,102,0.6); }
+    .glow-amber { text-shadow: 0 0 10px rgba(255,204,102,0.6); }
+  </style>
+</head>
+
+<body>
+  <div class="crt"></div>
+
+  <main class="wrap">
+
+    <!-- HEADER -->
+    <header class="panel top border-amber">
+      <div>
+        <h1 class="h1 glow-amber">WEATHER TERMINAL</h1>
+        <p class="sub">Real-world conditions translated into wasteland threats.</p>
+      </div>
+      <div class="sys">
+        <a class="btn ghost" href="/">◀ HOME</a>
+      </div>
+    </header>
+
+    <!-- LOCATION INPUT -->
+    <section class="panel">
+      <h2 class="h2 accent-amber">LOCATION INPUT</h2>
+      <input
+        id="locationInput"
+        class="input"
+        placeholder="Enter city or ZIP and press Enter"
+      />
+      <p class="sub" id="locationStatus">Awaiting coordinates…</p>
+    </section>
+
+    <!-- READOUT -->
+    <section class="panel">
+      <h2 class="h2 accent-amber">ATMOSPHERIC READOUT</h2>
+
+      <div class="btnrow">
+        <div class="panel" style="flex:1">
+          <div class="sub">CONDITION</div>
+          <div class="h1" id="condition">—</div>
+        </div>
+        <div class="panel" style="flex:1">
+          <div class="sub">TEMPERATURE</div>
+          <div class="h1" id="temp">—</div>
+        </div>
+        <div class="panel" style="flex:1">
+          <div class="sub">WIND</div>
+          <div class="h1" id="wind">—</div>
+        </div>
+      </div>
+
+      <div class="panel ticker border-amber" style="margin-top:14px">
+        <strong class="accent-amber">WASTELAND ALERT:</strong>
+        <span id="alertText">Stand by…</span>
+      </div>
+    </section>
+
+  </main>
+
+<script>
+/* ---------------------------
+   WEATHER TERMINAL LOGIC
+   --------------------------- */
+
+const input = document.getElementById("locationInput");
+const status = document.getElementById("locationStatus");
+const conditionEl = document.getElementById("condition");
+const tempEl = document.getElementById("temp");
+const windEl = document.getElementById("wind");
+const alertEl = document.getElementById("alertText");
+
+const STORAGE_KEY = "wt_weather_location";
+
+/* Fallout-style mapping */
+function mapToWasteland(weather) {
+  const { weathercode, temperature, windspeed } = weather;
+
+  let condition = "CALM SKIES";
+  let alert = "Signal stable. Patrol activity nominal.";
+
+  if ([95,96,99].includes(weathercode)) {
+    condition = "RADSTORM DETECTED";
+    alert = "SEVERE RADIATION. SEEK IMMEDIATE SHELTER.";
+  } else if ([61,63,65,80,81,82].includes(weathercode)) {
+    condition = "ACID RAIN";
+    alert = "CORROSIVE PRECIPITATION. PROTECT EQUIPMENT.";
+  } else if ([45,48].includes(weathercode)) {
+    condition = "RADCLOUDS";
+    alert = "LOW VISIBILITY. NAVIGATION IMPAIRED.";
+  } else if (windspeed > 35) {
+    condition = "DUST FRONT";
+    alert = "HIGH WINDS. AIRBORNE DEBRIS HAZARD.";
+  } else if (temperature >= 32) {
+    condition = "HEAT HAZE";
+    alert = "EXTREME HEAT. HYDRATION ADVISED.";
+  } else if (temperature <= 0) {
+    condition = "FROST WARNING";
+    alert = "SUBZERO CONDITIONS. REDUCED MOBILITY.";
+  }
+
+  return { condition, alert };
+}
+
+async function geocodeLocation(query) {
+  const res = await fetch(
+    `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=1`
+  );
+  const data = await res.json();
+  if (!data.results) throw new Error("Location not found");
+  return data.results[0];
+}
+
+async function fetchWeather(lat, lon) {
+  const res = await fetch(
+    `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`
+  );
+  const data = await res.json();
+  return data.current_weather;
+}
+
+async function run(query) {
+  status.textContent = "Resolving location…";
+
+  const loc = await geocodeLocation(query);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(loc));
+
+  status.textContent = `ACTIVE: ${loc.name}, ${loc.country}`;
+  const weather = await fetchWeather(loc.latitude, loc.longitude);
+
+  const mapped = mapToWasteland(weather);
+
+  conditionEl.textContent = mapped.condition;
+  tempEl.textContent = Math.round(weather.temperature) + "°C";
+  windEl.textContent = Math.round(weather.windspeed) + " km/h";
+  alertEl.textContent = mapped.alert;
+}
+
+/* Input handling */
+input.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && input.value.trim()) {
+    run(input.value.trim()).catch(err => {
+      alertEl.textContent = err.message;
+    });
+  }
+});
+
+/* Auto-load last location */
+const saved = localStorage.getItem(STORAGE_KEY);
+if (saved) {
+  const loc = JSON.parse(saved);
+  run(loc.name).catch(() => {});
+}
+</script>
+
+</body>
+</html>
