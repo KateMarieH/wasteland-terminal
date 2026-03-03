@@ -5,15 +5,77 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Wasteland Terminal</title>
   <link rel="stylesheet" href="style.css" />
+
+  <style>
+    /* small homepage-only tweaks */
+    .heroTitle{
+      margin:0;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      font-size: 22px;
+    }
+    .heroTag{
+      margin:.6rem 0 0;
+      color: rgba(141,255,176,.75);
+      letter-spacing:.06em;
+      line-height: 1.4;
+    }
+    .monoStrong{
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    /* News ticker */
+    .tickerBox{
+      border: 1px solid rgba(141,255,176,.35);
+      border-radius: 14px;
+      padding: 12px 14px;
+      background: rgba(0,0,0,.18);
+      box-shadow: 0 0 18px rgba(141,255,176,.10);
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+    }
+    .tickerLabel{
+      white-space:nowrap;
+      color: rgba(255,204,102,.85);
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      font-weight: 900;
+    }
+    .tickerText{
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      font-weight: 900;
+      color: rgba(141,255,176,.95);
+    }
+    .tiny{
+      font-size: 12px;
+      color: rgba(141,255,176,.65);
+    }
+    .split{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:stretch;
+    }
+    .split > .panel{ flex:1; min-width: 260px; }
+  </style>
 </head>
+
 <body>
   <div class="crt"></div>
 
   <main class="wrap">
+
+    <!-- HERO -->
     <header class="panel top">
       <div>
-        <h1 class="h1">WASTELAND TERMINAL</h1>
-        <p class="sub">A personal dashboard for weather, signals, and field intel.</p>
+        <h1 class="heroTitle">WASTELAND TERMINAL</h1>
+        <p class="heroTag">
+          <span class="monoStrong">Your personal terminal</span> for weather, news, music, and wastelander oddities.
+        </p>
       </div>
       <div class="sys">
         <div class="k">SYSTEM</div>
@@ -21,25 +83,295 @@
       </div>
     </header>
 
+    <!-- FALLOUT NEWS SCROLLER -->
     <section class="panel">
-      <h2 class="h2">MODULES</h2>
-      <div class="btnrow">
-        <a class="btn" href="/weather/">▶ WEATHER TERMINAL</a>
-        <a class="btn ghost" href="/headlines/">▶ FALLOUT HEADLINES</a>
-        <a class="btn ghost" href="/radio/">▶ WASTELAND RADIO</a>
-        <a class="btn ghost" href="/archive/">▶ ARCHIVE</a>
+      <h2 class="h2" style="color:#ffcc66;">FALLOUT HEADLINES</h2>
+
+      <div class="tickerBox" style="margin-top:10px;">
+        <div class="tickerLabel">NEWS:</div>
+        <div class="tickerText" id="newsTicker">Loading feeds…</div>
+      </div>
+
+      <div class="split" style="margin-top:12px;">
+        <div class="panel" style="margin:0;">
+          <div class="tiny">SOURCE</div>
+          <div class="monoStrong" id="newsSource">—</div>
+        </div>
+        <div class="panel" style="margin:0;">
+          <div class="tiny">LAST UPDATE</div>
+          <div class="monoStrong" id="newsUpdated">—</div>
+        </div>
+        <div class="panel" style="margin:0;">
+          <div class="tiny">OPEN</div>
+          <a class="btn ghost" id="newsLink" href="#" target="_blank" rel="noopener">▶ VIEW STORY</a>
+        </div>
+      </div>
+
+      <p class="tiny" style="margin-top:10px;">
+        This will scroll through Fallout-related headlines (we’ll plug in real RSS feeds next).
+      </p>
+    </section>
+
+    <!-- WEATHER WIDGET -->
+    <section class="panel" id="wxWidget">
+      <h2 class="h2">WEATHER WIDGET</h2>
+
+      <div class="btnrow" style="align-items:stretch;">
+        <div class="panel" style="flex:2;margin:0;">
+          <div class="sub" id="wxLoc">LOCATION: —</div>
+          <div class="h1" id="wxNow" style="font-size:18px;margin-top:8px;">NOW: —</div>
+          <div class="sub" id="wxClock" style="margin-top:8px;">LOCAL TIME: —</div>
+
+          <div class="panel" style="margin-top:12px;">
+            <div class="tiny"><strong>SCROLL:</strong></div>
+            <div id="wxScroll" style="margin-top:6px;letter-spacing:.08em;text-transform:uppercase;font-weight:900;">
+              Awaiting terminal profile…
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" style="flex:1;margin:0;min-width:220px;">
+          <div class="sub">ACTIONS</div>
+          <div class="btnrow" style="margin-top:10px;">
+            <a class="btn" href="/weather/">▶ OPEN WEATHER</a>
+            <button class="btn ghost" id="wxRefresh" type="button">↻ REFRESH</button>
+          </div>
+
+          <div class="panel" style="margin-top:12px;">
+            <div class="tiny">TIP</div>
+            <div class="tiny" style="margin-top:6px;">
+              Set your location once in the Weather Terminal. This widget will follow it.
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section class="panel ticker">
-      <strong>WASTELAND ALERTS:</strong>
-      <span>Signal stable. Patrol activity nominal. Radstorm probability: low.</span>
+    <!-- MODULES (for later) -->
+    <section class="panel">
+      <h2 class="h2" style="color:#ffcc66;">MODULES</h2>
+      <div class="btnrow">
+        <a class="btn" href="/weather/">▶ WEATHER TERMINAL</a>
+        <a class="btn ghost" href="/radio/">▶ WASTELAND RADIO</a>
+        <a class="btn ghost" href="/fanart/">▶ FAN ART VAULT</a>
+        <a class="btn ghost" href="/archive/">▶ ARCHIVE</a>
+      </div>
+      <p class="tiny" style="margin-top:10px;">
+        Next: we’ll build Radio + Fan Art + more modules without cluttering the homepage.
+      </p>
     </section>
 
     <footer class="foot">
       <span>Unofficial Fallout fan terminal.</span>
       <span class="dim">Hosted on Netlify.</span>
     </footer>
+
   </main>
+
+  <!-- =========================
+       NEWS TICKER (placeholder)
+       We’ll swap this to real RSS
+       ========================= -->
+  <script>
+    // For now: fake rotating headlines so the UI is alive.
+    // Next step: replace with a real RSS proxy via Netlify Function.
+    const demoNews = [
+      { title: "Bethesda transmission detected… standby for intel.", source: "SYSTEM", url: "#" },
+      { title: "Wasteland rumor: vault door activity reported.", source: "FIELD", url: "#" },
+      { title: "Enclave chatter intercepted. Verify authenticity.", source: "RELAY", url: "#" },
+      { title: "New radio signal discovered. Frequency unstable.", source: "RADIO", url: "#" }
+    ];
+
+    const newsTicker = document.getElementById("newsTicker");
+    const newsSource = document.getElementById("newsSource");
+    const newsUpdated = document.getElementById("newsUpdated");
+    const newsLink = document.getElementById("newsLink");
+
+    let ni = 0;
+    function stamp(){ return new Date().toLocaleString(); }
+
+    function rotateNews(){
+      const item = demoNews[ni];
+      newsTicker.textContent = item.title;
+      newsSource.textContent = item.source;
+      newsUpdated.textContent = stamp();
+      newsLink.href = item.url;
+      ni = (ni + 1) % demoNews.length;
+    }
+    rotateNews();
+    setInterval(rotateNews, 6500);
+  </script>
+
+  <!-- =========================
+       HOMEPAGE WEATHER WIDGET
+       ========================= -->
+  <script>
+    const WX_KEY = "wt_weather_profile_v2"; // must match your /weather/ page
+    let wxTimer = null;
+    let clockTimer = null;
+
+    const elLoc = document.getElementById("wxLoc");
+    const elNow = document.getElementById("wxNow");
+    const elClock = document.getElementById("wxClock");
+    const elScroll = document.getElementById("wxScroll");
+    const btnRefresh = document.getElementById("wxRefresh");
+
+    function safeJSON(raw){ try { return JSON.parse(raw); } catch { return null; } }
+
+    function formatTimeInZone(date, timeZone) {
+      return new Intl.DateTimeFormat("en-US", {
+        timeZone,
+        hour: "numeric",
+        minute: "2-digit",
+        second: "2-digit"
+      }).format(date);
+    }
+
+    function startClock(timeZone){
+      if (clockTimer) clearInterval(clockTimer);
+      const tick = () => {
+        const now = new Date();
+        elClock.textContent = "LOCAL TIME: " + formatTimeInZone(now, timeZone);
+      };
+      tick();
+      clockTimer = setInterval(tick, 1000);
+    }
+
+    function moonPhaseInfo(date = new Date()) {
+      const synodicMonth = 29.53058867;
+      const knownNewMoon = new Date(Date.UTC(2000, 0, 6, 18, 14, 0));
+      const days = (date - knownNewMoon) / 86400000;
+      const age = ((days % synodicMonth) + synodicMonth) % synodicMonth;
+      const pct = age / synodicMonth;
+
+      let name = "New Moon";
+      if (pct < 0.03 || pct > 0.97) name = "New Moon";
+      else if (pct < 0.22) name = "Waxing Crescent";
+      else if (pct < 0.28) name = "First Quarter";
+      else if (pct < 0.47) name = "Waxing Gibbous";
+      else if (pct < 0.53) name = "Full Moon";
+      else if (pct < 0.72) name = "Waning Gibbous";
+      else if (pct < 0.78) name = "Last Quarter";
+      else name = "Waning Crescent";
+
+      const fullTarget = synodicMonth * 0.5;
+      let untilFull = fullTarget - age;
+      if (untilFull < 0) untilFull += synodicMonth;
+
+      return { name, untilFull: Math.round(untilFull) };
+    }
+
+    function mapToWastelandFromCode(weathercode, tempF, windMph, pop){
+      let condition = "CALM SKIES";
+      let threat = "LOW";
+      const windy = windMph >= 25;
+
+      if ([95,96,99].includes(weathercode)) { condition = "RADSTORM"; threat = "SEVERE"; }
+      else if ([61,63,65,80,81,82].includes(weathercode)) { condition = (pop != null && pop >= 60) ? "ACID RAIN" : "TOXIC RAIN"; threat = "ELEVATED"; }
+      else if ([45,48].includes(weathercode)) { condition = "RADCLOUDS"; threat = "MODERATE"; }
+      else if ([71,73,75,77].includes(weathercode)) { condition = "ASHFALL"; threat = "MODERATE"; }
+      else if ([1,2,3].includes(weathercode)) { condition = "BROKEN SKIES"; threat = "LOW"; }
+
+      if (windy && threat !== "SEVERE") { condition = "DUST FRONT"; threat = (threat === "LOW") ? "MODERATE" : "ELEVATED"; }
+      if (tempF >= 95 && threat !== "SEVERE") { condition = "HEAT HAZE"; threat = (threat === "LOW") ? "MODERATE" : threat; }
+      if (tempF <= 32 && threat !== "SEVERE") { condition = "FROST WARNING"; threat = (threat === "LOW") ? "MODERATE" : threat; }
+
+      return { condition, threat };
+    }
+
+    async function fetchBundle(lat, lon){
+      const url =
+        `https://api.open-meteo.com/v1/forecast` +
+        `?latitude=${lat}&longitude=${lon}` +
+        `&current_weather=true` +
+        `&temperature_unit=fahrenheit&windspeed_unit=mph` +
+        `&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode,sunrise,sunset` +
+        `&timezone=auto`;
+
+      const res = await fetch(url);
+      const data = await res.json();
+      if (!data.current_weather) throw new Error("Weather unavailable");
+      return data;
+    }
+
+    function weekdayShort(yyyy_mm_dd, timeZone){
+      const d = new Date(yyyy_mm_dd + "T12:00:00");
+      return new Intl.DateTimeFormat("en-US", { timeZone, weekday:"short" }).format(d);
+    }
+
+    function startScroller(lines){
+      if (wxTimer) clearInterval(wxTimer);
+      if (!lines || !lines.length){
+        elScroll.textContent = "—";
+        return;
+      }
+      let i = 0;
+      elScroll.textContent = lines[0];
+      wxTimer = setInterval(() => {
+        i = (i + 1) % lines.length;
+        elScroll.textContent = lines[i];
+      }, 7000);
+    }
+
+    async function loadWidget(){
+      const raw = localStorage.getItem(WX_KEY);
+      const profile = raw ? safeJSON(raw) : null;
+
+      if (!profile || !profile.latitude || !profile.longitude){
+        elLoc.textContent = "LOCATION: —";
+        elNow.textContent = "NOW: —";
+        elScroll.textContent = "Set location in /weather/ first.";
+        elClock.textContent = "LOCAL TIME: —";
+        return;
+      }
+
+      elLoc.textContent = "LOCATION: " + (profile.name || "SAVED");
+
+      const bundle = await fetchBundle(profile.latitude, profile.longitude);
+      const tz = bundle.timezone || "UTC";
+      startClock(tz);
+
+      const cw = bundle.current_weather;
+      const tempF = Math.round(cw.temperature);
+      const windMph = Math.round(cw.windspeed);
+
+      const nowMapped = mapToWastelandFromCode(cw.weathercode, tempF, windMph, null);
+      elNow.textContent = `NOW: ${nowMapped.condition} • ${tempF}°F • WIND ${windMph} MPH • THREAT ${nowMapped.threat}`;
+
+      const moon = moonPhaseInfo(new Date());
+      const sr = bundle.daily.sunrise?.[0] ? formatTimeInZone(new Date(bundle.daily.sunrise[0]), tz) : "—";
+      const ss = bundle.daily.sunset?.[0] ? formatTimeInZone(new Date(bundle.daily.sunset[0]), tz) : "—";
+
+      const lines = [];
+      lines.push(`SUNRISE ${sr} • SUNSET ${ss}`);
+      lines.push(`MOON ${moon.name.toUpperCase()} • FULL IN ~${moon.untilFull} DAYS`);
+
+      const days = bundle.daily.time || [];
+      for (let i = 0; i < Math.min(7, days.length); i++){
+        const day = days[i];
+        const hi = Math.round(bundle.daily.temperature_2m_max[i]);
+        const lo = Math.round(bundle.daily.temperature_2m_min[i]);
+        const pop = bundle.daily.precipitation_probability_max?.[i];
+        const code = bundle.daily.weathercode[i];
+
+        const mapped = mapToWastelandFromCode(code, hi, windMph, pop);
+        const dow = weekdayShort(day, tz).toUpperCase();
+        lines.push(`${dow} • ${mapped.condition} • HI ${hi}° LO ${lo}°${pop != null ? ` • PRECIP ${Math.round(pop)}%` : ""}`);
+      }
+
+      startScroller(lines);
+    }
+
+    btnRefresh?.addEventListener("click", () => {
+      loadWidget().catch(() => {
+        elScroll.textContent = "Refresh failed. Open /weather/ to reset.";
+      });
+    });
+
+    loadWidget().catch(() => {
+      elScroll.textContent = "Weather widget offline. Open /weather/ to reset.";
+    });
+  </script>
+
 </body>
 </html>
