@@ -1,106 +1,277 @@
+/* =========================================================
+   WASTELAND TERMINAL — FULL STYLE.CSS
+   Blocky / vintage terminal look (amber + green)
+   ========================================================= */
+
 :root{
-  --bg:#06130c;
-  --bg2:#040e08;
-  --text:#8dffb0;
-  --dim: rgba(141,255,176,.7);
-  --border: rgba(141,255,176,.45);
-  --radius: 14px;
-  --font: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+  --bg: #050806;
+  --panel: rgba(0,0,0,.55);
+  --panel2: rgba(0,0,0,.35);
+
+  --green: rgba(141,255,176,.95);
+  --greenDim: rgba(141,255,176,.70);
+  --greenSoft: rgba(141,255,176,.25);
+
+  --amber: rgba(255,204,102,.92);
+  --amberDim: rgba(255,204,102,.70);
+  --amberSoft: rgba(255,204,102,.25);
+
+  --border: rgba(141,255,176,.35);
+  --borderHard: rgba(141,255,176,.60);
+
+  --shadow: 0 0 18px rgba(141,255,176,.10);
 }
+
+/* ===== RESET / BASE ===== */
 *{ box-sizing:border-box; }
+html,body{ height:100%; }
 body{
   margin:0;
-  background: radial-gradient(1200px 900px at 30% 10%, rgba(141,255,176,.08), transparent 55%),
-              linear-gradient(to bottom, var(--bg), var(--bg2));
-  color: var(--text);
-  font-family: var(--font);
-}
-.wrap{ max-width: 980px; margin: 0 auto; padding: 18px; }
-.panel{
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 14px;
-  background: rgba(0,0,0,.14);
-  margin-top: 14px;
-  box-shadow: 0 0 18px rgba(141,255,176,.10);
-}
-.top{ display:flex; justify-content:space-between; gap:14px; align-items:flex-start; }
-.h1{ margin:0; letter-spacing:.12em; text-transform:uppercase; font-size:22px; }
-.sub{ margin:.5rem 0 0; color: var(--dim); }
-.sys .k{ color: var(--dim); font-size: 12px; letter-spacing:.14em; text-transform:uppercase; }
-.sys .v{ font-weight: 900; letter-spacing:.12em; text-transform:uppercase; }
-.h2{ margin:0 0 10px; letter-spacing:.12em; font-size: 14px; text-transform:uppercase; }
-.btnrow{ display:flex; gap:10px; flex-wrap:wrap; }
-.btn{
-  display:inline-block;
-  border: 1px solid rgba(141,255,176,.8);
-  padding: 10px 12px;
-  border-radius: 12px;
-  color: var(--text);
-  text-decoration:none;
-  font-weight: 900;
+  background: radial-gradient(1200px 800px at 15% 0%, rgba(141,255,176,.08), transparent 55%),
+              radial-gradient(1000px 700px at 90% 20%, rgba(255,204,102,.06), transparent 55%),
+              var(--bg);
+  color: var(--green);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
   letter-spacing:.06em;
-  text-transform:uppercase;
-}
-.btn.ghost{ border-color: rgba(141,255,176,.35); color: rgba(141,255,176,.85); }
-.ticker{ display:flex; gap:10px; align-items:flex-start; }
-.foot{ margin-top: 14px; display:flex; justify-content:space-between; color: var(--dim); font-size: 12px; flex-wrap:wrap; gap:10px; }
-.dim{ color: rgba(141,255,176,.55); }
-.crt{
-  position:fixed; inset:0; pointer-events:none;
-  background: repeating-linear-gradient(to bottom, rgba(255,255,255,.02), rgba(255,255,255,.02) 1px, rgba(0,0,0,0) 3px, rgba(0,0,0,0) 6px);
-  opacity:.45;
-}
-/* Fallout terminal hover glow */
-.btn, .btn.ghost, .btnSmall {
-  transition: transform .08s ease, box-shadow .12s ease, border-color .12s ease, background-color .12s ease, color .12s ease;
 }
 
-.btn:hover, .btnSmall:hover {
-  border-color: rgba(180, 255, 205, .85);
-  background: rgba(141, 255, 176, .12);
-  box-shadow:
-    0 0 0 1px rgba(180, 255, 205, .20),
-    0 0 22px rgba(141, 255, 176, .22);
-  transform: translateY(-1px);
+/* ===== CRT OVERLAY ===== */
+.crt{ position:fixed; inset:0; pointer-events:none; z-index:2; }
+.crt::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.028),
+      rgba(255,255,255,0.028) 1px,
+      rgba(0,0,0,0) 2px,
+      rgba(0,0,0,0) 4px
+    );
+  mix-blend-mode: overlay;
+  opacity:.35;
+}
+.crt::after{
+  content:"";
+  position:absolute;
+  inset:-40px;
+  background: radial-gradient(closest-side, rgba(0,0,0,0), rgba(0,0,0,.35));
+  opacity:.55;
 }
 
-.btn.ghost:hover {
-  border-color: rgba(180, 255, 205, .70);
-  background: rgba(141, 255, 176, .08);
-  box-shadow:
-    0 0 0 1px rgba(180, 255, 205, .16),
-    0 0 18px rgba(141, 255, 176, .18);
-  transform: translateY(-1px);
-}
-/* Continuous scrolling news ticker (Fallout style) */
-.tickerTrack {
-  position: relative;
-  overflow: hidden;
-  width: 100%;
+/* ===== LAYOUT ===== */
+.wrap{
+  width:min(980px, 92vw);
+  margin: 28px auto 40px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  position:relative;
+  z-index:1;
 }
 
-.tickerScroll {
-  display: inline-block;
-  white-space: nowrap;
-  padding-left: 100%;
-  animation: tickerScroll 100s linear infinite;
-  letter-spacing: .08em;
+/* ===== PANELS ===== */
+.panel{
+  background: var(--panel);
+  border: 2px solid var(--border);
+  border-radius: 0;               /* blocky */
+  padding: 14px 14px;
+  box-shadow: var(--shadow);
+}
+
+.panel.top{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+}
+
+/* ===== HEADERS / TEXT ===== */
+.h1{ font-size: 18px; font-weight:900; text-transform:uppercase; letter-spacing:.14em; }
+.h2{ margin:0; font-size: 14px; font-weight:900; letter-spacing:.14em; text-transform:uppercase; }
+.sub{
+  color: var(--greenDim);
+  font-size: 12px;
+  letter-spacing: .10em;
   text-transform: uppercase;
+}
+.dim{ color: rgba(141,255,176,.55); }
+.tiny{ font-size:12px; color: rgba(141,255,176,.65); }
+
+a{ color: var(--green); text-decoration:none; }
+a:hover{ text-decoration:none; }
+
+/* ===== SYSTEM BOX (right side of header) ===== */
+.sys{
+  min-width: 160px;
+  padding: 10px 12px;
+  border: 2px solid rgba(255,204,102,.55);
+  background: var(--panel2);
+  border-radius: 0;
+}
+.sys .k{
+  font-size: 12px;
+  color: var(--amberDim);
   font-weight: 900;
-  color: rgba(141,255,176,.95);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.sys .v{
+  margin-top: 6px;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing:.14em;
+  text-transform: uppercase;
+  color: var(--green);
 }
 
-@keyframes tickerScroll {
-  from {
-    transform: translateX(0%);
-  }
-  to {
-    transform: translateX(-100%);
-  }
+/* ===== BUTTON ROW ===== */
+.btnrow{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  align-items:center;
 }
 
-/* Pause scroll on hover (nice UX) */
-.tickerTrack:hover .tickerScroll {
-  animation-play-state: paused;
+/* ===== INPUTS ===== */
+.input{
+  background: rgba(0,0,0,.75);
+  color: var(--green);
+  border: 2px solid var(--borderHard);
+  border-radius: 0;
+  padding: 10px 12px;
+  font: inherit;
+  letter-spacing:.10em;
+  text-transform: uppercase;
+  outline:none;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.6);
+}
+.input::placeholder{
+  color: rgba(141,255,176,.45);
+  text-transform:none;
+  letter-spacing:.06em;
+}
+.input:focus{
+  border-color: rgba(180,255,205,.85);
+  box-shadow:
+    0 0 12px rgba(141,255,176,.35),
+    inset 0 0 0 1px rgba(0,0,0,.8);
+}
+
+/* ===== FORCE TERMINAL BUTTONS (fixes white buttons) ===== */
+.btn,
+button,
+a.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+
+  background: rgba(0,0,0,.85) !important;
+  color: var(--green) !important;
+
+  border: 2px solid var(--borderHard) !important;
+  border-radius: 0 !important;
+
+  padding: 10px 12px;
+  font: inherit;
+  font-weight: 900;
+  letter-spacing:.12em;
+  text-transform: uppercase;
+
+  cursor:pointer;
+  user-select:none;
+
+  box-shadow:
+    inset 0 0 0 1px rgba(0,0,0,.6),
+    0 0 10px rgba(141,255,176,.12);
+  transition:
+    transform .08s ease,
+    box-shadow .14s ease,
+    background-color .14s ease,
+    border-color .14s ease,
+    color .14s ease;
+}
+
+.btn.ghost{
+  background: rgba(0,0,0,.45) !important;
+  border-color: rgba(141,255,176,.45) !important;
+}
+
+/* Fallout terminal hover highlight */
+.btn:hover,
+button:hover,
+a.btn:hover{
+  color: #020402 !important;
+  background: rgba(141,255,176,.92) !important;
+  border-color: rgba(200,255,220,.95) !important;
+  box-shadow:
+    0 0 14px rgba(141,255,176,.75),
+    0 0 26px rgba(141,255,176,.25),
+    inset 0 0 0 1px rgba(0,0,0,.85);
+  transform: translateY(-1px);
+}
+
+.btn:active,
+button:active,
+a.btn:active{
+  transform: translateY(0px);
+  box-shadow:
+    0 0 10px rgba(141,255,176,.45),
+    inset 0 0 0 1px rgba(0,0,0,.85);
+}
+
+/* ===== LINKS THAT LOOK LIKE BUTTONS ===== */
+a.btn{ text-decoration:none; }
+a.btn:visited{ color: var(--green) !important; }
+
+/* ===== TICKER / BOXES ===== */
+.tickerBox{
+  border: 2px solid var(--border);
+  background: rgba(0,0,0,.25);
+  padding: 12px 14px;
+  border-radius: 0;
+  box-shadow: var(--shadow);
+}
+
+.tickerLabel{
+  color: var(--amber);
+  font-weight: 900;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.scrollBox{
+  border: 2px solid rgba(255,204,102,.45);
+  background: rgba(0,0,0,.25);
+  border-radius: 0;
+  padding: 10px 12px;
+  box-shadow: 0 0 16px rgba(255,204,102,.08);
+}
+
+.scrollText{
+  font-weight: 900;
+  letter-spacing:.12em;
+  text-transform: uppercase;
+  color: var(--green);
+}
+
+/* ===== FOOTER ===== */
+.foot{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  padding: 6px 2px;
+  color: rgba(141,255,176,.55);
+  font-size: 12px;
+  letter-spacing:.08em;
+  text-transform: uppercase;
+}
+
+/* ===== SMALL SCREEN ===== */
+@media (max-width:560px){
+  .sys{ min-width:unset; width:100%; }
+  .panel.top{ flex-direction:column; }
+  .foot{ flex-direction:column; }
 }
