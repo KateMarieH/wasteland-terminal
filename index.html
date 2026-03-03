@@ -10,8 +10,8 @@
 <body>
   <div class="crt"></div>
 
-  <main class="screen">
-    <!-- TOP HEADER (RobCo style) -->
+  <main class="screen" role="main" aria-label="Wasteland Terminal">
+    <!-- TOP HEADER -->
     <header class="block">
       <div class="robco">
         <div class="robcoLine">ROBCO INDUSTRIES UNIFIED OPERATING SYSTEM</div>
@@ -21,8 +21,7 @@
 
       <div class="rule">==============================================</div>
 
-      <!-- USER PROMPT (same page; no separate welcome screen) -->
-      <div class="row between">
+      <div class="row between wrap">
         <div>
           <div class="title">WASTELAND TERMINAL</div>
           <div class="sub">Your personal terminal for weather, news, music, and wastelander oddities.</div>
@@ -34,27 +33,29 @@
         </div>
       </div>
 
-      <div class="row">
+      <div class="row wrap">
         <div class="kv"><span class="k">USER:</span> <span id="userName">WANDERER</span></div>
         <div class="kv"><span class="k">LOCAL TIME:</span> <span id="localClock">—</span></div>
       </div>
 
-      <div id="loginBar" class="loginBar">
+      <!-- Single-page identification prompt -->
+      <div id="loginBar" class="loginBar" aria-live="polite">
         <span class="k">IDENTIFICATION REQUIRED:</span>
         <input id="nameInput" class="input" type="text" placeholder="ENTER CALLSIGN" maxlength="18" />
-        <button id="nameConfirm" class="btn">[ CONFIRM ]</button>
-        <button id="nameSkip" class="btn ghost">[ CONTINUE AS WANDERER ]</button>
+        <button id="nameConfirm" class="btn" type="button">[ CONFIRM ]</button>
+        <button id="nameSkip" class="btn ghost" type="button">[ CONTINUE AS WANDERER ]</button>
         <span class="tiny dim">Stored locally on this device.</span>
       </div>
 
       <div class="rule">----------------------------------------------</div>
     </header>
 
-    <!-- MODULES (text-first, no modern cards) -->
-    <section class="grid">
-      <!-- LEFT: NEWS -->
+    <!-- MODULES -->
+    <section class="grid" aria-label="Terminal Modules">
+
+      <!-- NEWS -->
       <section class="block">
-        <div class="h">> NEWS FEED</div>
+        <div class="h">&gt; NEWS FEED</div>
         <div class="ruleSmall">--------------------------------</div>
 
         <div class="tickerLine">
@@ -69,28 +70,28 @@
           <div class="kv"><span class="k">LAST UPDATE:</span> <span id="newsUpdated">—</span></div>
         </div>
 
-        <div class="row gap">
-          <a class="btn ghost" id="newsLink" target="_blank" rel="noopener">[ OPEN STORY ]</a>
-          <button class="btn ghost" id="newsRefresh">[ REFRESH ]</button>
+        <div class="row gap wrap" style="margin-top:10px;">
+          <a class="btn ghost" id="newsLink" href="#" target="_blank" rel="noopener">[ OPEN STORY ]</a>
+          <button class="btn ghost" id="newsRefresh" type="button">[ REFRESH ]</button>
         </div>
 
-        <div class="tiny dim" style="margin-top:8px;">
-          Tip: Hover is interactive. Content rotates slowly.
+        <div class="tiny dim" style="margin-top:10px;">
+          Tip: News types slowly, then holds.
         </div>
       </section>
 
-      <!-- CENTER: WEATHER -->
+      <!-- WEATHER -->
       <section class="block">
-        <div class="h">> WEATHER TERMINAL</div>
+        <div class="h">&gt; WEATHER TERMINAL</div>
         <div class="ruleSmall">--------------------------------</div>
 
-        <div class="row gap wrap">
+        <div class="row gap wrap controls">
           <input id="wxInput" class="input" placeholder="City or ZIP — press Enter" />
-          <button class="btn ghost" id="wxUseMyLoc">[ USE MY LOCATION ]</button>
-          <button class="btn ghost" id="wxUseSaved">[ USE SAVED ]</button>
+          <button class="btn ghost" id="wxUseMyLoc" type="button">[ USE MY LOCATION ]</button>
+          <button class="btn ghost" id="wxUseSaved" type="button">[ USE SAVED ]</button>
         </div>
 
-        <div class="tiny dim" id="wxStatus" style="margin-top:8px;">Awaiting terminal profile…</div>
+        <div class="tiny dim" id="wxStatus" style="margin-top:10px;">Awaiting terminal profile…</div>
 
         <div class="ruleDots">::::::::::::::::::::::::::::::::</div>
 
@@ -103,15 +104,15 @@
         <div class="kv"><span class="k">SCROLL:</span></div>
         <div class="scrollLine mono" id="wxScroll">—</div>
 
-        <div class="row gap" style="margin-top:10px;">
+        <div class="row gap wrap" style="margin-top:12px;">
           <a class="btn" href="/weather/">[ FULL WEATHER ]</a>
-          <button class="btn ghost" id="wxRefresh">[ REFRESH ]</button>
+          <button class="btn ghost" id="wxRefresh" type="button">[ REFRESH ]</button>
         </div>
       </section>
 
-      <!-- RIGHT: RADIO + SUPPORT -->
+      <!-- RADIO / ALERTS / SUPPORT -->
       <section class="block">
-        <div class="h">> RADIO SIGNAL</div>
+        <div class="h">&gt; RADIO SIGNAL</div>
         <div class="ruleSmall">--------------------------------</div>
 
         <div class="kv"><span class="k">SOURCE:</span> THE MYSTIC BROADCAST</div>
@@ -122,12 +123,13 @@
 
         <div class="row gap wrap">
           <a class="btn" href="/radio/">[ RADIO TERMINAL ]</a>
-          <a class="btn ghost" href="https://www.youtube.com/@YOUR_CHANNEL_HERE" target="_blank" rel="noopener">[ OPEN YOUTUBE ]</a>
+          <!-- Replace this link with your channel URL -->
+          <a class="btn ghost" href="https://www.youtube.com/" target="_blank" rel="noopener">[ OPEN YOUTUBE ]</a>
         </div>
 
         <div class="rule">----------------------------------------------</div>
 
-        <div class="h">> WASTELAND ALERTS</div>
+        <div class="h">&gt; WASTELAND ALERTS</div>
         <div class="ruleSmall">--------------------------------</div>
         <div class="mono" id="alertsLine">
           SIGNAL STABLE. PATROL ACTIVITY NOMINAL. RADSTORM PROBABILITY: LOW.
@@ -135,17 +137,19 @@
 
         <div class="rule">----------------------------------------------</div>
 
-        <div class="h">> SUPPORT</div>
+        <div class="h">&gt; SUPPORT</div>
         <div class="ruleSmall">--------------------------------</div>
         <div class="mono">
           This terminal is <span class="amber"><strong>audience-supported</strong></span>.<br>
           No ads. No tracking. Just vibes.
         </div>
-        <div class="row gap" style="margin-top:10px;">
+
+        <div class="row gap wrap" style="margin-top:12px;">
           <a class="btn ghost" href="/support/">[ SUPPORT THE TERMINAL ]</a>
           <a class="btn ghost" href="/about/">[ ABOUT ]</a>
         </div>
       </section>
+
     </section>
 
     <footer class="foot">
@@ -156,9 +160,9 @@
     </footer>
   </main>
 
-  <!-- ===== USER NAME (single-page “welcome”) ===== -->
+  <!-- ================= USER NAME (same page) ================= -->
   <script>
-    const USER_KEY = "wt_user_name";
+    const USER_KEY = "wt_user_name_v2";
     const userNameEl = document.getElementById("userName");
     const loginBar = document.getElementById("loginBar");
     const nameInput = document.getElementById("nameInput");
@@ -169,14 +173,13 @@
     function cleanName(s){
       return (s || "")
         .trim()
+        .replace(/[^\w\s\-']/g, "")
         .replace(/\s+/g, " ")
         .slice(0, 18);
     }
 
-    function setName(name){
-      const n = cleanName(name);
+    function applyName(n){
       if(n){
-        localStorage.setItem(USER_KEY, n);
         userNameEl.textContent = n.toUpperCase();
         loginBar.style.display = "none";
       }else{
@@ -185,30 +188,316 @@
       }
     }
 
-    const saved = localStorage.getItem(USER_KEY);
-    setName(saved);
+    function setName(raw){
+      const n = cleanName(raw);
+      if(n){
+        localStorage.setItem(USER_KEY, n);
+        applyName(n);
+      }else{
+        localStorage.removeItem(USER_KEY);
+        applyName("");
+      }
+    }
+
+    // init
+    applyName(localStorage.getItem(USER_KEY) || "");
 
     nameConfirm.addEventListener("click", () => setName(nameInput.value));
     nameInput.addEventListener("keydown", (e) => {
       if(e.key === "Enter") setName(nameInput.value);
     });
-    nameSkip.addEventListener("click", () => {
-      localStorage.removeItem(USER_KEY);
-      setName("");
-    });
+    nameSkip.addEventListener("click", () => setName(""));
 
     // Local clock
     function tick(){
       clockEl.textContent = new Date().toLocaleString();
-      requestAnimationFrame(() => {});
     }
     setInterval(tick, 1000);
     tick();
   </script>
 
-  <!-- ===== KEEP YOUR EXISTING NEWS + WEATHER SCRIPTS BELOW ===== -->
-  <!-- Paste your NEWS script here (the one that calls /.netlify/functions/fallout-news) -->
-  <!-- Paste your WEATHER script here (open-meteo + your Fallout mapping) -->
+  <!-- ================= NEWS SCRIPT =================
+       Keep your existing version OR paste this one.
+       (Requires Netlify function: /.netlify/functions/fallout-news)
+  -->
+  <script>
+    const newsTicker = document.getElementById("newsTicker");
+    const newsSource = document.getElementById("newsSource");
+    const newsUpdated = document.getElementById("newsUpdated");
+    const newsLink = document.getElementById("newsLink");
+    const newsRefresh = document.getElementById("newsRefresh");
 
+    let headlines = [];
+    let idx = 0;
+
+    const TYPE_SPEED = 22;       // typing speed
+    const HOLD_TIME = 12000;     // hold after typed
+    const FADE_TIME = 700;       // fade duration
+    const BETWEEN_TIME = 350;    // gap between stories
+
+    let typingTimer = null;
+    let cycleTimer = null;
+
+    function stamp(){ return new Date().toLocaleString(); }
+
+    function shorten(text, max=110){
+      text = (text || "").trim();
+      return text.length > max ? text.slice(0, max-1) + "…" : text;
+    }
+
+    function clearTimers(){
+      if (typingTimer) clearInterval(typingTimer);
+      if (cycleTimer) clearTimeout(cycleTimer);
+      typingTimer = null;
+      cycleTimer = null;
+    }
+
+    function typeLine(fullText, onDone){
+      let i = 0;
+      newsTicker.style.opacity = 1;
+      newsTicker.textContent = "";
+
+      typingTimer = setInterval(() => {
+        i++;
+        newsTicker.textContent = fullText.slice(0, i);
+        if (i >= fullText.length){
+          clearInterval(typingTimer);
+          typingTimer = null;
+          onDone?.();
+        }
+      }, TYPE_SPEED);
+    }
+
+    function fadeOut(onDone){
+      newsTicker.style.opacity = 0;
+      cycleTimer = setTimeout(() => onDone?.(), FADE_TIME);
+    }
+
+    function startCycle(){
+      clearTimers();
+
+      if (!headlines.length){
+        newsTicker.textContent = "NO HEADLINES AVAILABLE";
+        newsSource.textContent = "—";
+        newsUpdated.textContent = stamp();
+        newsLink.href = "#";
+        return;
+      }
+
+      const item = headlines[idx];
+      const line = `${(item.source || "SOURCE").toUpperCase()} — ${shorten(item.title, 110)}`;
+
+      newsSource.textContent = (item.source || "—").toUpperCase();
+      newsUpdated.textContent = stamp();
+      newsLink.href = item.link || "#";
+
+      typeLine(line, () => {
+        cycleTimer = setTimeout(() => {
+          fadeOut(() => {
+            idx = (idx + 1) % headlines.length;
+            cycleTimer = setTimeout(startCycle, BETWEEN_TIME);
+          });
+        }, HOLD_TIME);
+      });
+    }
+
+    async function loadNews(){
+      clearTimers();
+      newsTicker.style.opacity = 1;
+      newsTicker.textContent = "LOADING FALLOUT HEADLINES…";
+      newsSource.textContent = "—";
+      newsUpdated.textContent = stamp();
+      newsLink.href = "#";
+
+      try{
+        const r = await fetch("/.netlify/functions/fallout-news", { cache:"no-store" });
+        const d = await r.json();
+        if (!r.ok || !d.items?.length) throw new Error(d.error || "No headlines");
+
+        headlines = d.items.slice(0, 12);
+        idx = 0;
+        startCycle();
+      }catch(e){
+        newsTicker.textContent = "NEWS FEED OFFLINE";
+        newsSource.textContent = "SYSTEM";
+        newsUpdated.textContent = stamp();
+        newsLink.href = "#";
+      }
+    }
+
+    newsRefresh?.addEventListener("click", loadNews);
+    loadNews();
+  </script>
+
+  <!-- ================= WEATHER SCRIPT =================
+       This is a compact working version using Open-Meteo geocoding + forecast.
+       It saves location and supports "Use my location" + "Use saved".
+  -->
+  <script>
+    const WX_KEY = "wt_weather_profile_v3";
+    const wxLoc = document.getElementById("wxLoc");
+    const wxNow = document.getElementById("wxNow");
+    const wxClock = document.getElementById("wxClock");
+    const wxScroll = document.getElementById("wxScroll");
+    const wxStatus = document.getElementById("wxStatus");
+    const wxInput = document.getElementById("wxInput");
+
+    const wxUseMyLoc = document.getElementById("wxUseMyLoc");
+    const wxUseSaved = document.getElementById("wxUseSaved");
+    const wxRefresh = document.getElementById("wxRefresh");
+
+    function saveProfile(p){ localStorage.setItem(WX_KEY, JSON.stringify(p)); }
+    function loadProfile(){ try{ return JSON.parse(localStorage.getItem(WX_KEY)); }catch{ return null; } }
+
+    // Map Open-Meteo weather codes to Fallout-y conditions
+    function mapWasteland(code){
+      if([95,96,99].includes(code)) return "RADSTORM";
+      if([61,63,65,80,81,82].includes(code)) return "ACID RAIN";
+      if([45,48].includes(code)) return "RADCLOUDS";
+      if([71,73,75,77,85,86].includes(code)) return "ASHFALL";
+      if([51,53,55,56,57].includes(code)) return "TOXIC DRIZZLE";
+      if([1,2,3].includes(code)) return "CLEAR SKIES";
+      if([0].includes(code)) return "CLEAR";
+      if([ fog=45, rime=48 ].includes(code)) return "RADCLOUDS";
+      return "OVERCAST";
+    }
+
+    async function geocodeName(q){
+      const r = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=1&format=json`, {cache:"no-store"});
+      const j = await r.json();
+      if(!j.results?.length) return null;
+      const g = j.results[0];
+      return {
+        name: `${g.name}${g.admin1 ? ", " + g.admin1 : ""}, ${g.country}`,
+        latitude: g.latitude,
+        longitude: g.longitude,
+        timezone: g.timezone || "auto"
+      };
+    }
+
+    async function forecast(lat, lon){
+      const url =
+        `https://api.open-meteo.com/v1/forecast` +
+        `?latitude=${lat}&longitude=${lon}` +
+        `&current_weather=true` +
+        `&daily=sunrise,sunset,temperature_2m_max,temperature_2m_min,weathercode` +
+        `&temperature_unit=fahrenheit&windspeed_unit=mph` +
+        `&timezone=auto`;
+      const r = await fetch(url, {cache:"no-store"});
+      return r.json();
+    }
+
+    function fmtTime(t){
+      try{
+        return new Date(t).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+      }catch{
+        return "—";
+      }
+    }
+
+    function fmtDay(d){
+      try{
+        return new Date(d).toLocaleDateString([], {weekday:"short"});
+      }catch{
+        return "";
+      }
+    }
+
+    async function render(profile){
+      if(!profile) return;
+      wxStatus.textContent = "Pulling atmospheric data…";
+
+      try{
+        const d = await forecast(profile.latitude, profile.longitude);
+        const cw = d.current_weather;
+
+        wxLoc.textContent = profile.name;
+        wxNow.textContent =
+          `NOW: ${mapWasteland(cw.weathercode)} • ${Math.round(cw.temperature)}°F • WIND ${Math.round(cw.windspeed)} MPH`;
+
+        // NOTE: Open-Meteo returns local times in the selected timezone. Using "auto" is fine.
+        wxClock.textContent = new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+
+        const sunrise = d.daily?.sunrise?.[0];
+        const sunset  = d.daily?.sunset?.[0];
+
+        // Compact "scroll" line: sunrise/sunset + tomorrow
+        const tmax1 = d.daily?.temperature_2m_max?.[1];
+        const tmin1 = d.daily?.temperature_2m_min?.[1];
+        const code1 = d.daily?.weathercode?.[1];
+        const day1  = d.daily?.time?.[1];
+
+        wxScroll.textContent =
+          `SUNRISE ${fmtTime(sunrise)} • SUNSET ${fmtTime(sunset)} • ` +
+          `${fmtDay(day1)}: ${mapWasteland(code1)} ${Math.round(tmin1)}–${Math.round(tmax1)}°F`;
+
+        wxStatus.textContent = "Signal stable.";
+      }catch(e){
+        wxStatus.textContent = "Weather feed offline.";
+      }
+    }
+
+    // Input search
+    wxInput?.addEventListener("keydown", async (e) => {
+      if(e.key !== "Enter") return;
+      const q = wxInput.value.trim();
+      if(!q) return;
+      wxInput.value = "";
+      wxStatus.textContent = "Searching location…";
+
+      const p = await geocodeName(q);
+      if(!p){
+        wxStatus.textContent = "Location not found.";
+        return;
+      }
+      saveProfile(p);
+      render(p);
+    });
+
+    // Use saved
+    wxUseSaved?.addEventListener("click", () => {
+      const p = loadProfile();
+      if(!p){
+        wxStatus.textContent = "No saved location.";
+        return;
+      }
+      render(p);
+    });
+
+    // Use my location
+    wxUseMyLoc?.addEventListener("click", () => {
+      if(!navigator.geolocation){
+        wxStatus.textContent = "Geolocation not supported.";
+        return;
+      }
+      wxStatus.textContent = "Requesting device location…";
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        const p = {
+          name: "DEVICE LOCATION",
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
+          timezone: "auto"
+        };
+        saveProfile(p);
+        render(p);
+      }, () => {
+        wxStatus.textContent = "Permission denied.";
+      }, { enableHighAccuracy:false, timeout:8000 });
+    });
+
+    // Refresh
+    wxRefresh?.addEventListener("click", () => {
+      const p = loadProfile();
+      if(!p){
+        wxStatus.textContent = "No saved location.";
+        return;
+      }
+      render(p);
+    });
+
+    // init render if saved
+    const init = loadProfile();
+    if(init) render(init);
+  </script>
 </body>
 </html>
