@@ -32,8 +32,10 @@
           </div>
 
           <div class="row gap wrap topLinks">
-            <a class="btn ghost" href="https://patreon.com/wastelandterminal/membership" target="_blank" rel="noopener"> [ SUPPORT THE TERMINAL ]
-</a>
+            <a class="btn ghost"
+               href="https://patreon.com/wastelandterminal/membership"
+               target="_blank"
+               rel="noopener">[ SPARE SOME CAPS ]</a>
           </div>
         </div>
       </div>
@@ -114,20 +116,54 @@
         <div class="h">&gt; SIGNALS</div>
         <div class="ruleSmall">--------------------------------</div>
 
+        <!-- PRE-WAR TUNES + LIVE STREAM INFO -->
         <div class="kv"><span class="k">CHANNEL:</span> PRE-WAR TUNES</div>
-        <div class="row gap wrap" style="margin-top:10px;">
-          <a class="btn" href="/radio-prewar/">[ PLAY PRE-WAR TUNES ]</a>
+
+        <div class="ruleDots">::::::::::::::::::::::::::::::::</div>
+
+        <div class="kv">
+          <span class="k">STATUS:</span>
+          <span class="cc_streaminfo" data-type="server" data-username="themysti">—</span>
+        </div>
+
+        <div class="bigLine" style="margin-top:10px;">NOW PLAYING:</div>
+
+        <div class="mono" style="margin-top:6px;">
+          <span class="cc_streaminfo" data-type="trackartist" data-username="themysti">—</span>
+          —
+          <span class="cc_streaminfo" data-type="tracktitle" data-username="themysti">—</span>
+        </div>
+
+        <div class="tiny dim" style="margin-top:6px;">
+          LISTENERS:
+          <span class="cc_streaminfo" data-type="listeners" data-username="themysti">—</span>
+          <span class="dim"> / MAX </span>
+          <span class="cc_streaminfo" data-type="maxlisteners" data-username="themysti">—</span>
+        </div>
+
+        <div class="row gap wrap" style="margin-top:12px;">
+          <a class="btn"
+             href="https://radio.shoutcheap.com/tunein/themysti.pls"
+             target="_blank"
+             rel="noopener">[ TUNE IN ]</a>
         </div>
 
         <div class="ruleDots">::::::::::::::::::::::::::::::::</div>
 
+        <!-- WASTELAND WEBCAM -->
         <div class="kv"><span class="k">CHANNEL:</span> WASTELAND WEBCAM</div>
         <div class="kv dim" style="margin-top:6px;">SOURCE: THE MYSTIC BROADCAST</div>
 
         <div class="row gap wrap" style="margin-top:10px;">
-          <a class="btn" href="https://www.youtube.com/@TheMysticBroadcast/live" target="_blank" rel="noopener">[ OPEN WASTELAND WEBCAM ]</a>
-          <!-- replace with your real channel link -->
-          <a class="btn ghost" href="https://www.youtube.com/@themysticbroadcast" target="_blank" rel="noopener">[ OPEN YOUTUBE ]</a>
+          <a class="btn"
+             href="https://www.youtube.com/@TheMysticBroadcast/live"
+             target="_blank"
+             rel="noopener">[ OPEN WASTELAND WEBCAM ]</a>
+
+          <a class="btn ghost"
+             href="https://www.youtube.com/@themysticbroadcast"
+             target="_blank"
+             rel="noopener">[ OPEN YOUTUBE ]</a>
         </div>
       </section>
 
@@ -466,6 +502,9 @@
     const init = loadProfile();
     if(init) render(init);
   </script>
+
+  <!-- ================= STREAM INFO WIDGET (Shoutcheap) ================= -->
+  <script language="javascript" type="text/javascript" src="https://radio.shoutcheap.com/system/streaminfo.js"></script>
 
 </body>
 </html>
