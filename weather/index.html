@@ -4,12 +4,17 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Weather Terminal • Wasteland Terminal</title>
+
+  <!-- Uses your global theme -->
   <link rel="stylesheet" href="../style.css" />
+
+  <!-- Weather-page-only styling (amber+green accents, forecast grid, meters) -->
   <style>
     :root{
       --amber:#ffcc66;
-      --amberDim: rgba(255,204,102,.55);
+      --amberDim: rgba(255,204,102,.65);
       --amberBorder: rgba(255,204,102,.55);
+      --panelSoft: rgba(0,0,0,.18);
     }
     .amber { color: var(--amber); }
     .panel.amberBorder { border-color: var(--amberBorder); }
@@ -20,37 +25,71 @@
       letter-spacing:.12em; text-transform:uppercase; font-weight:900; font-size:12px;
     }
     .badge.amberB { border-color: var(--amberBorder); color: var(--amber); }
+
+    .row {
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    }
+    .btnSmall {
+      padding: 8px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(141,255,176,.35);
+      background: rgba(0,0,0,.20);
+      color: rgba(141,255,176,.92);
+      text-decoration:none;
+      font-weight:900;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      cursor:pointer;
+      white-space: nowrap;
+    }
+    .btnSmall:hover { box-shadow: 0 0 16px rgba(141,255,176,.20); }
+
     .hero {
       margin-top:14px;
-      border:1px solid rgba(141,255,176,.35);
+      border:1px solid rgba(141,255,176,.30);
       border-radius: 14px;
       padding: 14px;
       background: linear-gradient(to bottom, rgba(0,0,0,.18), rgba(0,0,0,.08));
       box-shadow: 0 0 18px rgba(141,255,176,.10);
     }
-    .heroTop { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:flex-start; }
+    .heroTop {
+      display:flex;
+      justify-content:space-between;
+      gap: 14px;
+      flex-wrap:wrap;
+      align-items:flex-start;
+    }
     .condBig {
       margin-top:10px;
-      font-size: 28px;
+      font-size: 26px;
       letter-spacing:.14em;
       text-transform:uppercase;
       font-weight: 900;
       text-shadow: 0 0 18px rgba(141,255,176,.18);
     }
-    .grid2 {
+    .smallLine {
+      margin-top:6px;
+      color: rgba(141,255,176,.7);
+      font-size: 12px;
+      letter-spacing: .10em;
+      text-transform: uppercase;
+    }
+
+    .kGrid {
       display:grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 10px;
       margin-top: 12px;
     }
     .kpiBox {
-      border:1px solid rgba(141,255,176,.25);
+      border:1px solid rgba(141,255,176,.22);
       border-radius: 12px;
       padding: 12px;
       background: rgba(0,0,0,.12);
     }
     .kLabel { color: rgba(141,255,176,.7); font-size: 11px; letter-spacing:.16em; text-transform:uppercase; }
-    .kValue { margin-top:6px; font-size: 18px; font-weight: 900; letter-spacing:.08em; text-transform:uppercase; }
+    .kValue { margin-top:6px; font-size: 16px; font-weight: 900; letter-spacing:.08em; text-transform:uppercase; }
+
     .meter {
       margin-top:10px;
       height: 10px;
@@ -60,23 +99,13 @@
       overflow:hidden;
       box-shadow: inset 0 0 10px rgba(0,0,0,.45);
     }
-    .bar { height:100%; width:0%; background: linear-gradient(90deg, rgba(141,255,176,.65), rgba(255,204,102,.75)); }
-    .row {
-      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    .bar {
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, rgba(141,255,176,.65), rgba(255,204,102,.75));
+      transition: width .35s ease;
     }
-    .btnSmall {
-      padding: 8px 10px;
-      border-radius: 12px;
-      border: 1px solid rgba(141,255,176,.35);
-      background: rgba(0,0,0,.20);
-      color: rgba(141,255,176,.9);
-      text-decoration:none;
-      font-weight:900;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-      cursor:pointer;
-    }
-    .btnSmall:hover { box-shadow: 0 0 16px rgba(141,255,176,.20); }
+
     .ticker2{
       margin-top:14px;
       border:1px solid var(--amberBorder);
@@ -86,10 +115,48 @@
       box-shadow: 0 0 18px rgba(255,204,102,.10);
       display:flex; gap:10px; align-items:flex-start;
     }
-    .ticker2 strong{ letter-spacing:.12em; text-transform:uppercase; }
-    @media (max-width: 760px){
-      .grid2{ grid-template-columns: 1fr; }
-      .condBig{ font-size: 22px; }
+    .ticker2 strong{
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      color: var(--amber);
+      white-space: nowrap;
+    }
+
+    .sunMoonGrid{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .forecastGrid{
+      display:grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .forecastCard{
+      border:1px solid rgba(141,255,176,.22);
+      border-radius: 12px;
+      padding: 10px;
+      background: rgba(0,0,0,.12);
+      min-height: 118px;
+    }
+    .fcDay{ color: rgba(141,255,176,.7); font-size: 11px; letter-spacing:.16em; text-transform:uppercase; }
+    .fcCond{ margin-top:6px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; font-size: 12px; }
+    .fcTemps{ margin-top:8px; color: rgba(141,255,176,.85); font-size: 12px; letter-spacing:.10em; text-transform:uppercase; }
+    .fcPop{ margin-top:4px; color: rgba(255,204,102,.75); font-size: 11px; letter-spacing:.12em; text-transform:uppercase; }
+
+    @media (max-width: 980px){
+      .forecastGrid{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .kGrid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .sunMoonGrid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 520px){
+      .forecastGrid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .kGrid{ grid-template-columns: 1fr; }
+      .sunMoonGrid{ grid-template-columns: 1fr; }
+      .condBig{ font-size: 20px; }
     }
   </style>
 </head>
@@ -99,16 +166,17 @@
 
   <main class="wrap">
 
+    <!-- Header -->
     <header class="panel top amberBorder">
       <div>
         <h1 class="h1">WEATHER TERMINAL</h1>
-        <p class="sub">Real-world conditions translated into wasteland threats.</p>
       </div>
       <div class="sys">
         <a class="btn ghost" href="/">◀ HOME</a>
       </div>
     </header>
 
+    <!-- Location -->
     <section class="panel">
       <h2 class="h2 amber">LOCATION INPUT</h2>
       <div class="row">
@@ -119,23 +187,25 @@
       <p class="sub" id="locationStatus">Awaiting coordinates…</p>
     </section>
 
+    <!-- Main readout -->
     <section class="hero">
       <div class="heroTop">
         <div>
           <span class="badge">ATMOSPHERIC STATUS</span>
           <span class="badge amberB" id="badgeThreat">THREAT: —</span>
           <div class="condBig" id="conditionBig">—</div>
-          <div class="sub" id="conditionSub">Stand by…</div>
+          <div class="smallLine" id="condDetail">—</div>
         </div>
-        <div style="min-width:220px;">
+
+        <div style="min-width:240px;">
           <div class="kLabel">RADS INDEX</div>
           <div class="kValue" id="radsText">—</div>
           <div class="meter"><div class="bar" id="radsBar"></div></div>
-          <div class="sub" style="margin-top:8px;">Simulated readout based on weather intensity.</div>
+          <div class="sub" style="margin-top:8px;">Simulated based on storm intensity.</div>
         </div>
       </div>
 
-      <div class="grid2">
+      <div class="kGrid">
         <div class="kpiBox">
           <div class="kLabel">TEMPERATURE</div>
           <div class="kValue" id="temp">—</div>
@@ -145,8 +215,16 @@
           <div class="kValue" id="wind">—</div>
         </div>
         <div class="kpiBox">
-          <div class="kLabel">REAL CODE</div>
-          <div class="kValue" id="code">—</div>
+          <div class="kLabel">VISIBILITY</div>
+          <div class="kValue" id="vis">—</div>
+        </div>
+        <div class="kpiBox">
+          <div class="kLabel">PRESSURE</div>
+          <div class="kValue" id="press">—</div>
+        </div>
+        <div class="kpiBox">
+          <div class="kLabel">HUMIDITY</div>
+          <div class="kValue" id="humid">—</div>
         </div>
         <div class="kpiBox">
           <div class="kLabel">LAST UPDATE</div>
@@ -155,201 +233,490 @@
       </div>
 
       <div class="ticker2">
-        <strong class="amber">WASTELAND ALERT:</strong>
+        <strong>WASTELAND ALERT:</strong>
         <span id="alertText">Stand by…</span>
       </div>
+    </section>
+
+    <!-- Local time -->
+    <section class="panel">
+      <h2 class="h2 amber">LOCAL TIME</h2>
+      <div class="kGrid">
+        <div class="kpiBox">
+          <div class="kLabel">CLOCK</div>
+          <div class="kValue" id="localClock">—</div>
+        </div>
+        <div class="kpiBox">
+          <div class="kLabel">DATE</div>
+          <div class="kValue" id="localDate">—</div>
+        </div>
+        <div class="kpiBox">
+          <div class="kLabel">TIMEZONE</div>
+          <div class="kValue" id="tzLabel">—</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sun & moon -->
+    <section class="panel">
+      <h2 class="h2 amber">SUN & MOON</h2>
+      <div class="sunMoonGrid">
+        <div class="kpiBox">
+          <div class="kLabel">SUNRISE</div>
+          <div class="kValue" id="sunrise">—</div>
+        </div>
+        <div class="kpiBox">
+          <div class="kLabel">SUNSET</div>
+          <div class="kValue" id="sunset">—</div>
+        </div>
+        <div class="kpiBox">
+          <div class="kLabel">MOON</div>
+          <div class="kValue" id="moonName">—</div>
+          <div class="sub" id="moonDetail" style="margin-top:6px;">—</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Extended forecast -->
+    <section class="panel">
+      <h2 class="h2 amber">EXTENDED FORECAST</h2>
+      <div class="forecastGrid" id="forecastGrid"></div>
+      <p class="sub" style="margin-top:10px;">Forecast is real-world data mapped to wasteland conditions.</p>
     </section>
 
   </main>
 
 <script>
+/* =========================
+   WEATHER TERMINAL SCRIPT
+   ========================= */
+
 const input = document.getElementById("locationInput");
 const status = document.getElementById("locationStatus");
 
 const conditionBig = document.getElementById("conditionBig");
-const conditionSub = document.getElementById("conditionSub");
-const alertEl = document.getElementById("alertText");
+const condDetail = document.getElementById("condDetail");
 const badgeThreat = document.getElementById("badgeThreat");
+const alertEl = document.getElementById("alertText");
 
 const tempEl = document.getElementById("temp");
 const windEl = document.getElementById("wind");
-const codeEl = document.getElementById("code");
+const visEl = document.getElementById("vis");
+const pressEl = document.getElementById("press");
+const humidEl = document.getElementById("humid");
 const updatedEl = document.getElementById("updated");
 
 const radsText = document.getElementById("radsText");
 const radsBar = document.getElementById("radsBar");
 
+const clockEl = document.getElementById("localClock");
+const dateEl = document.getElementById("localDate");
+const tzEl = document.getElementById("tzLabel");
+
+const sunriseEl = document.getElementById("sunrise");
+const sunsetEl = document.getElementById("sunset");
+const moonNameEl = document.getElementById("moonName");
+const moonDetailEl = document.getElementById("moonDetail");
+
+const forecastGrid = document.getElementById("forecastGrid");
+
 const btnMyLoc = document.getElementById("useMyLoc");
 const btnSaved = document.getElementById("useSaved");
 
-const STORAGE_KEY = "wt_weather_location_v2";
+const STORAGE_KEY = "wt_weather_profile_v1";
 
-const ALERT_POOL = [
-  "Deathclaw sighting unconfirmed. Maintain perimeter discipline.",
-  "Scavenger activity detected. Secure loose supplies.",
-  "Signal drift observed. Recalibrating antenna array…",
-  "Radroaches reported near water sources. Boil before use.",
-  "Brotherhood patrol route: intermittent. Do not rely on support."
-];
+let tickerTimer = null;
+let clockTimer = null;
+
+function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
 
 function nowStamp(){
   return new Date().toLocaleString();
 }
 
-function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
-
-/* Fallout-style mapping with threat + rads */
-function mapToWasteland(weather) {
-  const { weathercode, temperature, windspeed } = weather;
-
-  let condition = "CALM SKIES";
-  let threat = "LOW";
-  let alert = "Signal stable. Patrol activity nominal.";
-  let rads = 5;
-
-  const windy = windspeed >= 35;
-
-  if ([95,96,99].includes(weathercode)) {
-    condition = "RADSTORM DETECTED";
-    threat = "SEVERE";
-    alert = "SEVERE RADIATION. SEEK IMMEDIATE SHELTER.";
-    rads = 85;
-  } else if ([61,63,65,80,81,82].includes(weathercode)) {
-    condition = "ACID RAIN";
-    threat = "ELEVATED";
-    alert = "CORROSIVE PRECIPITATION. PROTECT EQUIPMENT.";
-    rads = 35;
-  } else if ([45,48].includes(weathercode)) {
-    condition = "RADCLOUDS";
-    threat = "MODERATE";
-    alert = "LOW VISIBILITY. NAVIGATION IMPAIRED.";
-    rads = 22;
-  } else if (windy) {
-    condition = "DUST FRONT";
-    threat = "ELEVATED";
-    alert = "HIGH WINDS. AIRBORNE DEBRIS HAZARD.";
-    rads = 18;
-  } else if (temperature >= 32) {
-    condition = "HEAT HAZE";
-    threat = "MODERATE";
-    alert = "EXTREME HEAT. HYDRATION ADVISED.";
-    rads = 10;
-  } else if (temperature <= 0) {
-    condition = "FROST WARNING";
-    threat = "MODERATE";
-    alert = "SUBZERO CONDITIONS. REDUCED MOBILITY.";
-    rads = 8;
-  } else if ([1,2,3].includes(weathercode)) {
-    condition = "BROKEN SKIES";
-    threat = "LOW";
-    alert = "Cloud cover variable. Maintain watch.";
-    rads = 6;
-  }
-
-  // spice: add occasional flavor line
-  const flavor = ALERT_POOL[Math.floor(Math.random()*ALERT_POOL.length)];
-  const combined = threat === "SEVERE" ? alert : `${alert} ${flavor}`;
-
-  return { condition, threat, alert: combined, rads };
+/* -------- Clock (timezone aware) -------- */
+function formatTimeInZone(date, timeZone) {
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit"
+  }).format(date);
+}
+function formatDateInZone(date, timeZone) {
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    weekday: "short",
+    month: "short",
+    day: "2-digit",
+    year: "numeric"
+  }).format(date);
+}
+function startClock(timeZone){
+  if (clockTimer) clearInterval(clockTimer);
+  tzEl.textContent = timeZone || "—";
+  const tick = () => {
+    const now = new Date();
+    clockEl.textContent = formatTimeInZone(now, timeZone);
+    dateEl.textContent = formatDateInZone(now, timeZone);
+  };
+  tick();
+  clockTimer = setInterval(tick, 1000);
 }
 
-async function geocodeLocation(query) {
-  const res = await fetch(
-    `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=1&language=en&format=json`
-  );
+/* -------- Moon phase (approx) -------- */
+function moonPhaseInfo(date = new Date()) {
+  const synodicMonth = 29.53058867;
+  const knownNewMoon = new Date(Date.UTC(2000, 0, 6, 18, 14, 0));
+  const days = (date - knownNewMoon) / 86400000;
+  const age = ((days % synodicMonth) + synodicMonth) % synodicMonth;
+  const pct = age / synodicMonth;
+
+  let name = "New Moon";
+  if (pct < 0.03 || pct > 0.97) name = "New Moon";
+  else if (pct < 0.22) name = "Waxing Crescent";
+  else if (pct < 0.28) name = "First Quarter";
+  else if (pct < 0.47) name = "Waxing Gibbous";
+  else if (pct < 0.53) name = "Full Moon";
+  else if (pct < 0.72) name = "Waning Gibbous";
+  else if (pct < 0.78) name = "Last Quarter";
+  else name = "Waning Crescent";
+
+  const fullTarget = synodicMonth * 0.5;
+  let untilFull = fullTarget - age;
+  if (untilFull < 0) untilFull += synodicMonth;
+
+  return { name, age: age.toFixed(1), untilFull: Math.round(untilFull) };
+}
+
+/* -------- Fallout condition mapping --------
+   Open-Meteo weathercode reference (WMO):
+   0 clear, 1-3 partly/overcast, 45/48 fog, 51-57 drizzle,
+   61-67 rain, 71-77 snow, 80-82 showers, 95-99 thunderstorm
+*/
+function mapToWastelandFromCode(weathercode, tempF, windMph, pop){
+  // pop = precipitation probability max (%) for daily cards (optional)
+  let condition = "CALM SKIES";
+  let threat = "LOW";
+  let detail = "Signal stable. Patrol activity nominal.";
+  let rads = 6;
+  let visibility = "CLEAR";
+
+  const windy = windMph >= 25;
+
+  // Thunderstorms -> Radstorm
+  if ([95,96,99].includes(weathercode)) {
+    condition = "RADSTORM";
+    threat = "SEVERE";
+    detail = "SEVERE RADIATION. SEEK SHELTER IMMEDIATELY.";
+    rads = 85;
+    visibility = "POOR";
+  }
+  // Rain/showers -> Acid rain (if heavy probability), otherwise irradiated drizzle
+  else if ([61,63,65,80,81,82].includes(weathercode)) {
+    condition = (pop != null && pop >= 60) ? "ACID RAIN" : "TOXIC RAIN";
+    threat = "ELEVATED";
+    detail = "CORROSIVE PRECIPITATION. PROTECT EQUIPMENT.";
+    rads = (pop != null && pop >= 60) ? 40 : 28;
+    visibility = "REDUCED";
+  }
+  // Fog -> Radclouds
+  else if ([45,48].includes(weathercode)) {
+    condition = "RADCLOUDS";
+    threat = "MODERATE";
+    detail = "LOW VISIBILITY. NAVIGATION IMPAIRED.";
+    rads = 22;
+    visibility = "LOW";
+  }
+  // Snow -> Ashfall / Whiteout
+  else if ([71,73,75,77].includes(weathercode)) {
+    condition = "ASHFALL";
+    threat = "MODERATE";
+    detail = "PARTICULATE FALL. FILTER MASK ADVISED.";
+    rads = 16;
+    visibility = "REDUCED";
+  }
+  // Cloudy -> Broken skies
+  else if ([1,2,3].includes(weathercode)) {
+    condition = "BROKEN SKIES";
+    threat = "LOW";
+    detail = "Cloud cover variable. Maintain watch.";
+    rads = 8;
+    visibility = "FAIR";
+  }
+
+  // Wind overlay -> Dust front
+  if (windy && threat !== "SEVERE") {
+    condition = "DUST FRONT";
+    threat = (threat === "LOW") ? "MODERATE" : "ELEVATED";
+    detail = "HIGH WINDS. AIRBORNE DEBRIS HAZARD.";
+    rads = Math.max(rads, 18);
+    visibility = "REDUCED";
+  }
+
+  // Temperature overlays (if calm-ish)
+  if (tempF >= 95 && threat !== "SEVERE") {
+    condition = "HEAT HAZE";
+    threat = (threat === "LOW") ? "MODERATE" : threat;
+    detail = "EXTREME HEAT. HYDRATION ADVISED.";
+    rads = Math.max(rads, 10);
+  }
+  if (tempF <= 32 && threat !== "SEVERE") {
+    condition = "FROST WARNING";
+    threat = (threat === "LOW") ? "MODERATE" : threat;
+    detail = "SUBFREEZING CONDITIONS. REDUCED MOBILITY.";
+    rads = Math.max(rads, 8);
+  }
+
+  return { condition, threat, detail, rads, visibility };
+}
+
+/* -------- Rotating ticker -------- */
+const FLAVOR_LINES = [
+  "Deathclaw sighting unconfirmed. Maintain perimeter discipline.",
+  "Scavenger activity detected. Secure loose supplies.",
+  "Radroach presence elevated near water sources. Boil before use.",
+  "Signal drift observed. Recalibrating antenna array…",
+  "Brotherhood patrol route intermittent. Do not rely on support.",
+  "Gunfire reported beyond the ridge. Avoid open ground."
+];
+
+function startRotatingTicker(lines){
+  if (tickerTimer) clearInterval(tickerTimer);
+  if (!lines || !lines.length) {
+    alertEl.textContent = "Signal stable.";
+    return;
+  }
+  let i = 0;
+  alertEl.textContent = lines[0];
+  tickerTimer = setInterval(() => {
+    i = (i + 1) % lines.length;
+    alertEl.textContent = lines[i];
+  }, 4500);
+}
+
+/* -------- API: Geocode + Forecast bundle -------- */
+async function geocode(query){
+  const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=1&language=en&format=json`;
+  const res = await fetch(url);
   const data = await res.json();
   if (!data.results || !data.results.length) throw new Error("Location not found");
   return data.results[0];
 }
 
-async function fetchWeather(lat, lon) {
-  const res = await fetch(
-    `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`
-  );
+async function fetchBundle(lat, lon){
+  const url =
+    `https://api.open-meteo.com/v1/forecast` +
+    `?latitude=${lat}&longitude=${lon}` +
+    `&current_weather=true` +
+    `&temperature_unit=fahrenheit&windspeed_unit=mph` +
+    `&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode,sunrise,sunset` +
+    `&hourly=relative_humidity_2m,surface_pressure` +
+    `&timezone=auto`;
+
+  const res = await fetch(url);
   const data = await res.json();
   if (!data.current_weather) throw new Error("Weather unavailable");
-  return data.current_weather;
+  return data;
 }
 
-function render(locLabel, weather){
-  const mapped = mapToWasteland(weather);
-
-  status.textContent = `ACTIVE: ${locLabel}`;
-  conditionBig.textContent = mapped.condition;
-  badgeThreat.textContent = `THREAT: ${mapped.threat}`;
-  conditionSub.textContent = `WMO code ${weather.weathercode} • Live conversion active`;
-  alertEl.textContent = mapped.alert;
-
-  tempEl.textContent = Math.round(weather.temperature) + "°C";
-  windEl.textContent = Math.round(weather.windspeed) + " km/h";
-  codeEl.textContent = String(weather.weathercode);
-  updatedEl.textContent = nowStamp();
-
-  radsText.textContent = mapped.rads + " µSv/h";
-  radsBar.style.width = clamp(mapped.rads, 0, 100) + "%";
+/* -------- Render helpers -------- */
+function weekdayShort(yyyy_mm_dd, timeZone){
+  const d = new Date(yyyy_mm_dd + "T12:00:00"); // noon avoids DST edge issues
+  return new Intl.DateTimeFormat("en-US", { timeZone, weekday:"short" }).format(d);
 }
 
-async function run(query) {
+function safeNum(x){ return (x === null || x === undefined || Number.isNaN(x)) ? null : x; }
+
+function pickNearestHourly(bundle){
+  // We requested humidity + pressure hourly; pick closest to "now" in the location timezone.
+  const times = bundle.hourly?.time || [];
+  if (!times.length) return { humidity: null, pressure: null };
+
+  // Use bundle.current_weather.time which is in local tz string like "2026-03-02T11:00"
+  const target = bundle.current_weather?.time;
+  if (!target) return { humidity: null, pressure: null };
+
+  const idx = times.indexOf(target);
+  const i = idx >= 0 ? idx : Math.max(0, times.length - 1);
+
+  const humidity = safeNum(bundle.hourly.relative_humidity_2m?.[i]);
+  const pressure = safeNum(bundle.hourly.surface_pressure?.[i]); // hPa
+  return { humidity, pressure };
+}
+
+function renderForecast(bundle, windMph){
+  forecastGrid.innerHTML = "";
+  const tz = bundle.timezone || "UTC";
+
+  const days = bundle.daily.time;
+  const hiArr = bundle.daily.temperature_2m_max;
+  const loArr = bundle.daily.temperature_2m_min;
+  const popArr = bundle.daily.precipitation_probability_max;
+  const codeArr = bundle.daily.weathercode;
+
+  for (let i = 0; i < Math.min(7, days.length); i++){
+    const day = days[i];
+    const hi = Math.round(hiArr[i]);
+    const lo = Math.round(loArr[i]);
+    const pop = safeNum(popArr?.[i]);
+    const code = codeArr[i];
+
+    const mapped = mapToWastelandFromCode(code, hi, windMph, pop);
+    const card = document.createElement("div");
+    card.className = "forecastCard";
+    card.innerHTML = `
+      <div class="fcDay">${weekdayShort(day, tz)} • ${day}</div>
+      <div class="fcCond">${mapped.condition}</div>
+      <div class="fcTemps">HI ${hi}° / LO ${lo}°</div>
+      <div class="fcPop">${pop === null ? "PRECIP —" : `PRECIP ${pop}%`}</div>
+    `;
+    forecastGrid.appendChild(card);
+  }
+}
+
+function renderSunMoon(bundle){
+  const tz = bundle.timezone || "UTC";
+  const sr = bundle.daily.sunrise?.[0];
+  const ss = bundle.daily.sunset?.[0];
+
+  if (sr) sunriseEl.textContent = formatTimeInZone(new Date(sr), tz);
+  else sunriseEl.textContent = "—";
+
+  if (ss) sunsetEl.textContent = formatTimeInZone(new Date(ss), tz);
+  else sunsetEl.textContent = "—";
+
+  const moon = moonPhaseInfo(new Date());
+  moonNameEl.textContent = moon.name.toUpperCase();
+  moonDetailEl.textContent = `Full moon in ~${moon.untilFull} days • Age ${moon.age}d`;
+}
+
+/* -------- Main run -------- */
+function saveProfile(profile){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+}
+function loadProfile(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return null;
+  try { return JSON.parse(raw); } catch { return null; }
+}
+
+async function runByQuery(query){
   status.textContent = "Resolving location…";
-  const loc = await geocodeLocation(query);
+  const loc = await geocode(query);
 
   const locLabel = `${loc.name}${loc.admin1 ? ", " + loc.admin1 : ""}${loc.country ? ", " + loc.country : ""}`;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({
-    name: locLabel,
-    latitude: loc.latitude,
-    longitude: loc.longitude
-  }));
 
-  status.textContent = "Pulling atmospheric data…";
-  const weather = await fetchWeather(loc.latitude, loc.longitude);
-  render(locLabel, weather);
+  const profile = { name: locLabel, latitude: loc.latitude, longitude: loc.longitude };
+  saveProfile(profile);
+
+  await runByProfile(profile);
 }
 
-/* Buttons */
-btnSaved.addEventListener("click", async () => {
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if (!saved) { alertEl.textContent = "No saved location. Enter city/ZIP."; return; }
-  const loc = JSON.parse(saved);
-  status.textContent = "Loading saved terminal profile…";
-  const weather = await fetchWeather(loc.latitude, loc.longitude);
-  render(loc.name, weather);
-});
+async function runByProfile(profile){
+  status.textContent = "Pulling atmospheric data…";
+  const bundle = await fetchBundle(profile.latitude, profile.longitude);
 
-btnMyLoc.addEventListener("click", () => {
-  if (!navigator.geolocation) { alertEl.textContent = "Auto-location not supported."; return; }
-  status.textContent = "Scanning local coordinates…";
-  navigator.geolocation.getCurrentPosition(async (pos) => {
-    try {
-      const lat = pos.coords.latitude;
-      const lon = pos.coords.longitude;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ name: "LOCAL COORDINATES", latitude: lat, longitude: lon }));
-      const weather = await fetchWeather(lat, lon);
-      render("LOCAL COORDINATES", weather);
-    } catch (e) {
-      alertEl.textContent = "Auto-location failed. Enter city/ZIP.";
-    }
-  }, () => {
-    alertEl.textContent = "Location permission denied. Enter city/ZIP.";
-  }, { timeout: 8000 });
-});
+  const tz = bundle.timezone || "UTC";
+  startClock(tz);
 
-/* Input handling */
+  status.textContent = `ACTIVE: ${profile.name}`;
+
+  const cw = bundle.current_weather;
+  const tempF = Math.round(cw.temperature);
+  const windMph = Math.round(cw.windspeed);
+
+  const hourly = pickNearestHourly(bundle);
+  const humidity = hourly.humidity;
+  const pressure = hourly.pressure;
+
+  // Convert to wasteland mapping
+  const mapped = mapToWastelandFromCode(cw.weathercode, tempF, windMph, null);
+
+  conditionBig.textContent = mapped.condition;
+  badgeThreat.textContent = `THREAT: ${mapped.threat}`;
+  condDetail.textContent = `WMO ${cw.weathercode} • Live conversion active`;
+  radsText.textContent = `${mapped.rads} µSv/h`;
+  radsBar.style.width = clamp(mapped.rads, 0, 100) + "%";
+
+  tempEl.textContent = `${tempF}°F`;
+  windEl.textContent = `${windMph} mph`;
+  visEl.textContent = mapped.visibility;
+  pressEl.textContent = (pressure === null) ? "—" : `${Math.round(pressure)} hPa`;
+  humidEl.textContent = (humidity === null) ? "—" : `${Math.round(humidity)}%`;
+  updatedEl.textContent = nowStamp();
+
+  renderSunMoon(bundle);
+  renderForecast(bundle, windMph);
+
+  // Build rotating ticker lines (WeatherStar feel)
+  const moon = moonPhaseInfo(new Date());
+  const tickerLines = [
+    mapped.detail,
+    `Active location: ${profile.name}`,
+    `Temp ${tempF}°F • Wind ${windMph} mph • Threat ${mapped.threat}`,
+    `Sunrise ${sunriseEl.textContent} • Sunset ${sunsetEl.textContent}`,
+    `Moon: ${moon.name} • Full in ~${moon.untilFull} days`,
+    ...FLAVOR_LINES
+  ];
+  startRotatingTicker(tickerLines);
+}
+
+/* -------- Controls -------- */
 input.addEventListener("keydown", (e) => {
-  if (e.key === "Enter" && input.value.trim()) {
-    run(input.value.trim()).catch(err => alertEl.textContent = err.message);
+  if (e.key === "Enter" && input.value.trim()){
+    runByQuery(input.value.trim()).catch(err => {
+      startRotatingTicker([err.message, ...FLAVOR_LINES]);
+    });
   }
 });
 
-/* Auto-load */
-(async () => {
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if (!saved) return;
-  try {
-    const loc = JSON.parse(saved);
-    status.textContent = "Restoring last terminal session…";
-    const weather = await fetchWeather(loc.latitude, loc.longitude);
-    render(loc.name, weather);
-  } catch {}
+btnSaved.addEventListener("click", () => {
+  const p = loadProfile();
+  if (!p){
+    startRotatingTicker(["No saved location. Enter city or ZIP.", ...FLAVOR_LINES]);
+    return;
+  }
+  runByProfile(p).catch(err => startRotatingTicker([err.message, ...FLAVOR_LINES]));
+});
+
+btnMyLoc.addEventListener("click", () => {
+  if (!navigator.geolocation){
+    startRotatingTicker(["Auto-location not supported. Enter city or ZIP.", ...FLAVOR_LINES]);
+    return;
+  }
+  status.textContent = "Scanning local coordinates…";
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    try {
+      const profile = {
+        name: "LOCAL COORDINATES",
+        latitude: pos.coords.latitude,
+        longitude: pos.coords.longitude
+      };
+      saveProfile(profile);
+      await runByProfile(profile);
+    } catch (e){
+      startRotatingTicker(["Auto-location failed. Enter city or ZIP.", ...FLAVOR_LINES]);
+    }
+  }, () => {
+    startRotatingTicker(["Location permission denied. Enter city or ZIP.", ...FLAVOR_LINES]);
+  }, { timeout: 8000 });
+});
+
+/* -------- Auto-load last profile -------- */
+(() => {
+  const p = loadProfile();
+  if (!p) {
+    // start a nice idle ticker
+    startRotatingTicker([
+      "Awaiting location input…",
+      ...FLAVOR_LINES
+    ]);
+    return;
+  }
+  runByProfile(p).catch(() => {
+    startRotatingTicker(["Saved location could not be loaded. Enter city or ZIP.", ...FLAVOR_LINES]);
+  });
 })();
 </script>
 
