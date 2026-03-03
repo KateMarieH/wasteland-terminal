@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Wasteland Terminal Access</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+<div class="crt"></div>
+
+<main class="wrap">
+
+  <section class="panel">
+    <h1 class="heroTitle">WASTELAND TERMINAL</h1>
+    <p class="heroTag">
+      <span class="monoStrong">Access Request</span> — identify user.
+    </p>
+
+    <div class="inputRow" style="margin-top:14px;">
+      <input class="input" id="userName" placeholder="Enter your name or callsign…" maxlength="18" />
+      <button class="btn" id="initBtn" type="button">Initialize</button>
+    </div>
+
+    <div class="scrollBox" style="margin-top:14px;">
+      <div class="tiny"><strong>TERMINAL OUTPUT:</strong></div>
+      <div class="scrollText" id="typeOut" style="min-height:2.4em;"></div>
+    </div>
+
+    <div class="btnrow" style="margin-top:14px;">
+      <a class="btn ghost" id="enterBtn" href="index.html" style="pointer-events:none; opacity:.45;">
+        ▶ ENTER WASTELAND TERMINAL
+      </a>
+      <button class="btn ghost" id="skipBtn" type="button">Skip</button>
+    </div>
+
+    <p class="tiny" style="margin-top:12px;">
+      Note: Your name is stored only on your device (local terminal memory).
+    </p>
+  </section>
+
+</main>
+
+<script>
+const KEY = "wt_user_name";
+
+const userName = document.getElementById("userName");
+const initBtn = document.getElementById("initBtn");
+const enterBtn = document.getElementById("enterBtn");
+const skipBtn = document.getElementById("skipBtn");
+const typeOut = document.getElementById("typeOut");
+
+let typingTimer = null;
+
+function sanitizeName(v){
+  // keep it terminal-y and safe: letters/numbers/spaces/-/_
+  v = (v || "").trim();
+  v = v.replace(/[^a-z0-9 _-]/gi, "");
+  if (!v) return "WANDERER";
+  return v.slice(0, 18);
+}
+
+function typeText(text, speed=20, done){
+  clearInterval(typingTimer);
+  typeOut.textContent = "";
+  let i = 0;
+  typingTimer = setInterval(() => {
+    i++;
+    typeOut.textContent = text.slice(0, i);
+    if (i >= text.length){
+      clearInterval(typingTimer);
+      typingTimer = null;
+      done?.();
+    }
+  }, speed);
+}
+
+function enableEnter(){
+  enterBtn.style.pointerEvents = "auto";
+  enterBtn.style.opacity = "1";
+}
+
+function initialize(){
+  const name = sanitizeName(userName.value);
+  localStorage.setItem(KEY, name);
+
+  const msg =
+`WELCOME, ${name.toUpperCase()}.
+ACCESS GRANTED.
+THIS IS YOUR PERSONAL WASTELAND TERMINAL.
+
+YOU'VE BEEN CLEARED FOR:
+• WEATHER
+• NEWS
+• RADIO
+• …AND A FEW WASTELAND ODDITIES.
+
+THIS TERMINAL UPDATES AS NEW DATA BECOMES AVAILABLE.`;
+
+  typeText(msg, 18, enableEnter);
+}
+
+initBtn.addEventListener("click", initialize);
+userName.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") initialize();
+});
+
+skipBtn.addEventListener("click", () => {
+  // set a default so index has something to show
+  if (!localStorage.getItem(KEY)) localStorage.setItem(KEY, "WANDERER");
+  window.location.href = "index.html";
+});
+
+// if they already set a name before, preload it
+const existing = localStorage.getItem(KEY);
+if (existing) userName.value = existing;
+</script>
+
+</body>
+</html>
