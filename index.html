@@ -1,164 +1,145 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Wasteland Terminal</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
   <div class="crt"></div>
 
-  <main class="screen" role="main" aria-label="Wasteland Terminal">
+  <main class="screen">
 
-    <!-- ================= TOP BAR ================= -->
-    <header class="block topbar">
-      <div class="row between wrap headerRow">
+    <!-- HEADER -->
+    <header class="row between wrap">
+      <div class="topLeft">
+        <div class="titleRow">
+          <h1 class="title">WASTELAND TERMINAL</h1>
 
-        <!-- Left: Title + Counter + Support -->
-        <div class="topLeft">
-          <div class="headerLine">
-            <div class="title">WASTELAND TERMINAL</div>
-
-            <div class="headerInline">
-              <!-- flip counter -->
-              <div class="flipCounter" id="flipCounter" aria-label="Visitor Counter"></div>
-
-              <a class="btn ghost" id="supportBtn"
-                 href="https://www.patreon.com/cw/wastelandterminal/membership"
-                 target="_blank" rel="noopener">
-                [ SUPPORT THE TERMINAL ]
-              </a>
-            </div>
+          <!-- counter sits right beside the title -->
+          <div class="counterInline">
+            <div class="counterLabel">VISITORS</div>
+            <div class="flipCounter" id="flipCounter" aria-label="Visitor counter"></div>
           </div>
 
-          <div class="sub">Your go-to terminal for news, weather, music, &amp; more.</div>
-
-          <div class="kv compactLine">
-            <span class="k">USER:</span> <span id="userName">WANDERER</span>
-            <span class="k sep">LOCAL TIME:</span> <span id="localClock">—</span>
-          </div>
+          <!-- support button right beside counter -->
+          <a class="btn ghost" id="supportBtn" href="https://www.patreon.com/cw/wastelandterminal/membership" target="_blank" rel="noopener">
+            [ SUPPORT THE TERMINAL ]
+          </a>
         </div>
 
-        <!-- Right: Mini Weather Widget -->
-        <div class="topRight">
-          <div class="miniWx" aria-label="Mini Weather">
-            <div class="miniWxTitle">WASTELAND WEATHER</div>
-            <div class="miniWxLine" id="miniWxNow">NOW: —</div>
-            <div class="miniWxLine dim" id="miniWxLoc">LOC: —</div>
+        <div class="sub">Your go-to terminal for news, weather, music, & wastelander oddities.</div>
+        <div class="compactLine"><span class="mono">USER:</span> <span id="userLabel">WANDERER</span> &nbsp; <span class="mono">LOCAL TIME:</span> <span id="localTime">—</span></div>
 
-            <div class="row gap wrap" style="margin-top:8px; justify-content:flex-end;">
-              <button class="btn" id="miniWxUseMyLoc" type="button">[ USE MY LOC ]</button>
-              <button class="btn ghost" id="miniWxUseSaved" type="button">[ USE SAVED ]</button>
-            </div>
-          </div>
+        <!-- NAV BUTTONS -->
+        <nav class="topMenu" aria-label="Terminal navigation">
+          <a class="btn ghost" href="/about/">[ ABOUT ]</a>
+          <a class="btn ghost" href="/community/">[ COMMUNITY ]</a>
+          <a class="btn ghost" href="/news/">[ NEWS ARCHIVE ]</a>
+          <a class="btn ghost" href="/weather/">[ WEATHER ]</a>
+          <a class="btn ghost" href="/outpost/">[ OUTPOST ]</a>
+        </nav>
+      </div>
+
+      <!-- TOP RIGHT: Compact Weather Widget -->
+      <aside class="topRight weatherTop">
+        <div class="h">WASTELAND WEATHER</div>
+        <div class="ruleSmall">------------------------------------</div>
+
+        <div class="loginBar">
+          <input id="wxTopInput" class="input" placeholder="City or ZIP — press Enter" />
+          <button class="btn ghost" id="wxTopMyLoc">[ USE MY LOC ]</button>
+          <button class="btn ghost" id="wxTopUseSaved">[ USE SAVED ]</button>
         </div>
 
-      </div>
-
-      <!-- ================= TOP NAV ================= -->
-      <nav class="topMenu" aria-label="Terminal Navigation">
-        <a class="btn ghost" href="/about/">[ ABOUT ]</a>
-        <a class="btn ghost" href="/community/">[ COMMUNITY ]</a>
-        <a class="btn ghost" href="/news/">[ NEWS ARCHIVE ]</a>
-        <a class="btn ghost" href="/weather/">[ WEATHER ]</a>
-        <a class="btn ghost" href="/outpost/">[ OUTPOST ]</a>
-      </nav>
-
-      <!-- Same-page identification prompt -->
-      <div id="loginBar" class="loginBar" aria-live="polite">
-        <span class="k">IDENTIFICATION:</span>
-        <input id="nameInput" class="input" type="text" placeholder="ENTER CALLSIGN" maxlength="18" />
-        <button id="nameConfirm" class="btn" type="button">[ CONFIRM ]</button>
-        <button id="nameSkip" class="btn ghost" type="button">[ CONTINUE AS WANDERER ]</button>
-        <span class="tiny dim">Stored locally on this device.</span>
-      </div>
-
-      <div class="rule">----------------------------------------------</div>
+        <div class="kv">
+          <div><span class="k">LOC:</span> <span class="v" id="wxTopLoc">—</span></div>
+          <div><span class="k">NOW:</span> <span class="v" id="wxTopNow">—</span></div>
+          <div><span class="k">UPCOMING:</span> <span class="v" id="wxTopNext">—</span></div>
+          <div><span class="k">MOON:</span> <span class="v" id="wxTopMoon">—</span></div>
+        </div>
+        <div class="tiny dim" id="wxTopStatus">Awaiting atmospheric scan…</div>
+      </aside>
     </header>
 
-    <!-- ================= TERMINAL BULLETIN ================= -->
-    <section class="block bulletin">
-      <div class="h">&gt; TERMINAL BULLETIN</div>
-      <div class="ruleSmall">--------------------------------</div>
+    <div class="rule">================================================================</div>
 
-      <!-- You can hardcode updates here for now; later we can load from /data/bulletin.json -->
-      <div class="bulletinBox">
-        <div class="mono">•  NEW: Stations module is live (radio embedded).</div>
-        <div class="mono">•  IN PROGRESS: Community chat + live cam detection.</div>
-        <div class="mono">•  SOON: Outpost marketplace + creator features.</div>
+    <!-- TERMINAL NEWS / UPDATES (you can edit this text anytime) -->
+    <section class="block">
+      <div class="h">> TERMINAL NEWS</div>
+      <div class="ruleSmall">------------------------------------</div>
+      <div class="tickerLine">
+        <div class="mono">TRANSMISSION:</div>
+        <div class="dim">
+          Welcome to Wasteland Terminal. Modules are coming online. Check back often — new data drops as it’s recovered.
+        </div>
       </div>
     </section>
 
-    <div class="rule">----------------------------------------------</div>
+    <div class="ruleDots">::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::</div>
 
-    <!-- ================= MAIN MODULES ================= -->
-    <section class="grid2" aria-label="Terminal Modules">
+    <!-- MAIN GRID -->
+    <section class="grid">
 
-      <!-- ================= COMMUNITY ================= -->
-      <section class="block">
-        <div class="h">&gt; COMMUNITY</div>
-        <div class="ruleSmall">--------------------------------</div>
+      <!-- COMMUNITY COLUMN -->
+      <div class="block">
+        <div class="h">> COMMUNITY</div>
+        <div class="ruleSmall">------------------------------------</div>
 
-        <!-- Chat (scaffold) -->
-        <div class="sub dim" style="margin-top:6px;">
-          CHAT (BETA): This is a local prototype until we wire a real multi-user chat backend.
-        </div>
-
-        <div class="chatBox">
-          <div class="chatLog" id="chatLog" aria-label="Chat log"></div>
-
-          <div class="chatRow">
-            <input class="input chatAlias" id="chatAlias" placeholder="ALIAS" maxlength="18">
-            <input class="input chatMsg" id="chatMsg" placeholder="TYPE MESSAGE…" maxlength="200">
-            <button class="btn ghost" id="chatSend" type="button">[ SEND ]</button>
+        <!-- CHAT PLACEHOLDER (real chat needs a service/backend) -->
+        <div class="panelBox">
+          <div class="mono">LIVE CHAT</div>
+          <div class="tiny dim" style="margin-top:6px">
+            Chat module coming online. (When you’re ready, we can drop in an embedded chat provider.)
           </div>
 
-          <div class="tiny dim">Tip: When we switch to real chat, this panel will become shared across visitors.</div>
+          <!-- OPTIONAL: If you later pick an embed chat (example only)
+          <iframe class="chatFrame" src="YOUR_CHAT_EMBED_URL"></iframe>
+          -->
         </div>
 
-        <div class="ruleDots">::::::::::::::::::::::::::::::::</div>
+        <div class="ruleDots">::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::</div>
 
-        <!-- Static Top 5 News -->
-        <div class="h" style="margin-top:10px;">&gt; TOP HEADLINES</div>
-        <div class="sub dim">Newest story highlights in amber; oldest drops off.</div>
+        <!-- STATIC TOP 5 NEWS -->
+        <div class="h">> NEWS FEED</div>
+        <div class="ruleSmall">------------------------------------</div>
 
-        <div class="newsList" id="newsList">
-          <div class="tickerLine mono">LOADING FALLOUT HEADLINES…</div>
+        <div class="tickerLine mono" id="newsStatus">LOADING FALLOUT HEADLINES…</div>
+
+        <div class="newsList" id="newsList"></div>
+
+        <div class="row gap wrap" style="margin-top:12px">
+          <a class="btn ghost" id="newsOpenNewest" href="#" target="_blank" rel="noopener">[ OPEN NEWEST ]</a>
+          <button class="btn ghost" id="newsRefresh">[ REFRESH ]</button>
         </div>
 
-        <div class="meta2col" style="margin-top:12px;">
-          <div class="kv">
-            <span class="k">SOURCE:</span> <span class="v" id="newsSource">—</span>
-          </div>
-          <div class="kv">
-            <span class="k">LAST UPDATE:</span> <span class="v" id="newsUpdated">—</span>
-          </div>
+        <div class="kv">
+          <div><span class="k">LAST UPDATE:</span> <span class="v" id="newsUpdated">—</span></div>
         </div>
+      </div>
 
-        <div class="row gap wrap" style="margin-top:10px;">
-          <a class="btn ghost" id="newsLink" href="#" target="_blank" rel="noopener">[ OPEN NEWEST ]</a>
-          <button class="btn ghost" id="newsRefresh" type="button">[ REFRESH ]</button>
-        </div>
-      </section>
-
-      <!-- ================= STATIONS ================= -->
-      <section class="block">
-        <div class="h">&gt; STATIONS</div>
-        <div class="ruleSmall">--------------------------------</div>
+      <!-- STATIONS COLUMN -->
+      <div class="block">
+        <div class="h">> STATIONS</div>
+        <div class="ruleSmall">------------------------------------</div>
 
         <!-- RADIO -->
-        <div class="stationBox">
-          <div class="monoStrong">MYSTIC BROADCAST RADIO</div>
-          <div class="sub dim">Embedded stream — no extra page needed.</div>
+        <div class="panelBox">
+          <div class="mono bigLine">MYSTIC BROADCAST RADIO</div>
 
-          <div class="nowPlaying">
-            <div class="k">NOW PLAYING:</div>
-            <div class="bigLine" id="radioNowPlaying">
-              <span class="cc_streaminfo" data-type="song" data-username="themysti">Loading…</span>
+          <div class="kv">
+            <div><span class="k">STATUS:</span> <span class="v" id="radioStatus">STANDBY</span></div>
+            <div>
+              <span class="k">NOW PLAYING:</span>
+              <span class="v">
+                <span class="cc_streaminfo" data-type="trackartist" data-username="themysti">—</span>
+                &nbsp;—&nbsp;
+                <span class="cc_streaminfo" data-type="tracktitle" data-username="themysti">—</span>
+              </span>
             </div>
-            <div class="tiny dim">
+            <div class="tiny dim" style="margin-top:6px">
               LISTENERS:
               <span class="cc_streaminfo" data-type="listeners" data-username="themysti">—</span>
               /
@@ -166,457 +147,465 @@
             </div>
           </div>
 
-          <audio id="radioPlayer" class="audio" controls preload="none">
-            <source src="https://radio.shoutcheap.com/proxy/themysti/stream" type="audio/mpeg">
-          </audio>
+          <!-- Custom player (no white default controls) -->
+          <div class="radioPlayer">
+            <button class="btn" id="radioPlay">[ PLAY ]</button>
+            <button class="btn ghost" id="radioStop">[ STOP ]</button>
 
-          <div class="row gap wrap" style="margin-top:10px;">
-            <a class="btn ghost" href="https://radio.shoutcheap.com/tunein/themysti.pls" target="_blank" rel="noopener">[ TUNEIN (PLS) ]</a>
-          </div>
-        </div>
+            <div class="radioViz" aria-hidden="true">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
 
-        <div class="ruleDots">::::::::::::::::::::::::::::::::</div>
-
-        <!-- WASTELAND LIVE CAM (YouTube live scaffold) -->
-        <div class="stationBox">
-          <div class="row between wrap">
-            <div class="monoStrong">WASTELAND LIVE CAM</div>
-            <div class="liveBadge" id="liveBadge" hidden>
-              <span class="dot"></span> LIVE NOW
+            <div class="radioVol">
+              <label class="tiny dim" for="radioVol">VOL</label>
+              <input id="radioVol" type="range" min="0" max="1" step="0.01" value="0.85" />
             </div>
           </div>
-          <div class="sub dim">Auto-detect live stream later; standby screen when offline.</div>
 
-          <div id="livePlayer" class="livePlayer">
-            <img id="standbyImg" class="standbyImg" src="/assets/please-stand-by.png" alt="Please stand by">
-            <div class="tiny dim" style="margin-top:8px">Standby. No broadcast detected.</div>
+          <div class="row gap wrap" style="margin-top:12px">
+            <a class="btn ghost" href="https://radio.shoutcheap.com/tunein/themysti.pls" target="_blank" rel="noopener">[ TUNEIN (PLS) ]</a>
           </div>
 
-          <div class="row gap wrap" style="margin-top:10px;">
-            <a class="btn" id="openLive" href="https://www.youtube.com/@themysticbroadcast" target="_blank" rel="noopener">[ OPEN LIVE CAM ]</a>
-            <a class="btn ghost" id="openArchives" href="https://www.youtube.com/@themysticbroadcast/streams" target="_blank" rel="noopener">[ ARCHIVES ]</a>
-            <button class="btn ghost" id="checkLive" type="button">[ CHECK SIGNAL ]</button>
+          <!-- hidden audio element -->
+          <audio id="radioAudio" preload="none" crossorigin="anonymous">
+            <source src="https://radio.shoutcheap.com/proxy/themysti/stream" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="ruleDots">::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::</div>
+
+        <!-- LIVE CAM -->
+        <div class="panelBox">
+          <div class="row between wrap">
+            <div class="mono bigLine">WASTELAND LIVE CAM</div>
+            <div class="liveBadge" id="liveBadge"><span class="dot"></span> LIVE NOW</div>
+          </div>
+
+          <div class="camBox" id="camBox">
+            <!-- replaced dynamically -->
+            <img id="camStandby" class="camImg" src="/assets/please-stand-by.png" alt="Please stand by" />
+          </div>
+
+          <div class="row gap wrap" style="margin-top:12px">
+            <a class="btn" id="openLiveCam" href="https://www.youtube.com/@themysticbroadcast/live" target="_blank" rel="noopener">[ OPEN LIVE CAM ]</a>
+            <a class="btn ghost" href="https://www.youtube.com/@themysticbroadcast/videos" target="_blank" rel="noopener">[ ARCHIVES ]</a>
+            <button class="btn ghost" id="checkSignal">[ CHECK SIGNAL ]</button>
+          </div>
+
+          <div class="tiny dim" id="liveStatus" style="margin-top:10px">Standby.</div>
+        </div>
+
+        <div class="ruleDots">::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::</div>
+
+        <!-- WASTELAND TV placeholder -->
+        <div class="panelBox">
+          <div class="mono bigLine">WASTELAND TV</div>
+          <div class="tiny dim" style="margin-top:8px">
+            Coming soon: rotating PSAs, public domain cartoons, and archive reels.
+          </div>
+          <div class="row gap wrap" style="margin-top:12px">
+            <a class="btn ghost" href="/tv/">[ OPEN WASTELAND TV ]</a>
           </div>
         </div>
 
-        <div class="ruleDots">::::::::::::::::::::::::::::::::</div>
-
-        <!-- WASTELAND TV (placeholder) -->
-        <div class="stationBox">
-          <div class="monoStrong">WASTELAND TV</div>
-          <div class="sub dim">Reserved for rotating PSAs, public domain movies, cartoons, loops.</div>
-
-          <div class="tvPlaceholder">
-            <div class="mono dim">SIGNAL: STANDBY</div>
-            <div class="tiny dim">Coming soon.</div>
-          </div>
-
-          <div class="row gap wrap" style="margin-top:10px;">
-            <a class="btn ghost" href="/outpost/" rel="noopener">[ TV SCHEDULE (SOON) ]</a>
-          </div>
-        </div>
-
-      </section>
+      </div>
     </section>
 
-    <!-- FOOTER -->
-    <footer class="foot">
-      <div class="tiny dim">Unofficial Fallout fan terminal — built and managed by Lady Mystic.</div>
+    <footer class="foot row between wrap">
+      <span class="tiny dim">Unofficial Fallout fan terminal.</span>
+      <span class="tiny dim">Built and managed by Lady Mystic.</span>
     </footer>
 
   </main>
 
-  <!-- StreamInfo widgets -->
-  <script src="https://radio.shoutcheap.com/system/streaminfo.js" defer></script>
+  <!-- Shoutcheap streaminfo -->
+  <script src="https://radio.shoutcheap.com/system/streaminfo.js"></script>
 
-  <!-- ================= CLOCK + NAME ================= -->
   <script>
-    const NAME_KEY = "wt_callsign_v2";
+    /***********************
+     * HEADER: TIME + USER
+     ***********************/
+    const localTimeEl = document.getElementById("localTime");
+    const userLabelEl = document.getElementById("userLabel");
+    const USER_KEY = "wt_user_alias_v1";
 
-    const userNameEl = document.getElementById("userName");
-    const localClockEl = document.getElementById("localClock");
-
-    const loginBar = document.getElementById("loginBar");
-    const nameInput = document.getElementById("nameInput");
-    const nameConfirm = document.getElementById("nameConfirm");
-    const nameSkip = document.getElementById("nameSkip");
-
-    function tickClock(){
-      localClockEl.textContent = new Date().toLocaleString();
+    function tickTime(){
+      localTimeEl.textContent = new Date().toLocaleString();
     }
-    setInterval(tickClock, 1000);
-    tickClock();
+    setInterval(tickTime, 1000);
+    tickTime();
 
-    function setName(n){
-      const clean = (n || "").trim().toUpperCase();
-      if(!clean) return;
-      localStorage.setItem(NAME_KEY, clean);
-      userNameEl.textContent = clean;
-      loginBar.style.display = "none";
-    }
+    // minimal alias support (optional)
+    const existingAlias = localStorage.getItem(USER_KEY);
+    if (existingAlias) userLabelEl.textContent = existingAlias.toUpperCase();
 
-    const saved = localStorage.getItem(NAME_KEY);
-    if(saved){
-      userNameEl.textContent = saved;
-      loginBar.style.display = "none";
-    }
+    /***********************
+     * VISITOR COUNTER (local)
+     * (Counts visits per device/session; real unique requires backend)
+     ***********************/
+    const COUNTER_KEY = "wt_local_counter_v1";
+    const SESSION_KEY = "wt_session_counted_v1";
 
-    nameConfirm?.addEventListener("click", () => setName(nameInput.value));
-    nameInput?.addEventListener("keydown", (e) => {
-      if(e.key === "Enter") setName(nameInput.value);
-    });
-    nameSkip?.addEventListener("click", () => {
-      userNameEl.textContent = "WANDERER";
-      loginBar.style.display = "none";
-    });
-  </script>
+    function padNum(n, len=6){ return String(n).padStart(len, "0"); }
 
-  <!-- ================= VISITOR FLIP COUNTER (LOCAL) ================= -->
-  <script>
-    const flipEl = document.getElementById("flipCounter");
-    const VIS_COUNT_KEY = "wt_visitors_count_v1";
-    const VIS_SEEN_KEY  = "wt_visitor_seen_v1";
-
-    function padDigits(n, width){
-      const s = String(n);
-      return s.length >= width ? s : ("0".repeat(width - s.length) + s);
-    }
-
-    function renderFlipDigits(str){
-      if(!flipEl) return;
-      flipEl.innerHTML = "";
-      for(const ch of str){
+    function buildFlipDigits(str){
+      const wrap = document.getElementById("flipCounter");
+      wrap.innerHTML = "";
+      for (const ch of str){
         const d = document.createElement("div");
         d.className = "flipDigit";
         d.innerHTML = `<div class="old">${ch}</div><div class="new">${ch}</div>`;
-        flipEl.appendChild(d);
+        wrap.appendChild(d);
       }
     }
 
-    function flipTo(nextStr){
-      if(!flipEl) return;
-      if(!flipEl.children.length){
-        renderFlipDigits(nextStr);
-        return;
-      }
-
-      const digits = Array.from(flipEl.children);
-      for(let i=0; i<digits.length; i++){
-        const box = digits[i];
-        const oldEl = box.querySelector(".old");
-        const newEl = box.querySelector(".new");
-        const oldChar = oldEl.textContent;
-        const newChar = nextStr[i];
-
-        if(oldChar === newChar) continue;
-
-        newEl.textContent = newChar;
-        box.classList.remove("flip");
-        void box.offsetWidth;
-        box.classList.add("flip");
-
+    function animateTo(newStr){
+      const wrap = document.getElementById("flipCounter");
+      const digits = [...wrap.querySelectorAll(".flipDigit")];
+      for (let i=0;i<digits.length;i++){
+        const digit = digits[i];
+        const oldEl = digit.querySelector(".old");
+        const newEl = digit.querySelector(".new");
+        if (oldEl.textContent === newStr[i]) continue;
+        newEl.textContent = newStr[i];
+        digit.classList.remove("flip");
+        void digit.offsetWidth;
+        digit.classList.add("flip");
         setTimeout(() => {
-          oldEl.textContent = newChar;
-          newEl.textContent = newChar;
-          box.classList.remove("flip");
-        }, 320);
+          oldEl.textContent = newStr[i];
+          digit.classList.remove("flip");
+        }, 360);
       }
     }
 
-    (function initCounter(){
-      if(!flipEl) return;
-      renderFlipDigits("000000");
-
-      let count = parseInt(localStorage.getItem(VIS_COUNT_KEY) || "0", 10);
-      const seen = localStorage.getItem(VIS_SEEN_KEY);
-
-      if(!seen){
-        localStorage.setItem(VIS_SEEN_KEY, "1");
-        count = (isNaN(count) ? 0 : count) + 1;
-        localStorage.setItem(VIS_COUNT_KEY, String(count));
+    function bumpCounter(){
+      let n = Number(localStorage.getItem(COUNTER_KEY) || "0");
+      if (!sessionStorage.getItem(SESSION_KEY)){
+        n += 1;
+        localStorage.setItem(COUNTER_KEY, String(n));
+        sessionStorage.setItem(SESSION_KEY, "1");
       }
-
-      flipTo(padDigits(count, 6));
-    })();
-  </script>
-
-  <!-- ================= MINI WEATHER (TOP RIGHT) ================= -->
-  <script>
-    const WX_MINI_KEY = "wt_weather_profile_mini_v1";
-
-    const miniWxNow = document.getElementById("miniWxNow");
-    const miniWxLoc = document.getElementById("miniWxLoc");
-    const miniWxUseMyLoc = document.getElementById("miniWxUseMyLoc");
-    const miniWxUseSaved = document.getElementById("miniWxUseSaved");
-
-    function mapWasteland(code){
-      if([95,96,99].includes(code)) return "RADSTORM";
-      if([61,63,65,80,81,82].includes(code)) return "ACID RAIN";
-      if([45,48].includes(code)) return "RADCLOUDS";
-      if([71,73,75,77,85,86].includes(code)) return "ASHFALL";
-      if([1,2,3].includes(code)) return "CLEAR SKIES";
-      if([0].includes(code)) return "CLEAR";
-      return "OVERCAST";
+      const str = padNum(n, 6);
+      buildFlipDigits(str);
+      // no animation on first paint
     }
 
-    function saveMini(p){ localStorage.setItem(WX_MINI_KEY, JSON.stringify(p)); }
-    function loadMini(){ try{ return JSON.parse(localStorage.getItem(WX_MINI_KEY)); }catch{ return null; } }
+    bumpCounter();
 
-    async function miniForecast(lat, lon){
-      const url =
-        `https://api.open-meteo.com/v1/forecast` +
-        `?latitude=${lat}&longitude=${lon}` +
-        `&current_weather=true` +
-        `&temperature_unit=fahrenheit&windspeed_unit=mph` +
-        `&timezone=auto`;
-      const r = await fetch(url, {cache:"no-store"});
-      return r.json();
-    }
-
-    async function miniRender(p){
-      try{
-        const d = await miniForecast(p.latitude, p.longitude);
-        const cw = d.current_weather;
-        miniWxLoc.textContent = `LOC: ${p.name}`;
-        miniWxNow.textContent = `NOW: ${mapWasteland(cw.weathercode)} • ${Math.round(cw.temperature)}°F`;
-      }catch{
-        miniWxLoc.textContent = `LOC: —`;
-        miniWxNow.textContent = `NOW: —`;
-      }
-    }
-
-    miniWxUseSaved?.addEventListener("click", () => {
-      const p = loadMini();
-      if(!p) return;
-      miniRender(p);
-    });
-
-    miniWxUseMyLoc?.addEventListener("click", () => {
-      if(!navigator.geolocation) return;
-      navigator.geolocation.getCurrentPosition((pos) => {
-        const p = { name: "DEVICE LOCATION", latitude: pos.coords.latitude, longitude: pos.coords.longitude };
-        saveMini(p);
-        miniRender(p);
-      });
-    });
-
-    const initMini = loadMini();
-    if(initMini) miniRender(initMini);
-  </script>
-
-  <!-- ================= COMMUNITY CHAT (LOCAL DEMO) ================= -->
-  <script>
-    const CHAT_KEY = "wt_local_chat_v1";
-    const chatLog = document.getElementById("chatLog");
-    const chatAlias = document.getElementById("chatAlias");
-    const chatMsg = document.getElementById("chatMsg");
-    const chatSend = document.getElementById("chatSend");
-
-    function loadChat(){
-      try { return JSON.parse(localStorage.getItem(CHAT_KEY) || "[]"); }
-      catch { return []; }
-    }
-    function saveChat(arr){
-      localStorage.setItem(CHAT_KEY, JSON.stringify(arr.slice(-60)));
-    }
-    function esc(s){
-      return (s||"").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-    }
-    function renderChat(){
-      const items = loadChat();
-      chatLog.innerHTML = items.map(x => `
-        <div class="chatLine">
-          <span class="chatTag">${esc(x.alias || "WANDERER")}</span>
-          <span class="chatText">${esc(x.msg || "")}</span>
-          <span class="chatTime dim">${esc(x.t || "")}</span>
-        </div>
-      `).join("");
-      chatLog.scrollTop = chatLog.scrollHeight;
-    }
-
-    function sendChat(){
-      const alias = (chatAlias.value || localStorage.getItem("wt_callsign_v2") || "WANDERER").trim().toUpperCase();
-      const msg = (chatMsg.value || "").trim();
-      if(!msg) return;
-
-      const t = new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
-      const items = loadChat();
-      items.push({ alias, msg, t });
-      saveChat(items);
-
-      chatMsg.value = "";
-      renderChat();
-    }
-
-    chatSend?.addEventListener("click", sendChat);
-    chatMsg?.addEventListener("keydown", (e) => {
-      if(e.key === "Enter") sendChat();
-    });
-
-    renderChat();
-  </script>
-
-  <!-- ================= NEWS (STATIC TOP 5) ================= -->
-  <script>
-    const newsListEl  = document.getElementById("newsList");
-    const newsSource  = document.getElementById("newsSource");
+    /***********************
+     * NEWS: STATIC TOP 5 LIST
+     ***********************/
+    const newsStatus = document.getElementById("newsStatus");
+    const newsList = document.getElementById("newsList");
     const newsUpdated = document.getElementById("newsUpdated");
-    const newsLink    = document.getElementById("newsLink");
     const newsRefresh = document.getElementById("newsRefresh");
-
-    const NEWS_CACHE_KEY = "wt_news_cache_v3";
-    const MAX_ITEMS = 5;
-    const POLL_MS = 5 * 60 * 1000;
+    const newsOpenNewest = document.getElementById("newsOpenNewest");
 
     function stamp(){ return new Date().toLocaleString(); }
-
-    function loadCache(){
-      try { return JSON.parse(localStorage.getItem(NEWS_CACHE_KEY) || "[]"); }
-      catch { return []; }
-    }
-    function saveCache(arr){
-      localStorage.setItem(NEWS_CACHE_KEY, JSON.stringify(arr.slice(0, MAX_ITEMS)));
-    }
-    function esc(s){
-      return (s||"").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-    }
-    function shorten(text, max=96){
-      text = (text || "").trim();
-      return text.length > max ? text.slice(0, max-1) + "…" : text;
+    function shorten(t, max=120){
+      t = (t || "").replace(/\s+/g, " ").trim();
+      return t.length > max ? t.slice(0, max-1) + "…" : t;
     }
 
-    function render(items, newestIsNew){
-      if(!items?.length){
-        newsListEl.innerHTML = `<div class="tickerLine mono">NO HEADLINES AVAILABLE</div>`;
-        newsSource.textContent = "—";
-        newsUpdated.textContent = stamp();
-        newsLink.href = "#";
+    function renderNews(items){
+      newsList.innerHTML = "";
+      if (!items?.length){
+        newsStatus.textContent = "NEWS FEED OFFLINE";
+        newsOpenNewest.href = "#";
         return;
       }
 
-      const newest = items[0];
-      newsLink.href = newest.link || "#";
-      newsSource.textContent = (newest.source || "MULTI").toUpperCase();
+      newsStatus.textContent = "TOP 5 HEADLINES:";
       newsUpdated.textContent = stamp();
 
-      newsListEl.innerHTML = items.slice(0, MAX_ITEMS).map((it, i) => {
-        const title = shorten(it.title || "UNTITLED", 96);
-        const src   = (it.source || "SOURCE").toUpperCase();
-        const link  = it.link || "#";
+      // top 5
+      const top = items.slice(0, 5);
 
-        const cls = (i === 0) ? "newsItem newest" : "newsItem";
-        const tag = (i === 0 && newestIsNew) ? ` <span class="amber mono">[NEW]</span>` : "";
+      // newest = first item
+      newsOpenNewest.href = top[0].link || "#";
 
-        return `
-          <div class="${cls}">
-            <div class="headline mono">
-              <a href="${esc(link)}" target="_blank" rel="noopener">
-                ${i+1}. ${esc(title)}${tag}
-              </a>
-            </div>
-            <div class="meta">SOURCE: ${esc(src)}</div>
-          </div>
+      top.forEach((it, i) => {
+        const div = document.createElement("div");
+        div.className = "newsItem" + (i===0 ? " newest" : "");
+        const source = (it.source || "SOURCE").toUpperCase();
+        const title = shorten(it.title, 120);
+        div.innerHTML = `
+          <a href="${it.link || "#"}" target="_blank" rel="noopener">
+            <div class="headline mono">${source} — ${title}</div>
+            <div class="meta">Open story in new tab</div>
+          </a>
         `;
-      }).join("");
+        newsList.appendChild(div);
+      });
     }
 
     async function loadNews(){
-      newsListEl.innerHTML = `<div class="tickerLine mono">LOADING FALLOUT HEADLINES…</div>`;
+      newsStatus.textContent = "LOADING FALLOUT HEADLINES…";
       newsUpdated.textContent = stamp();
-      newsSource.textContent = "—";
-      newsLink.href = "#";
+      newsList.innerHTML = "";
 
       try{
-        // IMPORTANT: This requires your Netlify function to be reachable on this domain.
-        const r = await fetch("/.netlify/functions/fallout-news", { cache:"no-store" });
+        const r = await fetch("/.netlify/functions/fallout-news", { cache: "no-store" });
         const d = await r.json();
-
-        if(!r.ok || !d.items?.length) throw new Error(d?.error || "No headlines");
-
-        const items = d.items.slice(0, MAX_ITEMS);
-        const prev = loadCache();
-        const newestLink = items[0]?.link || "";
-        const newestIsNew = !!(prev.length && newestLink && prev[0] !== newestLink);
-
-        saveCache(items.map(x => x.link || ""));
-        render(items, newestIsNew);
+        if (!r.ok) throw new Error(d?.error || "News function failed");
+        renderNews(d.items || []);
       }catch(e){
-        newsListEl.innerHTML = `<div class="tickerLine mono">NEWS FEED OFFLINE</div>`;
-        newsSource.textContent = "SYSTEM";
-        newsUpdated.textContent = stamp();
-        newsLink.href = "#";
-
-        // Helpful debugging:
-        console.warn("News load failed:", e);
+        renderNews([]);
       }
     }
 
-    newsRefresh?.addEventListener("click", loadNews);
+    newsRefresh.addEventListener("click", loadNews);
     loadNews();
-    setInterval(loadNews, POLL_MS);
-  </script>
 
-  <!-- ================= YOUTUBE LIVE CAM (SCAFFOLD) ================= -->
-  <script>
+    /***********************
+     * RADIO: CUSTOM PLAYER
+     ***********************/
+    const radioAudio = document.getElementById("radioAudio");
+    const radioPlay = document.getElementById("radioPlay");
+    const radioStop = document.getElementById("radioStop");
+    const radioVol = document.getElementById("radioVol");
+    const radioStatus = document.getElementById("radioStatus");
+
+    function setRadioState(isPlaying){
+      radioStatus.textContent = isPlaying ? "ONLINE" : "STANDBY";
+      radioPlay.textContent = isPlaying ? "[ PAUSE ]" : "[ PLAY ]";
+      document.body.classList.toggle("radioPlaying", isPlaying);
+      radioPlay.classList.toggle("isPlaying", isPlaying);
+    }
+
+    radioVol.addEventListener("input", () => {
+      radioAudio.volume = Number(radioVol.value);
+    });
+    radioAudio.volume = Number(radioVol.value);
+
+    radioPlay.addEventListener("click", async () => {
+      try{
+        if (radioAudio.paused){
+          await radioAudio.play();
+          setRadioState(true);
+        }else{
+          radioAudio.pause();
+          setRadioState(false);
+        }
+      }catch(e){
+        setRadioState(false);
+      }
+    });
+
+    radioStop.addEventListener("click", () => {
+      radioAudio.pause();
+      // reset stream
+      radioAudio.src = radioAudio.currentSrc || "https://radio.shoutcheap.com/proxy/themysti/stream";
+      setRadioState(false);
+    });
+
+    radioAudio.addEventListener("playing", () => setRadioState(true));
+    radioAudio.addEventListener("pause", () => setRadioState(false));
+    radioAudio.addEventListener("error", () => setRadioState(false));
+
+    /***********************
+     * LIVE CAM: YouTube live detection (Netlify function)
+     ***********************/
     const liveBadge = document.getElementById("liveBadge");
-    const livePlayer = document.getElementById("livePlayer");
-    const openLive = document.getElementById("openLive");
-    const openArchives = document.getElementById("openArchives");
-    const checkLive = document.getElementById("checkLive");
+    const camBox = document.getElementById("camBox");
+    const liveStatus = document.getElementById("liveStatus");
+    const checkSignal = document.getElementById("checkSignal");
 
-    const YT_CHANNEL_URL = "https://www.youtube.com/@themysticbroadcast";
-    const YT_ARCHIVE_URL = "https://www.youtube.com/@themysticbroadcast/streams";
+    let currentLiveId = null;
 
-    openLive.href = YT_CHANNEL_URL;
-    openArchives.href = YT_ARCHIVE_URL;
+    function setLive(isLive, videoId=null, title=""){
+      liveBadge.classList.toggle("on", !!isLive);
 
-    function showStandby(){
-      liveBadge.hidden = true;
-      livePlayer.innerHTML = `
-        <img id="standbyImg" class="standbyImg" src="/assets/please-stand-by.png" alt="Please stand by">
-        <div class="tiny dim" style="margin-top:8px">Standby. No broadcast detected.</div>
-      `;
+      if (isLive && videoId){
+        if (currentLiveId !== videoId){
+          currentLiveId = videoId;
+          camBox.innerHTML = `
+            <iframe
+              class="camFrame"
+              src="https://www.youtube.com/embed/${videoId}?autoplay=0&mute=0&rel=0"
+              title="Wasteland Live Cam"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen
+            ></iframe>
+          `;
+        }
+        liveStatus.textContent = title ? `LIVE: ${title}` : "LIVE SIGNAL DETECTED.";
+      }else{
+        currentLiveId = null;
+        camBox.innerHTML = `<img class="camImg" src="/assets/please-stand-by.png" alt="Please stand by" />`;
+        liveStatus.textContent = "Standby. No broadcast detected.";
+      }
     }
 
-    function showLive(videoId, liveUrl){
-      liveBadge.hidden = false;
-      const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=0&mute=0`;
-      livePlayer.innerHTML = `
-        <div class="ytWrap">
-          <iframe
-            src="${embedUrl}"
-            title="Wasteland Live Cam"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowfullscreen></iframe>
-        </div>
-      `;
-      openLive.href = liveUrl || YT_CHANNEL_URL;
-    }
-
-    async function checkYouTubeLive(){
-      // This endpoint will not work until you create it:
-      // /.netlify/functions/youtube-live (YouTube API key required)
+    async function checkLive(){
+      liveStatus.textContent = "Checking signal…";
       try{
         const r = await fetch("/.netlify/functions/youtube-live", { cache:"no-store" });
         const d = await r.json();
-        if(!r.ok) throw new Error("no signal");
-
-        if(d.isLive && d.videoId){
-          showLive(d.videoId, d.liveUrl);
-        }else{
-          showStandby();
-        }
+        if (!r.ok) throw new Error(d?.error || "yt live failed");
+        setLive(!!d.live, d.videoId || null, d.title || "");
       }catch(e){
-        showStandby();
-        console.warn("Live check failed (expected until configured):", e);
+        // fail safe: show standby
+        setLive(false);
+        liveStatus.textContent = "Signal check failed (offline).";
       }
     }
 
-    checkLive?.addEventListener("click", checkYouTubeLive);
-    checkYouTubeLive();
-    setInterval(checkYouTubeLive, 2 * 60 * 1000);
-  </script>
+    checkSignal.addEventListener("click", checkLive);
+    checkLive();
+    setInterval(checkLive, 60000);
 
+    /***********************
+     * WEATHER (Top widget)
+     ***********************/
+    const WX_KEY = "wt_weather_profile_v3";
+    const wxTopInput = document.getElementById("wxTopInput");
+    const wxTopMyLoc = document.getElementById("wxTopMyLoc");
+    const wxTopUseSaved = document.getElementById("wxTopUseSaved");
+    const wxTopLoc = document.getElementById("wxTopLoc");
+    const wxTopNow = document.getElementById("wxTopNow");
+    const wxTopNext = document.getElementById("wxTopNext");
+    const wxTopMoon = document.getElementById("wxTopMoon");
+    const wxTopStatus = document.getElementById("wxTopStatus");
+
+    function saveWx(p){ localStorage.setItem(WX_KEY, JSON.stringify(p)); }
+    function loadWx(){ try{ return JSON.parse(localStorage.getItem(WX_KEY)); }catch{ return null; } }
+
+    function wastelandLabel(code){
+      // Open-Meteo weathercode mapping:
+      // https://open-meteo.com/en/docs (WMO codes)
+      if ([95,96,99].includes(code)) return "RADSTORM";
+      if ([61,63,65,80,81,82].includes(code)) return "ACID RAIN";
+      if ([45,48].includes(code)) return "RADCLOUDS";
+      if ([51,53,55].includes(code)) return "RAD DRIZZLE";
+      if ([71,73,75,77,85,86].includes(code)) return "ASHFALL";
+      if ([56,57].includes(code)) return "CHEM ICE";
+      if ([66,67].includes(code)) return "TOXIC FREEZE";
+      if ([1,2].includes(code)) return "HAZE";
+      if ([3].includes(code)) return "OVERCAST";
+      if ([0].includes(code)) return "CLEAR";
+      return "UNKNOWN";
+    }
+
+    // Simple moon phase approximation (good enough for a “terminal”)
+    function moonPhaseName(date=new Date()){
+      const year = date.getUTCFullYear();
+      const month = date.getUTCMonth() + 1;
+      const day = date.getUTCDate();
+      let c = 0, e = 0;
+      let jd = 0;
+
+      if (month < 3){
+        const y = year - 1;
+        const m = month + 12;
+        c = Math.floor(365.25 * y);
+        e = Math.floor(30.6 * (m + 1));
+        jd = c + e + day - 694039.09;
+      }else{
+        c = Math.floor(365.25 * year);
+        e = Math.floor(30.6 * (month + 1));
+        jd = c + e + day - 694039.09;
+      }
+
+      jd /= 29.5305882;
+      const b = jd - Math.floor(jd);
+      const age = b * 29.5305882;
+
+      if (age < 1.84566) return "NEW";
+      if (age < 5.53699) return "WAXING CRESCENT";
+      if (age < 9.22831) return "FIRST QUARTER";
+      if (age < 12.91963) return "WAXING GIBBOUS";
+      if (age < 16.61096) return "FULL";
+      if (age < 20.30228) return "WANING GIBBOUS";
+      if (age < 23.99361) return "LAST QUARTER";
+      if (age < 27.68493) return "WANING CRESCENT";
+      return "NEW";
+    }
+
+    async function geocode(q){
+      const r = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=1&format=json`);
+      const d = await r.json();
+      if (!d.results?.length) return null;
+      const g = d.results[0];
+      return { name: `${g.name}, ${g.country}`, latitude: g.latitude, longitude: g.longitude };
+    }
+
+    async function wxFetch(lat, lon){
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+        `&current_weather=true` +
+        `&daily=weathercode,temperature_2m_max,temperature_2m_min,sunrise,sunset` +
+        `&temperature_unit=fahrenheit&windspeed_unit=mph&timezone=auto`;
+      const r = await fetch(url);
+      return r.json();
+    }
+
+    async function renderWx(p){
+      wxTopStatus.textContent = "Scanning atmosphere…";
+      try{
+        const d = await wxFetch(p.latitude, p.longitude);
+        const cw = d.current_weather;
+
+        const nowLabel = `${wastelandLabel(cw.weathercode)} • ${Math.round(cw.temperature)}°F • WIND ${Math.round(cw.windspeed)} MPH`;
+        const nextLabel = d.daily?.weathercode?.length
+          ? `${wastelandLabel(d.daily.weathercode[0])} ${Math.round(d.daily.temperature_2m_min[0])}–${Math.round(d.daily.temperature_2m_max[0])}°F`
+          : "—";
+
+        wxTopLoc.textContent = p.name.toUpperCase();
+        wxTopNow.textContent = nowLabel;
+        wxTopNext.textContent = nextLabel;
+        wxTopMoon.textContent = moonPhaseName(new Date());
+        wxTopStatus.textContent = "Signal stable.";
+      }catch(e){
+        wxTopStatus.textContent = "Weather feed offline.";
+      }
+    }
+
+    wxTopInput.addEventListener("keydown", async (e) => {
+      if (e.key !== "Enter") return;
+      const q = wxTopInput.value.trim();
+      if (!q) return;
+      wxTopInput.value = "";
+      const p = await geocode(q);
+      if (!p){
+        wxTopStatus.textContent = "Location not found.";
+        return;
+      }
+      saveWx(p);
+      renderWx(p);
+    });
+
+    wxTopUseSaved.addEventListener("click", () => {
+      const p = loadWx();
+      if (!p){
+        wxTopStatus.textContent = "No saved location.";
+        return;
+      }
+      renderWx(p);
+    });
+
+    wxTopMyLoc.addEventListener("click", () => {
+      if (!navigator.geolocation){
+        wxTopStatus.textContent = "Geolocation not available.";
+        return;
+      }
+      wxTopStatus.textContent = "Acquiring coordinates…";
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        const p = {
+          name: "LOCAL POSITION",
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude
+        };
+        saveWx(p);
+        renderWx(p);
+      }, () => {
+        wxTopStatus.textContent = "Permission denied.";
+      }, { enableHighAccuracy: false, timeout: 8000 });
+    });
+
+    // init
+    const saved = loadWx();
+    if (saved) renderWx(saved);
+  </script>
 </body>
 </html>
