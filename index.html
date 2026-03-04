@@ -75,9 +75,8 @@
         <div class="h">&gt; NEWS FEED</div>
         <div class="ruleSmall">--------------------------------</div>
 
-        <div class="tickerLine">
-          <span class="amber"><strong>NEWS:</strong></span>
-          <span id="newsTicker" class="mono">Initializing news relay…</span>
+        <div id="newsList" class="newsList" aria-live="polite">
+          <div class="tickerLine mono">Loading Fallout headlines…</div>
         </div>
 
         <div class="ruleDots">::::::::::::::::::::::::::::::::</div>
@@ -88,8 +87,12 @@
         </div>
 
         <div class="row gap wrap" style="margin-top:10px;">
-          <a class="btn ghost" id="newsLink" href="#" target="_blank" rel="noopener">[ OPEN STORY ]</a>
+          <a class="btn ghost" id="newsLink" href="#" target="_blank" rel="noopener">[ OPEN NEWEST ]</a>
           <button class="btn ghost" id="newsRefresh" type="button">[ REFRESH ]</button>
+        </div>
+
+        <div class="tiny dim" style="margin-top:8px;">
+          Tip: Newest headline appears in amber; last item drops off.
         </div>
       </section>
 
@@ -148,7 +151,7 @@
           <span class="cc_streaminfo" data-type="maxlisteners" data-username="themysti">—</span>
         </div>
 
-        <!-- Embedded player (no ugly controls) -->
+        <!-- Embedded player -->
         <div class="radioControls">
           <button class="btn" id="radioPlay" type="button">[ PLAY RADIO ]</button>
           <button class="btn ghost" id="radioStop" type="button">[ STOP ]</button>
@@ -308,106 +311,93 @@
     })();
   </script>
 
-  <!-- ================= NEWS SCRIPT ================= -->
+  <!-- ================= NEWS (STATIC TOP 5) ================= -->
   <script>
-    const newsTicker = document.getElementById("newsTicker");
-    const newsSource = document.getElementById("newsSource");
+    const newsListEl  = document.getElementById("newsList");
+    const newsSource  = document.getElementById("newsSource");
     const newsUpdated = document.getElementById("newsUpdated");
-    const newsLink = document.getElementById("newsLink");
+    const newsLink    = document.getElementById("newsLink");
     const newsRefresh = document.getElementById("newsRefresh");
 
-    let headlines = [];
-    let idx = 0;
-
-    const TYPE_SPEED = 22;
-    const HOLD_TIME = 12000;
-    const FADE_TIME = 700;
-    const BETWEEN_TIME = 350;
-
-    let typingTimer = null;
-    let cycleTimer = null;
+    const NEWS_CACHE_KEY = "wt_news_cache_v2"; // stores last 5 links to detect change
+    const MAX_ITEMS = 5;
+    const POLL_MS = 5 * 60 * 1000; // 5 minutes
 
     function stamp(){ return new Date().toLocaleString(); }
 
-    function shorten(text, max=110){
+    function loadCache(){
+      try { return JSON.parse(localStorage.getItem(NEWS_CACHE_KEY) || "[]"); }
+      catch { return []; }
+    }
+    function saveCache(arr){
+      localStorage.setItem(NEWS_CACHE_KEY, JSON.stringify(arr.slice(0, MAX_ITEMS)));
+    }
+
+    function esc(s){
+      return (s||"").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
+
+    function shorten(text, max=96){
       text = (text || "").trim();
       return text.length > max ? text.slice(0, max-1) + "…" : text;
     }
 
-    function clearTimers(){
-      if (typingTimer) clearInterval(typingTimer);
-      if (cycleTimer) clearTimeout(cycleTimer);
-      typingTimer = null;
-      cycleTimer = null;
-    }
-
-    function typeLine(fullText, onDone){
-      let i = 0;
-      newsTicker.style.opacity = 1;
-      newsTicker.textContent = "";
-
-      typingTimer = setInterval(() => {
-        i++;
-        newsTicker.textContent = fullText.slice(0, i);
-        if (i >= fullText.length){
-          clearInterval(typingTimer);
-          typingTimer = null;
-          onDone?.();
-        }
-      }, TYPE_SPEED);
-    }
-
-    function fadeOut(onDone){
-      newsTicker.style.opacity = 0;
-      cycleTimer = setTimeout(() => onDone?.(), FADE_TIME);
-    }
-
-    function startCycle(){
-      clearTimers();
-
-      if (!headlines.length){
-        newsTicker.textContent = "NO HEADLINES AVAILABLE";
+    function render(items, newestIsNew){
+      if(!items?.length){
+        newsListEl.innerHTML = `<div class="tickerLine mono">NO HEADLINES AVAILABLE</div>`;
         newsSource.textContent = "—";
         newsUpdated.textContent = stamp();
         newsLink.href = "#";
         return;
       }
 
-      const item = headlines[idx];
-      const line = `${(item.source || "SOURCE").toUpperCase()} — ${shorten(item.title, 110)}`;
-
-      newsSource.textContent = (item.source || "—").toUpperCase();
+      const newest = items[0];
+      newsLink.href = newest.link || "#";
+      newsSource.textContent = (newest.source || "MULTI").toUpperCase();
       newsUpdated.textContent = stamp();
-      newsLink.href = item.link || "#";
 
-      typeLine(line, () => {
-        cycleTimer = setTimeout(() => {
-          fadeOut(() => {
-            idx = (idx + 1) % headlines.length;
-            cycleTimer = setTimeout(startCycle, BETWEEN_TIME);
-          });
-        }, HOLD_TIME);
-      });
+      newsListEl.innerHTML = items.slice(0, MAX_ITEMS).map((it, i) => {
+        const title = shorten(it.title || "UNTITLED", 96);
+        const src   = (it.source || "SOURCE").toUpperCase();
+        const link  = it.link || "#";
+
+        const cls = (i === 0) ? "newsItem newest" : "newsItem";
+        const tag = (i === 0 && newestIsNew) ? ` <span class="amber mono">[NEW]</span>` : "";
+
+        return `
+          <div class="${cls}">
+            <div class="headline mono">
+              <a href="${esc(link)}" target="_blank" rel="noopener">
+                ${i+1}. ${esc(title)}${tag}
+              </a>
+            </div>
+            <div class="meta">SOURCE: ${esc(src)}</div>
+          </div>
+        `;
+      }).join("");
     }
 
     async function loadNews(){
-      clearTimers();
-      newsTicker.style.opacity = 1;
-      newsTicker.textContent = "LOADING FALLOUT HEADLINES…";
-      newsSource.textContent = "—";
+      newsListEl.innerHTML = `<div class="tickerLine mono">LOADING FALLOUT HEADLINES…</div>`;
       newsUpdated.textContent = stamp();
+      newsSource.textContent = "—";
       newsLink.href = "#";
 
       try{
         const r = await fetch("/.netlify/functions/fallout-news", { cache:"no-store" });
         const d = await r.json();
-        if (!r.ok || !d.items?.length) throw new Error(d.error || "No headlines");
+        if(!r.ok || !d.items?.length) throw new Error(d.error || "No headlines");
 
-        headlines = d.items.slice(0, 12);
-        idx = 0;
-        startCycle();
+        const items = d.items.slice(0, MAX_ITEMS);
+
+        const prev = loadCache();
+        const newestLink = items[0]?.link || "";
+        const newestIsNew = !!(prev.length && newestLink && prev[0] !== newestLink);
+
+        saveCache(items.map(x => x.link || ""));
+        render(items, newestIsNew);
       }catch(e){
-        newsTicker.textContent = "NEWS FEED OFFLINE";
+        newsListEl.innerHTML = `<div class="tickerLine mono">NEWS FEED OFFLINE</div>`;
         newsSource.textContent = "SYSTEM";
         newsUpdated.textContent = stamp();
         newsLink.href = "#";
@@ -416,6 +406,7 @@
 
     newsRefresh?.addEventListener("click", loadNews);
     loadNews();
+    setInterval(loadNews, POLL_MS);
   </script>
 
   <!-- ================= WEATHER SCRIPT ================= -->
