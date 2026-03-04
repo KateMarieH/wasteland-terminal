@@ -1,100 +1,94 @@
-// netlify/functions/fallout-news.js
-export default async (req, context) => {
-  try {
-    const FEED =
-      "https://news.google.com/rss/search?q=Fallout+game+news&hl=en-US&gl=US&ceid=US:en";
+<script>
+const newsListEl  = document.getElementById("newsList");
+const newsSource  = document.getElementById("newsSource");
+const newsUpdated = document.getElementById("newsUpdated");
+const newsLink    = document.getElementById("newsLink");
+const newsRefresh = document.getElementById("newsRefresh");
 
-    const res = await fetch(FEED, {
-      headers: {
-        // Google News sometimes blocks generic serverless requests without a UA
-        "User-Agent": "Mozilla/5.0 (WastelandTerminal; +https://wastelandterminal.com)",
-        "Accept": "application/rss+xml,application/xml,text/xml,*/*",
-      },
-    });
+const NEWS_CACHE_KEY = "wt_news_cache_v1";   // stores last 5 links
+const NEWS_POLL_MS   = 5 * 60 * 1000;        // auto refresh every 5 minutes
+const MAX_ITEMS      = 5;
 
-    if (!res.ok) {
-      const t = await res.text();
-      return json(500, { error: `RSS fetch failed (${res.status})`, detail: t.slice(0, 300) });
-    }
+function stamp(){ return new Date().toLocaleString(); }
 
-    const xml = await res.text();
+function safeText(s){ return (s || "").toString().trim(); }
 
-    // Minimal RSS parsing (no dependencies)
-    const items = parseRss(xml).slice(0, 20).map((it) => ({
-      title: it.title,
-      link: it.link,
-      source: it.source || guessSource(it.link),
-      pubDate: it.pubDate,
-    }));
+function loadCache(){
+  try { return JSON.parse(localStorage.getItem(NEWS_CACHE_KEY) || "[]"); }
+  catch { return []; }
+}
+function saveCache(arr){
+  localStorage.setItem(NEWS_CACHE_KEY, JSON.stringify(arr.slice(0, MAX_ITEMS)));
+}
 
-    return json(200, { items, fetchedAt: new Date().toISOString() }, {
-      // cache a bit to avoid rate limits
-      "Cache-Control": "public, max-age=300",
-    });
-  } catch (e) {
-    return json(500, { error: "Function crashed", detail: String(e?.message || e) });
+function render(items, newestIsNew){
+  if(!items?.length){
+    newsListEl.innerHTML = `<div class="tickerLine mono">NO HEADLINES AVAILABLE</div>`;
+    newsSource.textContent = "—";
+    newsUpdated.textContent = stamp();
+    newsLink.href = "#";
+    return;
   }
-};
 
-function json(statusCode, body, headers = {}) {
-  return new Response(JSON.stringify(body), {
-    status: statusCode,
-    headers: {
-      "Content-Type": "application/json; charset=utf-8",
-      ...headers,
-    },
-  });
+  // newest item is index 0
+  const newest = items[0];
+  newsLink.href = newest.link || "#";
+  newsSource.textContent = (newest.source || "MULTI").toUpperCase();
+  newsUpdated.textContent = stamp();
+
+  newsListEl.innerHTML = items.slice(0, MAX_ITEMS).map((it, i) => {
+    const title = safeText(it.title) || "UNTITLED";
+    const src   = safeText(it.source) || "SOURCE";
+    const link  = it.link || "#";
+
+    const cls = i === 0 ? "newsItem newest" : "newsItem";
+    const newTag = (i === 0 && newestIsNew) ? ` <span class="amber mono">[NEW]</span>` : "";
+
+    return `
+      <div class="${cls}">
+        <div class="headline mono">
+          <a href="${link}" target="_blank" rel="noopener">
+            ${i+1}. ${title}${newTag}
+          </a>
+        </div>
+        <div class="meta">SOURCE: ${src.toUpperCase()}</div>
+      </div>
+    `;
+  }).join("");
 }
 
-function decode(s = "") {
-  return s
-    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'");
-}
+async function loadNews(){
+  newsListEl.innerHTML = `<div class="tickerLine mono">LOADING FALLOUT HEADLINES…</div>`;
+  newsUpdated.textContent = stamp();
+  newsSource.textContent = "—";
+  newsLink.href = "#";
 
-function getTag(block, tag) {
-  const m = block.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, "i"));
-  return m ? decode(m[1].trim()) : "";
-}
+  try{
+    const r = await fetch("/.netlify/functions/fallout-news", { cache:"no-store" });
+    const d = await r.json();
+    if(!r.ok || !d.items?.length) throw new Error(d.error || "No headlines");
 
-function parseRss(xml) {
-  const out = [];
-  const chunks = xml.match(/<item\b[\s\S]*?<\/item>/gi) || [];
-  for (const block of chunks) {
-    const title = getTag(block, "title");
-    let link = getTag(block, "link");
+    // keep top 5, newest first (assumes function already returns newest first)
+    const items = d.items.slice(0, MAX_ITEMS);
 
-    // Some feeds put the real link in guid
-    if (!link) link = getTag(block, "guid");
+    // detect if the newest story changed (by link)
+    const prev = loadCache();
+    const newestLink = items[0]?.link || "";
+    const newestIsNew = !!newestLink && prev.length && prev[0] !== newestLink;
 
-    const pubDate = getTag(block, "pubDate");
+    // store current links to compare next time
+    saveCache(items.map(x => x.link || ""));
 
-    // Google News often includes a <source> tag
-    const source = getTag(block, "source");
-
-    // Clean Google redirect links if present
-    link = cleanGoogleNewsLink(link);
-
-    if (title && link) out.push({ title, link, pubDate, source });
-  }
-  return out;
-}
-
-function cleanGoogleNewsLink(link = "") {
-  // Sometimes it is already a normal URL, sometimes it is a Google redirect.
-  // We won't overcomplicate — your UI just needs something clickable.
-  return link.trim();
-}
-
-function guessSource(link = "") {
-  try {
-    const u = new URL(link);
-    return u.hostname.replace(/^www\./, "");
-  } catch {
-    return "NEWS";
+    render(items, newestIsNew);
+  }catch(e){
+    newsListEl.innerHTML = `<div class="tickerLine mono">NEWS FEED OFFLINE</div>`;
+    newsSource.textContent = "SYSTEM";
+    newsUpdated.textContent = stamp();
+    newsLink.href = "#";
   }
 }
+
+newsRefresh?.addEventListener("click", loadNews);
+loadNews();
+setInterval(loadNews, NEWS_POLL_MS);
+</script>
