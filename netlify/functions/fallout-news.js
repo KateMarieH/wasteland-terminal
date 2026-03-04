@@ -1,90 +1,67 @@
-<script>
-const newsTicker  = document.getElementById("newsTicker");   // can be a div/span
-const newsSource  = document.getElementById("newsSource");
-const newsUpdated = document.getElementById("newsUpdated");
-const newsLink    = document.getElementById("newsLink");
-const newsRefresh = document.getElementById("newsRefresh");
+// netlify/functions/fallout-news.js
+export default async (request) => {
+  try {
+    // Google News RSS query you mentioned:
+    const rssUrl =
+      "https://news.google.com/rss/search?q=Fallout+game+news&hl=en-US&gl=US&ceid=US:en";
 
-function stamp(){ return new Date().toLocaleString(); }
-
-function esc(s=""){
-  return s.replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m]));
-}
-
-function renderList(items){
-  if (!items?.length){
-    newsTicker.innerHTML = `<div class="tickerLine mono">NO HEADLINES AVAILABLE</div>`;
-    newsSource.textContent = "—";
-    newsUpdated.textContent = stamp();
-    newsLink.href = "#";
-    return;
-  }
-
-  const top5 = items.slice(0,5);
-
-  // newest is [0]
-  newsLink.href = top5[0].link || "#";
-  newsSource.textContent = (top5[0].source || "—").toUpperCase();
-  newsUpdated.textContent = stamp();
-
-  // Build a static list. Newest line in amber.
-  newsTicker.innerHTML = `
-    <div class="newsList">
-      ${top5.map((it, i) => `
-        <div class="newsItem ${i===0 ? "isNew" : ""}">
-          <span class="newsSrc">${esc((it.source||"SOURCE").toUpperCase())}</span>
-          <span class="newsSep">—</span>
-          <a class="newsA" href="${esc(it.link||"#")}" target="_blank" rel="noopener">
-            ${esc(it.title || "Untitled")}
-          </a>
-        </div>
-      `).join("")}
-    </div>
-  `;
-}
-
-async function loadNews(){
-  // show loading
-  newsTicker.textContent = "LOADING FALLOUT HEADLINES…";
-  newsSource.textContent = "—";
-  newsUpdated.textContent = stamp();
-  newsLink.href = "#";
-
-  // timeout so it never hangs forever
-  const ctrl = new AbortController();
-  const t = setTimeout(() => ctrl.abort(), 8000);
-
-  try{
-    const r = await fetch("/.netlify/functions/fallout-news", {
-      cache: "no-store",
-      signal: ctrl.signal
+    const resp = await fetch(rssUrl, {
+      headers: {
+        "User-Agent": "WastelandTerminal/1.0 (+https://wastelandterminal.com)",
+        "Accept": "application/rss+xml, application/xml;q=0.9, */*;q=0.8",
+      },
     });
 
-    const ct = (r.headers.get("content-type") || "").toLowerCase();
-    const text = await r.text(); // read as text first so we can debug
-
-    if (!ct.includes("application/json")){
-      throw new Error(`Function returned non-JSON (${r.status}). First 120 chars: ${text.slice(0,120)}`);
+    if (!resp.ok) {
+      return new Response(JSON.stringify({ error: `RSS fetch failed: ${resp.status}` }), {
+        status: 502,
+        headers: { "content-type": "application/json" },
+      });
     }
 
-    const d = JSON.parse(text);
-    if (!r.ok) throw new Error(d.error || `HTTP ${r.status}`);
-    if (!d.items?.length) throw new Error("No items returned");
+    const xml = await resp.text();
 
-    renderList(d.items);
-  }catch(e){
-    newsTicker.innerHTML = `
-      <div class="tickerLine mono">NEWS FEED OFFLINE</div>
-      <div class="tiny dim" style="margin-top:8px;">${esc(String(e.message || e))}</div>
-    `;
-    newsSource.textContent = "SYSTEM";
-    newsUpdated.textContent = stamp();
-    newsLink.href = "#";
-  }finally{
-    clearTimeout(t);
+    // Minimal RSS parsing (no dependencies)
+    // NOTE: This is intentionally lightweight; good enough for Google News RSS.
+    const items = [];
+    const itemBlocks = xml.split("<item>").slice(1);
+    for (const block of itemBlocks) {
+      const get = (tag) => {
+        const m = block.match(new RegExp(`<${tag}>([\\s\\S]*?)<\\/${tag}>`, "i"));
+        return m ? m[1].trim() : "";
+      };
+
+      const rawTitle = get("title");
+      const rawLink = get("link");
+      const rawSource = (() => {
+        const m = block.match(/<source[^>]*>([\s\S]*?)<\/source>/i);
+        return m ? m[1].trim() : "";
+      })();
+
+      // Basic cleanup for CDATA
+      const clean = (s) =>
+        s.replace(/^<!\[CDATA\[/, "").replace(/\]\]>$/, "").trim();
+
+      const title = clean(rawTitle);
+      const link = clean(rawLink);
+      const source = clean(rawSource) || "Google News";
+
+      if (title && link) items.push({ title, link, source });
+      if (items.length >= 12) break;
+    }
+
+    return new Response(JSON.stringify({ items }), {
+      status: 200,
+      headers: {
+        "content-type": "application/json",
+        // light caching so Google News doesn’t rate-limit you
+        "cache-control": "public, max-age=60",
+      },
+    });
+  } catch (e) {
+    return new Response(JSON.stringify({ error: String(e?.message || e) }), {
+      status: 500,
+      headers: { "content-type": "application/json" },
+    });
   }
-}
-
-newsRefresh?.addEventListener("click", loadNews);
-loadNews();
-</script>
+};
