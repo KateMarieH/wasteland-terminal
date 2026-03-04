@@ -71,6 +71,13 @@ body{
   flex-wrap:wrap;
 }
 
+.headerActions{
+  display:flex;
+  gap: 10px;
+  flex-wrap:wrap;
+  align-items:flex-end;
+}
+
 .title{
   margin:0;
   font-weight: 900;
@@ -124,7 +131,6 @@ body{
   .topRight{ max-width:none; width:100%; }
 }
 
-/* Inputs */
 .loginBar{
   margin-top: 10px;
   display:flex;
@@ -152,7 +158,6 @@ body{
   box-shadow: 0 0 16px rgba(255,204,102,.12);
 }
 
-/* Buttons */
 .btn{
   display:inline-block;
   background: rgba(0,0,0,.55);
@@ -194,14 +199,12 @@ body{
   margin-top: 14px;
 }
 
-/* Key/values */
 .kv{ margin-top: 10px; font-size: 12px; }
 .k{ color: var(--phosphor-dim); font-weight: 900; }
 .v{ font-weight: 900; letter-spacing: .12em; overflow-wrap:anywhere; word-break:break-word; }
 
 .tickerLine{ line-height: 1.6; font-size: 12px; overflow-wrap:anywhere; word-break:break-word; }
 
-/* Panel boxes */
 .panelBox{
   border: 1px dashed rgba(141,255,176,.30);
   background: rgba(0,0,0,.20);
@@ -209,7 +212,6 @@ body{
   box-shadow: var(--glow);
 }
 
-/* Visitor counter inline */
 .counterInline{
   display:flex;
   flex-direction:column;
@@ -222,7 +224,6 @@ body{
   font-weight:900;
 }
 
-/* Flip counter */
 .flipCounter{
   display:inline-flex;
   gap:6px;
@@ -262,7 +263,6 @@ body{
   transition: transform 320ms ease, opacity 320ms ease;
 }
 
-/* NEWS list */
 .newsList{
   display:flex;
   flex-direction:column;
@@ -291,7 +291,6 @@ body{
 .newsItem.newest{ border-color: rgba(255,204,102,.70); }
 .newsItem.newest .headline{ color: var(--amber); }
 
-/* Radio player */
 .radioPlayer{
   display:flex;
   align-items:center;
@@ -309,7 +308,6 @@ body{
   accent-color: rgba(141,255,176,.85);
 }
 
-/* Radio visualizer bars */
 .radioViz{
   display:inline-flex;
   gap:6px;
@@ -337,9 +335,8 @@ body.radioPlaying .radioViz span:nth-child(5){ animation-delay: .48s; }
   50%{ height: 18px; opacity:1; }
 }
 
-/* Live badge */
 .liveBadge{
-  display:none; /* off by default */
+  display:none;
   align-items:center;
   gap: 8px;
   font-weight:900;
@@ -362,7 +359,6 @@ body.radioPlaying .radioViz span:nth-child(5){ animation-delay: .48s; }
   50%{ opacity: .35; }
 }
 
-/* Cam box */
 .camBox{
   margin-top: 12px;
   border: 1px dashed rgba(141,255,176,.30);
@@ -370,18 +366,9 @@ body.radioPlaying .radioViz span:nth-child(5){ animation-delay: .48s; }
   box-shadow: var(--glow);
   overflow:hidden;
 }
-.camImg{
-  display:block;
-  width:100%;
-  height:auto;
-}
-.camFrame{
-  width: 100%;
-  aspect-ratio: 16/9;
-  display:block;
-}
+.camImg{ display:block; width:100%; height:auto; }
+.camFrame{ width: 100%; aspect-ratio: 16/9; display:block; }
 
-/* Footer */
 .foot{ margin-top: 16px; }
 
 @media (prefers-reduced-motion: no-preference){
