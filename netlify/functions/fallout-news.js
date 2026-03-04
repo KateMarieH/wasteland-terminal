@@ -1,94 +1,119 @@
-<script>
-const newsListEl  = document.getElementById("newsList");
-const newsSource  = document.getElementById("newsSource");
-const newsUpdated = document.getElementById("newsUpdated");
-const newsLink    = document.getElementById("newsLink");
-const newsRefresh = document.getElementById("newsRefresh");
+// netlify/functions/fallout-news.js
+// No dependencies. Node 18+ (Netlify) supports global fetch.
 
-const NEWS_CACHE_KEY = "wt_news_cache_v1";   // stores last 5 links
-const NEWS_POLL_MS   = 5 * 60 * 1000;        // auto refresh every 5 minutes
-const MAX_ITEMS      = 5;
+const RSS_URL =
+  "https://news.google.com/rss/search?q=Fallout+game+news&hl=en-US&gl=US&ceid=US:en";
 
-function stamp(){ return new Date().toLocaleString(); }
-
-function safeText(s){ return (s || "").toString().trim(); }
-
-function loadCache(){
-  try { return JSON.parse(localStorage.getItem(NEWS_CACHE_KEY) || "[]"); }
-  catch { return []; }
-}
-function saveCache(arr){
-  localStorage.setItem(NEWS_CACHE_KEY, JSON.stringify(arr.slice(0, MAX_ITEMS)));
+// Tiny helpers
+function pickTag(xml, tag) {
+  // Matches <tag>...</tag> including CDATA
+  const re = new RegExp(`<${tag}>([\\s\\S]*?)<\\/${tag}>`, "i");
+  const m = xml.match(re);
+  if (!m) return "";
+  return m[1]
+    .replace(/<!\[CDATA\[(.*?)\]\]>/gis, "$1")
+    .trim();
 }
 
-function render(items, newestIsNew){
-  if(!items?.length){
-    newsListEl.innerHTML = `<div class="tickerLine mono">NO HEADLINES AVAILABLE</div>`;
-    newsSource.textContent = "—";
-    newsUpdated.textContent = stamp();
-    newsLink.href = "#";
-    return;
+function decodeEntities(str) {
+  return (str || "")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">");
+}
+
+function extractItems(xml, max = 15) {
+  const items = [];
+  const re = /<item>([\s\S]*?)<\/item>/gi;
+  let m;
+  while ((m = re.exec(xml)) && items.length < max) {
+    const block = m[1];
+
+    const title = decodeEntities(pickTag(block, "title"));
+    const link = decodeEntities(pickTag(block, "link"));
+    const pubDate = decodeEntities(pickTag(block, "pubDate"));
+
+    // Google News RSS often has: <source url="...">Publisher Name</source>
+    let source = decodeEntities(pickTag(block, "source"));
+
+    // Fallback: titles often look like "Headline - Publisher"
+    if (!source && title.includes(" - ")) {
+      source = title.split(" - ").slice(-1)[0].trim();
+    }
+
+    items.push({
+      title: title || "Untitled",
+      link: link || "",
+      source: source || "Google News",
+      pubDate: pubDate || ""
+    });
   }
-
-  // newest item is index 0
-  const newest = items[0];
-  newsLink.href = newest.link || "#";
-  newsSource.textContent = (newest.source || "MULTI").toUpperCase();
-  newsUpdated.textContent = stamp();
-
-  newsListEl.innerHTML = items.slice(0, MAX_ITEMS).map((it, i) => {
-    const title = safeText(it.title) || "UNTITLED";
-    const src   = safeText(it.source) || "SOURCE";
-    const link  = it.link || "#";
-
-    const cls = i === 0 ? "newsItem newest" : "newsItem";
-    const newTag = (i === 0 && newestIsNew) ? ` <span class="amber mono">[NEW]</span>` : "";
-
-    return `
-      <div class="${cls}">
-        <div class="headline mono">
-          <a href="${link}" target="_blank" rel="noopener">
-            ${i+1}. ${title}${newTag}
-          </a>
-        </div>
-        <div class="meta">SOURCE: ${src.toUpperCase()}</div>
-      </div>
-    `;
-  }).join("");
+  return items;
 }
 
-async function loadNews(){
-  newsListEl.innerHTML = `<div class="tickerLine mono">LOADING FALLOUT HEADLINES…</div>`;
-  newsUpdated.textContent = stamp();
-  newsSource.textContent = "—";
-  newsLink.href = "#";
+exports.handler = async function handler() {
+  try {
+    const r = await fetch(RSS_URL, {
+      headers: {
+        // User agent helps avoid occasional blocks
+        "user-agent": "Mozilla/5.0 (WastelandTerminal; +https://wastelandterminal.com)",
+        "accept": "application/rss+xml, application/xml;q=0.9, */*;q=0.8"
+      }
+    });
 
-  try{
-    const r = await fetch("/.netlify/functions/fallout-news", { cache:"no-store" });
-    const d = await r.json();
-    if(!r.ok || !d.items?.length) throw new Error(d.error || "No headlines");
+    const xml = await r.text();
 
-    // keep top 5, newest first (assumes function already returns newest first)
-    const items = d.items.slice(0, MAX_ITEMS);
+    if (!r.ok) {
+      return {
+        statusCode: 502,
+        headers: {
+          "content-type": "application/json; charset=utf-8",
+          "cache-control": "no-store"
+        },
+        body: JSON.stringify({
+          error: `RSS fetch failed: ${r.status} ${r.statusText}`,
+          sample: xml.slice(0, 300)
+        })
+      };
+    }
 
-    // detect if the newest story changed (by link)
-    const prev = loadCache();
-    const newestLink = items[0]?.link || "";
-    const newestIsNew = !!newestLink && prev.length && prev[0] !== newestLink;
+    const items = extractItems(xml, 20);
 
-    // store current links to compare next time
-    saveCache(items.map(x => x.link || ""));
+    if (!items.length) {
+      return {
+        statusCode: 200,
+        headers: {
+          "content-type": "application/json; charset=utf-8",
+          "cache-control": "no-store"
+        },
+        body: JSON.stringify({
+          error: "Parsed 0 items from RSS (feed format may have changed).",
+          items: []
+        })
+      };
+    }
 
-    render(items, newestIsNew);
-  }catch(e){
-    newsListEl.innerHTML = `<div class="tickerLine mono">NEWS FEED OFFLINE</div>`;
-    newsSource.textContent = "SYSTEM";
-    newsUpdated.textContent = stamp();
-    newsLink.href = "#";
+    return {
+      statusCode: 200,
+      headers: {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "no-store"
+      },
+      body: JSON.stringify({ items })
+    };
+  } catch (err) {
+    return {
+      statusCode: 500,
+      headers: {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "no-store"
+      },
+      body: JSON.stringify({
+        error: "Function crashed",
+        message: String(err?.message || err)
+      })
+    };
   }
-}
-
-newsRefresh?.addEventListener("click", loadNews);
-loadNews();
-setInterval(loadNews, NEWS_POLL_MS);
-</script>
+};
