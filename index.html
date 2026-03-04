@@ -24,14 +24,27 @@
             <div class="flipCounter" id="flipCounter" aria-label="Visitor counter"></div>
           </div>
 
-          <!-- support button right beside counter -->
-          <a class="btn ghost" id="supportBtn" href="https://www.patreon.com/cw/wastelandterminal/membership" target="_blank" rel="noopener">
-            [ SUPPORT THE TERMINAL ]
-          </a>
+          <!-- Support + Discord side-by-side -->
+          <div class="headerActions">
+            <a class="btn ghost" id="supportBtn"
+               href="https://www.patreon.com/cw/wastelandterminal/membership"
+               target="_blank" rel="noopener">
+              [ SUPPORT THE TERMINAL ]
+            </a>
+
+            <a class="btn" id="discordBtn"
+               href="https://discord.gg/wvrMZ8xynD"
+               target="_blank" rel="noopener">
+              [ JOIN DISCORD ]
+            </a>
+          </div>
         </div>
 
         <div class="sub">Your go-to terminal for news, weather, music, & wastelander oddities.</div>
-        <div class="compactLine"><span class="mono">USER:</span> <span id="userLabel">WANDERER</span> &nbsp; <span class="mono">LOCAL TIME:</span> <span id="localTime">—</span></div>
+        <div class="compactLine">
+          <span class="mono">USER:</span> <span id="userLabel">WANDERER</span>
+          &nbsp; <span class="mono">LOCAL TIME:</span> <span id="localTime">—</span>
+        </div>
 
         <!-- NAV BUTTONS -->
         <nav class="topMenu" aria-label="Terminal navigation">
@@ -66,7 +79,7 @@
 
     <div class="rule">================================================================</div>
 
-    <!-- TERMINAL NEWS / UPDATES (you can edit this text anytime) -->
+    <!-- TERMINAL NEWS / UPDATES -->
     <section class="block">
       <div class="h">> TERMINAL NEWS</div>
       <div class="ruleSmall">------------------------------------</div>
@@ -88,16 +101,12 @@
         <div class="h">> COMMUNITY</div>
         <div class="ruleSmall">------------------------------------</div>
 
-        <!-- CHAT PLACEHOLDER (real chat needs a service/backend) -->
+        <!-- CHAT PLACEHOLDER -->
         <div class="panelBox">
           <div class="mono">LIVE CHAT</div>
           <div class="tiny dim" style="margin-top:6px">
             Chat module coming online. (When you’re ready, we can drop in an embedded chat provider.)
           </div>
-
-          <!-- OPTIONAL: If you later pick an embed chat (example only)
-          <iframe class="chatFrame" src="YOUR_CHAT_EMBED_URL"></iframe>
-          -->
         </div>
 
         <div class="ruleDots">::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::</div>
@@ -107,7 +116,6 @@
         <div class="ruleSmall">------------------------------------</div>
 
         <div class="tickerLine mono" id="newsStatus">LOADING FALLOUT HEADLINES…</div>
-
         <div class="newsList" id="newsList"></div>
 
         <div class="row gap wrap" style="margin-top:12px">
@@ -162,10 +170,6 @@
             </div>
           </div>
 
-          <div class="row gap wrap" style="margin-top:12px">
-            <a class="btn ghost" href="https://radio.shoutcheap.com/tunein/themysti.pls" target="_blank" rel="noopener">[ TUNEIN (PLS) ]</a>
-          </div>
-
           <!-- hidden audio element -->
           <audio id="radioAudio" preload="none" crossorigin="anonymous">
             <source src="https://radio.shoutcheap.com/proxy/themysti/stream" type="audio/mpeg">
@@ -182,8 +186,7 @@
           </div>
 
           <div class="camBox" id="camBox">
-            <!-- replaced dynamically -->
-            <img id="camStandby" class="camImg" src="/assets/please-stand-by.png" alt="Please stand by" />
+            <img class="camImg" src="/assets/please-stand-by.png" alt="Please stand by" />
           </div>
 
           <div class="row gap wrap" style="margin-top:12px">
@@ -229,19 +232,15 @@
     const userLabelEl = document.getElementById("userLabel");
     const USER_KEY = "wt_user_alias_v1";
 
-    function tickTime(){
-      localTimeEl.textContent = new Date().toLocaleString();
-    }
+    function tickTime(){ localTimeEl.textContent = new Date().toLocaleString(); }
     setInterval(tickTime, 1000);
     tickTime();
 
-    // minimal alias support (optional)
     const existingAlias = localStorage.getItem(USER_KEY);
     if (existingAlias) userLabelEl.textContent = existingAlias.toUpperCase();
 
     /***********************
      * VISITOR COUNTER (local)
-     * (Counts visits per device/session; real unique requires backend)
      ***********************/
     const COUNTER_KEY = "wt_local_counter_v1";
     const SESSION_KEY = "wt_session_counted_v1";
@@ -259,25 +258,6 @@
       }
     }
 
-    function animateTo(newStr){
-      const wrap = document.getElementById("flipCounter");
-      const digits = [...wrap.querySelectorAll(".flipDigit")];
-      for (let i=0;i<digits.length;i++){
-        const digit = digits[i];
-        const oldEl = digit.querySelector(".old");
-        const newEl = digit.querySelector(".new");
-        if (oldEl.textContent === newStr[i]) continue;
-        newEl.textContent = newStr[i];
-        digit.classList.remove("flip");
-        void digit.offsetWidth;
-        digit.classList.add("flip");
-        setTimeout(() => {
-          oldEl.textContent = newStr[i];
-          digit.classList.remove("flip");
-        }, 360);
-      }
-    }
-
     function bumpCounter(){
       let n = Number(localStorage.getItem(COUNTER_KEY) || "0");
       if (!sessionStorage.getItem(SESSION_KEY)){
@@ -285,11 +265,8 @@
         localStorage.setItem(COUNTER_KEY, String(n));
         sessionStorage.setItem(SESSION_KEY, "1");
       }
-      const str = padNum(n, 6);
-      buildFlipDigits(str);
-      // no animation on first paint
+      buildFlipDigits(padNum(n, 6));
     }
-
     bumpCounter();
 
     /***********************
@@ -318,10 +295,7 @@
       newsStatus.textContent = "TOP 5 HEADLINES:";
       newsUpdated.textContent = stamp();
 
-      // top 5
       const top = items.slice(0, 5);
-
-      // newest = first item
       newsOpenNewest.href = top[0].link || "#";
 
       top.forEach((it, i) => {
@@ -373,9 +347,7 @@
       radioPlay.classList.toggle("isPlaying", isPlaying);
     }
 
-    radioVol.addEventListener("input", () => {
-      radioAudio.volume = Number(radioVol.value);
-    });
+    radioVol.addEventListener("input", () => { radioAudio.volume = Number(radioVol.value); });
     radioAudio.volume = Number(radioVol.value);
 
     radioPlay.addEventListener("click", async () => {
@@ -394,7 +366,6 @@
 
     radioStop.addEventListener("click", () => {
       radioAudio.pause();
-      // reset stream
       radioAudio.src = radioAudio.currentSrc || "https://radio.shoutcheap.com/proxy/themysti/stream";
       setRadioState(false);
     });
@@ -446,7 +417,6 @@
         if (!r.ok) throw new Error(d?.error || "yt live failed");
         setLive(!!d.live, d.videoId || null, d.title || "");
       }catch(e){
-        // fail safe: show standby
         setLive(false);
         liveStatus.textContent = "Signal check failed (offline).";
       }
@@ -473,8 +443,6 @@
     function loadWx(){ try{ return JSON.parse(localStorage.getItem(WX_KEY)); }catch{ return null; } }
 
     function wastelandLabel(code){
-      // Open-Meteo weathercode mapping:
-      // https://open-meteo.com/en/docs (WMO codes)
       if ([95,96,99].includes(code)) return "RADSTORM";
       if ([61,63,65,80,81,82].includes(code)) return "ACID RAIN";
       if ([45,48].includes(code)) return "RADCLOUDS";
@@ -488,13 +456,11 @@
       return "UNKNOWN";
     }
 
-    // Simple moon phase approximation (good enough for a “terminal”)
     function moonPhaseName(date=new Date()){
       const year = date.getUTCFullYear();
       const month = date.getUTCMonth() + 1;
       const day = date.getUTCDate();
-      let c = 0, e = 0;
-      let jd = 0;
+      let c = 0, e = 0, jd = 0;
 
       if (month < 3){
         const y = year - 1;
@@ -533,8 +499,7 @@
 
     async function wxFetch(lat, lon){
       const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
-        `&current_weather=true` +
-        `&daily=weathercode,temperature_2m_max,temperature_2m_min,sunrise,sunset` +
+        `&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min` +
         `&temperature_unit=fahrenheit&windspeed_unit=mph&timezone=auto`;
       const r = await fetch(url);
       return r.json();
@@ -567,43 +532,29 @@
       if (!q) return;
       wxTopInput.value = "";
       const p = await geocode(q);
-      if (!p){
-        wxTopStatus.textContent = "Location not found.";
-        return;
-      }
+      if (!p){ wxTopStatus.textContent = "Location not found."; return; }
       saveWx(p);
       renderWx(p);
     });
 
     wxTopUseSaved.addEventListener("click", () => {
       const p = loadWx();
-      if (!p){
-        wxTopStatus.textContent = "No saved location.";
-        return;
-      }
+      if (!p){ wxTopStatus.textContent = "No saved location."; return; }
       renderWx(p);
     });
 
     wxTopMyLoc.addEventListener("click", () => {
-      if (!navigator.geolocation){
-        wxTopStatus.textContent = "Geolocation not available.";
-        return;
-      }
+      if (!navigator.geolocation){ wxTopStatus.textContent = "Geolocation not available."; return; }
       wxTopStatus.textContent = "Acquiring coordinates…";
       navigator.geolocation.getCurrentPosition(async (pos) => {
-        const p = {
-          name: "LOCAL POSITION",
-          latitude: pos.coords.latitude,
-          longitude: pos.coords.longitude
-        };
+        const p = { name: "LOCAL POSITION", latitude: pos.coords.latitude, longitude: pos.coords.longitude };
         saveWx(p);
         renderWx(p);
       }, () => {
         wxTopStatus.textContent = "Permission denied.";
-      }, { enableHighAccuracy: false, timeout: 8000 });
+      }, { enableHighAccuracy:false, timeout:8000 });
     });
 
-    // init
     const saved = loadWx();
     if (saved) renderWx(saved);
   </script>
