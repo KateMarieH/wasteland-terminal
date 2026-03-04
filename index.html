@@ -1,10 +1,10 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Wasteland Terminal</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
@@ -17,12 +17,20 @@
       <div class="row between wrap">
         <div class="topLeft">
           <div class="title">WASTELAND TERMINAL</div>
-          <div class="sub"> YOUR GO TO TERMINAL FOR NEWS, WEATHER, MUSIC, &amp; MORE.</div>
+          <div class="sub">YOUR GO TO TERMINAL FOR NEWS, WEATHER, MUSIC, &amp; MORE.</div>
 
           <div class="kv compactLine">
             <span class="k">USER:</span> <span id="userName">WANDERER</span>
             <span class="k sep">LOCAL TIME:</span> <span id="localClock">—</span>
           </div>
+
+          <!-- optional: put About/Mods/Fanart/etc in the top row -->
+          <nav class="topMenu" aria-label="Terminal Navigation">
+            <a class="btn ghost" href="/about/">[ ABOUT ]</a>
+            <a class="btn ghost" href="/mods/">[ MOD SHOWCASE ]</a>
+            <a class="btn ghost" href="/fanart/">[ FAN ART VAULT ]</a>
+            <a class="btn ghost" href="/recs/">[ RECOMMENDATIONS ]</a>
+          </nav>
         </div>
 
         <div class="topRight">
@@ -42,18 +50,10 @@
             <a class="btn ghost"
                href="https://patreon.com/wastelandterminal/membership"
                target="_blank"
-               rel="noopener">[ SUPPORT THE TERMINAL ]</a>
+               rel="noopener">[ SPARE SOME CAPS ]</a>
           </div>
         </div>
       </div>
-
-      <!-- TOP MENU (future pages) -->
-      <nav class="topMenu" aria-label="Terminal Navigation">
-        <a class="btn ghost" href="/about/">[ ABOUT ]</a>
-        <a class="btn ghost" href="/mods/">[ MOD SHOWCASE ]</a>
-        <a class="btn ghost" href="/fanart/">[ FAN ART VAULT ]</a>
-        <a class="btn ghost" href="/recs/">[ RECOMMENDATIONS ]</a>
-      </nav>
 
       <!-- Same-page identification prompt -->
       <div id="loginBar" class="loginBar" aria-live="polite">
@@ -76,7 +76,7 @@
         <div class="ruleSmall">--------------------------------</div>
 
         <div id="newsList" class="newsList" aria-live="polite">
-          <div class="tickerLine mono">Loading Fallout headlines…</div>
+          <div class="tickerLine mono">LOADING FALLOUT HEADLINES…</div>
         </div>
 
         <div class="ruleDots">::::::::::::::::::::::::::::::::</div>
@@ -90,15 +90,11 @@
           <a class="btn ghost" id="newsLink" href="#" target="_blank" rel="noopener">[ OPEN NEWEST ]</a>
           <button class="btn ghost" id="newsRefresh" type="button">[ REFRESH ]</button>
         </div>
-
-        <div class="tiny dim" style="margin-top:8px;">
-          Tip: Newest headline appears in amber; last item drops off.
-        </div>
       </section>
 
       <!-- WEATHER -->
       <section class="block">
-        <div class="h">&gt; WASTELAND WEATHER </div>
+        <div class="h">&gt; WASTELAND WEATHER</div>
         <div class="ruleSmall">--------------------------------</div>
 
         <div class="row gap wrap controls">
@@ -107,7 +103,6 @@
           <button class="btn ghost" id="wxUseSaved" type="button">[ USE SAVED ]</button>
         </div>
 
-        <!-- only shown on errors / status -->
         <div class="tiny dim" id="wxStatus" style="margin-top:10px; display:none;"></div>
 
         <div class="ruleDots">::::::::::::::::::::::::::::::::</div>
@@ -126,8 +121,7 @@
         <div class="h">&gt; STATIONS</div>
         <div class="ruleSmall">--------------------------------</div>
 
-        <!-- PRE-WAR RADIO -->
-        <div class="kv"><span class="k">CHANNEL:</span> MYSTIC BROADCAST RADIO </div>
+        <div class="kv"><span class="k">CHANNEL:</span> MYSTIC BROADCAST RADIO</div>
 
         <div class="ruleDots">::::::::::::::::::::::::::::::::</div>
 
@@ -137,7 +131,6 @@
         </div>
 
         <div class="bigLine" style="margin-top:10px;">NOW PLAYING:</div>
-
         <div class="mono" style="margin-top:6px;">
           <span class="cc_streaminfo" data-type="trackartist" data-username="themysti">—</span>
           —
@@ -151,21 +144,15 @@
           <span class="cc_streaminfo" data-type="maxlisteners" data-username="themysti">—</span>
         </div>
 
-        <!-- Embedded player -->
         <div class="radioControls">
           <button class="btn" id="radioPlay" type="button">[ PLAY RADIO ]</button>
           <button class="btn ghost" id="radioStop" type="button">[ STOP ]</button>
         </div>
 
-        <audio
-          id="radioPlayer"
-          src="https://radio.shoutcheap.com/proxy/themysti/stream"
-          preload="none">
-        </audio>
+        <audio id="radioPlayer" src="https://radio.shoutcheap.com/proxy/themysti/stream" preload="none"></audio>
 
         <div class="ruleDots">::::::::::::::::::::::::::::::::</div>
 
-        <!-- WASTELAND WEBCAM -->
         <div class="kv"><span class="k">CHANNEL:</span> WASTELAND WEBCAM</div>
         <div class="kv dim" style="margin-top:6px;">SOURCE: THE MYSTIC BROADCAST</div>
 
@@ -239,9 +226,8 @@
     tick();
   </script>
 
-  <!-- ================= VISITOR COUNTER (LOCAL) ================= -->
+  <!-- ================= VISITOR COUNTER (LOCAL ONLY) ================= -->
   <script>
-    // Local-only "unique visitors" (counts this device once)
     const VIS_SEEN_KEY  = "wt_visit_seen_v1";
     const VIS_COUNT_KEY = "wt_visit_count_v1";
     const flipEl = document.getElementById("visitFlip");
@@ -252,7 +238,6 @@
     }
 
     function renderFlipDigits(str){
-      if(!flipEl) return;
       flipEl.innerHTML = "";
       for(const ch of str){
         const d = document.createElement("div");
@@ -263,7 +248,6 @@
     }
 
     function flipTo(nextStr){
-      if(!flipEl) return;
       if(!flipEl.children.length){
         renderFlipDigits(nextStr);
         return;
@@ -281,7 +265,7 @@
 
         newEl.textContent = newChar;
         box.classList.remove("flip");
-        void box.offsetWidth; // reflow
+        void box.offsetWidth;
         box.classList.add("flip");
 
         setTimeout(() => {
@@ -293,11 +277,7 @@
     }
 
     (function initCounter(){
-      if(!flipEl) return;
-
-      // start display
       renderFlipDigits("000000");
-
       let count = parseInt(localStorage.getItem(VIS_COUNT_KEY) || "0", 10);
       const seen = localStorage.getItem(VIS_SEEN_KEY);
 
@@ -306,7 +286,6 @@
         count = (isNaN(count) ? 0 : count) + 1;
         localStorage.setItem(VIS_COUNT_KEY, String(count));
       }
-
       flipTo(padDigits(count, 6));
     })();
   </script>
@@ -319,9 +298,9 @@
     const newsLink    = document.getElementById("newsLink");
     const newsRefresh = document.getElementById("newsRefresh");
 
-    const NEWS_CACHE_KEY = "wt_news_cache_v2"; // stores last 5 links to detect change
+    const NEWS_CACHE_KEY = "wt_news_cache_v3";
     const MAX_ITEMS = 5;
-    const POLL_MS = 5 * 60 * 1000; // 5 minutes
+    const POLL_MS = 5 * 60 * 1000;
 
     function stamp(){ return new Date().toLocaleString(); }
 
@@ -334,10 +313,12 @@
     }
 
     function esc(s){
-      return (s||"").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+      return (s||"").replace(/[&<>"']/g, m => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+      }[m]));
     }
 
-    function shorten(text, max=96){
+    function shorten(text, max=92){
       text = (text || "").trim();
       return text.length > max ? text.slice(0, max-1) + "…" : text;
     }
@@ -357,7 +338,7 @@
       newsUpdated.textContent = stamp();
 
       newsListEl.innerHTML = items.slice(0, MAX_ITEMS).map((it, i) => {
-        const title = shorten(it.title || "UNTITLED", 96);
+        const title = shorten(it.title || "UNTITLED", 92);
         const src   = (it.source || "SOURCE").toUpperCase();
         const link  = it.link || "#";
 
@@ -386,10 +367,10 @@
       try{
         const r = await fetch("/.netlify/functions/fallout-news", { cache:"no-store" });
         const d = await r.json();
-        if(!r.ok || !d.items?.length) throw new Error(d.error || "No headlines");
+        if(!r.ok) throw new Error(d?.error || ("HTTP " + r.status));
+        if(!d.items?.length) throw new Error("No headlines");
 
         const items = d.items.slice(0, MAX_ITEMS);
-
         const prev = loadCache();
         const newestLink = items[0]?.link || "";
         const newestIsNew = !!(prev.length && newestLink && prev[0] !== newestLink);
@@ -409,7 +390,7 @@
     setInterval(loadNews, POLL_MS);
   </script>
 
-  <!-- ================= WEATHER SCRIPT ================= -->
+  <!-- ================= WEATHER ================= -->
   <script>
     const WX_KEY = "wt_weather_profile_v4";
     const wxLoc = document.getElementById("wxLoc");
@@ -417,7 +398,6 @@
     const wxForecast = document.getElementById("wxForecast");
     const wxStatus = document.getElementById("wxStatus");
     const wxInput = document.getElementById("wxInput");
-
     const wxUseMyLoc = document.getElementById("wxUseMyLoc");
     const wxUseSaved = document.getElementById("wxUseSaved");
     const wxRefresh = document.getElementById("wxRefresh");
@@ -494,7 +474,6 @@
       rotateIdx = 0;
       wxForecast.textContent = rotateLines[0] || "—";
       if(rotateLines.length <= 1) return;
-
       rotateTimer = setInterval(() => {
         rotateIdx = (rotateIdx + 1) % rotateLines.length;
         wxForecast.textContent = rotateLines[rotateIdx];
@@ -504,13 +483,11 @@
     async function render(profile){
       if(!profile) return;
       showStatus("Pulling atmospheric data…");
-
       try{
         const d = await forecast(profile.latitude, profile.longitude);
         const cw = d.current_weather;
 
         wxLoc.textContent = profile.name;
-
         wxNow.textContent =
           `NOW: ${mapWasteland(cw.weathercode)} • ${Math.round(cw.temperature)}°F • WIND ${Math.round(cw.windspeed)} MPH`;
 
@@ -578,7 +555,7 @@
     if(init) render(init);
   </script>
 
-  <!-- ================= EMBEDDED RADIO CONTROLS ================= -->
+  <!-- ================= RADIO CONTROLS ================= -->
   <script>
     const radio = document.getElementById("radioPlayer");
     const playBtn = document.getElementById("radioPlay");
@@ -613,8 +590,7 @@
     radio.addEventListener("playing", setPlayLabelPlaying);
   </script>
 
-  <!-- ================= STREAM INFO WIDGET (Shoutcheap) ================= -->
-  <script language="javascript" type="text/javascript" src="https://radio.shoutcheap.com/system/streaminfo.js"></script>
-
+  <!-- ================= SHOUTCHEAP STREAM INFO ================= -->
+  <script src="https://radio.shoutcheap.com/system/streaminfo.js"></script>
 </body>
 </html>
