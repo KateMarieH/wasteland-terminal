@@ -1,119 +1,90 @@
-// netlify/functions/fallout-news.js
-// No dependencies. Node 18+ (Netlify) supports global fetch.
+<script>
+const newsTicker  = document.getElementById("newsTicker");   // can be a div/span
+const newsSource  = document.getElementById("newsSource");
+const newsUpdated = document.getElementById("newsUpdated");
+const newsLink    = document.getElementById("newsLink");
+const newsRefresh = document.getElementById("newsRefresh");
 
-const RSS_URL =
-  "https://news.google.com/rss/search?q=Fallout+game+news&hl=en-US&gl=US&ceid=US:en";
+function stamp(){ return new Date().toLocaleString(); }
 
-// Tiny helpers
-function pickTag(xml, tag) {
-  // Matches <tag>...</tag> including CDATA
-  const re = new RegExp(`<${tag}>([\\s\\S]*?)<\\/${tag}>`, "i");
-  const m = xml.match(re);
-  if (!m) return "";
-  return m[1]
-    .replace(/<!\[CDATA\[(.*?)\]\]>/gis, "$1")
-    .trim();
+function esc(s=""){
+  return s.replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m]));
 }
 
-function decodeEntities(str) {
-  return (str || "")
-    .replace(/&amp;/g, "&")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">");
-}
-
-function extractItems(xml, max = 15) {
-  const items = [];
-  const re = /<item>([\s\S]*?)<\/item>/gi;
-  let m;
-  while ((m = re.exec(xml)) && items.length < max) {
-    const block = m[1];
-
-    const title = decodeEntities(pickTag(block, "title"));
-    const link = decodeEntities(pickTag(block, "link"));
-    const pubDate = decodeEntities(pickTag(block, "pubDate"));
-
-    // Google News RSS often has: <source url="...">Publisher Name</source>
-    let source = decodeEntities(pickTag(block, "source"));
-
-    // Fallback: titles often look like "Headline - Publisher"
-    if (!source && title.includes(" - ")) {
-      source = title.split(" - ").slice(-1)[0].trim();
-    }
-
-    items.push({
-      title: title || "Untitled",
-      link: link || "",
-      source: source || "Google News",
-      pubDate: pubDate || ""
-    });
+function renderList(items){
+  if (!items?.length){
+    newsTicker.innerHTML = `<div class="tickerLine mono">NO HEADLINES AVAILABLE</div>`;
+    newsSource.textContent = "—";
+    newsUpdated.textContent = stamp();
+    newsLink.href = "#";
+    return;
   }
-  return items;
+
+  const top5 = items.slice(0,5);
+
+  // newest is [0]
+  newsLink.href = top5[0].link || "#";
+  newsSource.textContent = (top5[0].source || "—").toUpperCase();
+  newsUpdated.textContent = stamp();
+
+  // Build a static list. Newest line in amber.
+  newsTicker.innerHTML = `
+    <div class="newsList">
+      ${top5.map((it, i) => `
+        <div class="newsItem ${i===0 ? "isNew" : ""}">
+          <span class="newsSrc">${esc((it.source||"SOURCE").toUpperCase())}</span>
+          <span class="newsSep">—</span>
+          <a class="newsA" href="${esc(it.link||"#")}" target="_blank" rel="noopener">
+            ${esc(it.title || "Untitled")}
+          </a>
+        </div>
+      `).join("")}
+    </div>
+  `;
 }
 
-exports.handler = async function handler() {
-  try {
-    const r = await fetch(RSS_URL, {
-      headers: {
-        // User agent helps avoid occasional blocks
-        "user-agent": "Mozilla/5.0 (WastelandTerminal; +https://wastelandterminal.com)",
-        "accept": "application/rss+xml, application/xml;q=0.9, */*;q=0.8"
-      }
+async function loadNews(){
+  // show loading
+  newsTicker.textContent = "LOADING FALLOUT HEADLINES…";
+  newsSource.textContent = "—";
+  newsUpdated.textContent = stamp();
+  newsLink.href = "#";
+
+  // timeout so it never hangs forever
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), 8000);
+
+  try{
+    const r = await fetch("/.netlify/functions/fallout-news", {
+      cache: "no-store",
+      signal: ctrl.signal
     });
 
-    const xml = await r.text();
+    const ct = (r.headers.get("content-type") || "").toLowerCase();
+    const text = await r.text(); // read as text first so we can debug
 
-    if (!r.ok) {
-      return {
-        statusCode: 502,
-        headers: {
-          "content-type": "application/json; charset=utf-8",
-          "cache-control": "no-store"
-        },
-        body: JSON.stringify({
-          error: `RSS fetch failed: ${r.status} ${r.statusText}`,
-          sample: xml.slice(0, 300)
-        })
-      };
+    if (!ct.includes("application/json")){
+      throw new Error(`Function returned non-JSON (${r.status}). First 120 chars: ${text.slice(0,120)}`);
     }
 
-    const items = extractItems(xml, 20);
+    const d = JSON.parse(text);
+    if (!r.ok) throw new Error(d.error || `HTTP ${r.status}`);
+    if (!d.items?.length) throw new Error("No items returned");
 
-    if (!items.length) {
-      return {
-        statusCode: 200,
-        headers: {
-          "content-type": "application/json; charset=utf-8",
-          "cache-control": "no-store"
-        },
-        body: JSON.stringify({
-          error: "Parsed 0 items from RSS (feed format may have changed).",
-          items: []
-        })
-      };
-    }
-
-    return {
-      statusCode: 200,
-      headers: {
-        "content-type": "application/json; charset=utf-8",
-        "cache-control": "no-store"
-      },
-      body: JSON.stringify({ items })
-    };
-  } catch (err) {
-    return {
-      statusCode: 500,
-      headers: {
-        "content-type": "application/json; charset=utf-8",
-        "cache-control": "no-store"
-      },
-      body: JSON.stringify({
-        error: "Function crashed",
-        message: String(err?.message || err)
-      })
-    };
+    renderList(d.items);
+  }catch(e){
+    newsTicker.innerHTML = `
+      <div class="tickerLine mono">NEWS FEED OFFLINE</div>
+      <div class="tiny dim" style="margin-top:8px;">${esc(String(e.message || e))}</div>
+    `;
+    newsSource.textContent = "SYSTEM";
+    newsUpdated.textContent = stamp();
+    newsLink.href = "#";
+  }finally{
+    clearTimeout(t);
   }
-};
+}
+
+newsRefresh?.addEventListener("click", loadNews);
+loadNews();
+</script>
