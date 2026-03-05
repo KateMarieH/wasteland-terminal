@@ -504,9 +504,10 @@
     setInterval(checkYouTubeLive, 2 * 60 * 1000);
 
     /********************
-     * LIVE CHAT (SUPABASE)
+     * LIVE CHAT (SUPABASE) — FIXED SEND
      * - chat log always visible
      * - callsign required only to send
+     * - shows real Supabase errors if insert fails
      ********************/
     (function(){
       const chatBox = document.getElementById("chatMessages");
@@ -532,6 +533,14 @@
           .replaceAll("'","&#039;");
       }
 
+      function normalizeName(s){
+        return String(s || "").trim().toUpperCase().slice(0, 24);
+      }
+
+      function normalizeMsg(s){
+        return String(s || "").trim().slice(0, 280);
+      }
+
       function renderMessage(msg){
         const div = document.createElement("div");
         div.className = "chatLine";
@@ -552,13 +561,17 @@
             .order("created_at", { ascending: true })
             .limit(50);
 
-          if (error) throw error;
+          if (error){
+            console.error("[CHAT] load error:", error);
+            chatBox.innerHTML = `<div class="tiny dim">CHAT OFFLINE</div>`;
+            return;
+          }
 
           chatBox.innerHTML = "";
           (data || []).forEach(renderMessage);
           chatBox.scrollTop = chatBox.scrollHeight;
         }catch(e){
-          console.error("chat load error:", e);
+          console.error("[CHAT] load failed:", e);
           chatBox.innerHTML = `<div class="tiny dim">CHAT OFFLINE</div>`;
         }
       }
@@ -575,50 +588,68 @@
         if (chatStatus) chatStatus.textContent = `CALLSIGN: ${username}`;
       }
 
-      async function sendChat(){
-        const message = chatInput.value.trim();
+      async function sendChat(e){
+        if (e && typeof e.preventDefault === "function") e.preventDefault();
+
+        const message = normalizeMsg(chatInput.value);
         if (!username || !message) return;
+
+        chatSend.disabled = true;
 
         try{
           const { error } = await supabase
             .from("chat_messages")
             .insert({ room: ROOM, username, message });
 
-          if (error) throw error;
+          if (error){
+            console.error("[CHAT] insert error:", error);
+            alert(`CHAT SEND FAILED: ${error.message}`);
+            return;
+          }
 
           chatInput.value = "";
-        }catch(e){
-          console.error("chat send error:", e);
+          chatInput.focus();
+        }catch(err){
+          console.error("[CHAT] send failed:", err);
+          alert("CHAT SEND FAILED: check console for details.");
+        } finally{
+          chatSend.disabled = false;
         }
       }
 
-      joinChat.addEventListener("click", () => {
-        const name = callsignInput.value.trim();
+      joinChat.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        const name = normalizeName(callsignInput.value);
         if (!name) return;
-        username = name.slice(0, 24);
+
+        username = name;
         localStorage.setItem(NAME_KEY, username);
+
         callsignInput.value = "";
         setJoined();
+        chatInput.focus();
       });
 
       chatSend.addEventListener("click", sendChat);
       chatInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") sendChat();
+        if (e.key === "Enter") sendChat(e);
       });
 
       // Always show chat immediately
       loadChat();
 
       // Enable sending only if username already saved
+      username = normalizeName(username);
       if (username) setJoined();
       else setReadOnly();
 
-      // Realtime updates
+      // Realtime updates (lobby only)
       supabase
         .channel("wt-chat-lobby")
         .on(
           "postgres_changes",
-          { event: "INSERT", schema: "public", table: "chat_messages" },
+          { event: "INSERT", schema: "public", table: "chat_messages", filter: "room=eq.lobby" },
           (payload) => {
             if (payload?.new?.room === ROOM) renderMessage(payload.new);
           }
