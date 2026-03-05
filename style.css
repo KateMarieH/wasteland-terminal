@@ -443,3 +443,43 @@ body{
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }
 }
+/* ===== Header layout polish (no HTML changes) ===== */
+
+/* Make the right column a bit wider so weather + buttons feel intentional */
+.topHeader{
+  grid-template-columns: minmax(0, 1fr) minmax(0, 520px);
+  align-items: start;
+}
+
+/* Keep title row from feeling like it's "fighting" the right column */
+.titleRow{
+  align-items: flex-start;   /* was flex-end */
+  gap: 16px;
+}
+
+/* The header buttons: pin them to the top-right, not floating mid-row */
+.counterInline{
+  justify-content: flex-end;
+  align-items: flex-start;
+  margin-top: 2px;
+}
+
+/* Give the buttons a slightly tighter look in the header only */
+.topHeader .btn{
+  padding: 6px 10px;
+  font-size: 10px;
+}
+
+/* Create a small visual separation so the weather card doesn't feel glued to buttons */
+.topHeader-right .miniWx{
+  margin-top: 10px;
+}
+
+/* Optional: reduce marquee dominance a bit so the header breathes */
+.marquee{
+  padding: 8px 12px;     /* slightly shorter */
+}
+.marqueeTrack{
+  font-size: 11px;       /* slightly smaller */
+  letter-spacing: .10em;
+}
