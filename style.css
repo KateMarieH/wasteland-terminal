@@ -474,23 +474,22 @@ body{
   box-shadow: var(--glow);
   padding: 10px 12px;
   overflow: hidden;
+  position: relative;
 }
 
 .marqueeTrack{
-  display: inline-flex;
-  gap: 18px;
+  display:flex;
+  gap: 30px;
   white-space: nowrap;
-  will-change: transform;
-  animation: marquee 28s linear infinite;
-  font-weight: 900;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  font-size: 12px;
+  width: max-content;
+  animation: marqueeScroll 35s linear infinite;
 }
 
-.marqueeGap{ opacity: .55; }
-
-@keyframes marquee{
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+@keyframes marqueeScroll{
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
