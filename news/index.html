@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>News Archive • Wasteland Terminal</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+  <div class="crt"></div>
+
+  <main class="screen">
+
+    <div class="titleRow">
+      <div>
+        <div class="title">NEWS ARCHIVE</div>
+        <div class="sub">FALLOUT HEADLINES • RUNNING LOG</div>
+      </div>
+
+      <div class="row wrap">
+        <a class="btn ghost" href="/">◀ HOME</a>
+        <button class="btn ghost" id="refreshBtn" type="button">REFRESH</button>
+      </div>
+    </div>
+
+    <div class="rule">==============================================================</div>
+
+    <section class="block">
+      <div class="panelBox">
+        <div class="h">&gt; LIVE HEADLINES FEED</div>
+        <div class="ruleSmall">--------------------------------</div>
+
+        <div class="row wrap">
+          <input class="input" id="searchInput" placeholder="FILTER KEYWORDS (TYPE TO FILTER)" style="flex:1; min-width:260px;">
+          <div class="kv" style="margin-top:0">
+            <span class="k">LAST UPDATE:</span> <span id="updated">—</span>
+          </div>
+        </div>
+
+        <div class="ruleSmall">--------------------------------</div>
+
+        <div class="newsList" id="newsList">
+          <div class="newsItem">
+            <div class="headline">LOADING…</div>
+            <div class="meta">SOURCE: —</div>
+          </div>
+        </div>
+
+        <div class="ruleSmall">--------------------------------</div>
+
+        <div class="tiny dim" id="countLine">—</div>
+      </div>
+    </section>
+
+    <div class="rule">==============================================================</div>
+
+    <footer class="foot row between wrap">
+      <span class="dim">Unofficial Fallout fan terminal.</span>
+      <span class="dim">NEWS ARCHIVE MODULE ONLINE.</span>
+    </footer>
+
+  </main>
+
+  <script>
+    const newsListEl = document.getElementById("newsList");
+    const updatedEl = document.getElementById("updated");
+    const refreshBtn = document.getElementById("refreshBtn");
+    const searchInput = document.getElementById("searchInput");
+    const countLine = document.getElementById("countLine");
+
+    let allItems = [];
+
+    function stamp(){ return new Date().toLocaleString(); }
+
+    function escapeHtml(s){
+      return String(s || "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;");
+    }
+
+    function render(items){
+      if(!items.length){
+        newsListEl.innerHTML = `
+          <div class="newsItem">
+            <div class="headline amber mono">NO RESULTS</div>
+            <div class="meta">SOURCE: FILTER</div>
+          </div>
+        `;
+        countLine.textContent = "0 RESULTS";
+        return;
+      }
+
+      newsListEl.innerHTML = items.map((it, idx) => {
+        const title = escapeHtml(it.title);
+        const source = escapeHtml((it.source || "SOURCE").toUpperCase());
+        const link = it.link || "#";
+        const cls = idx === 0 ? "newsItem newest" : "newsItem";
+        return `
+          <div class="${cls}">
+            <a href="${link}" target="_blank" rel="noopener">
+              <div class="headline">${title}</div>
+              <div class="meta">SOURCE: ${source}</div>
+            </a>
+          </div>
+        `;
+      }).join("");
+
+      countLine.textContent = `${items.length} HEADLINES`;
+    }
+
+    function applyFilter(){
+      const q = searchInput.value.trim().toLowerCase();
+      if(!q){
+        render(allItems);
+        return;
+      }
+      const filtered = allItems.filter(it => {
+        const t = (it.title || "").toLowerCase();
+        const s = (it.source || "").toLowerCase();
+        return t.includes(q) || s.includes(q);
+      });
+      render(filtered);
+    }
+
+    async function loadNews(){
+      updatedEl.textContent = stamp();
+      newsListEl.innerHTML = `
+        <div class="newsItem">
+          <div class="headline">LOADING FALLOUT HEADLINES…</div>
+          <div class="meta">SOURCE: —</div>
+        </div>
+      `;
+      countLine.textContent = "—";
+
+      try{
+        const r = await fetch("/.netlify/functions/fallout-news", { cache: "no-store" });
+        const d = await r.json();
+        if(!r.ok || !d.items?.length) throw new Error(d.error || "no headlines");
+
+        allItems = d.items; // show everything the function returns
+        updatedEl.textContent = stamp();
+        applyFilter();
+      }catch(e){
+        allItems = [];
+        newsListEl.innerHTML = `
+          <div class="newsItem">
+            <div class="headline amber mono">NEWS FEED OFFLINE</div>
+            <div class="meta">SOURCE: SYSTEM</div>
+          </div>
+        `;
+        countLine.textContent = "0 HEADLINES";
+        updatedEl.textContent = stamp();
+      }
+    }
+
+    refreshBtn.addEventListener("click", loadNews);
+    searchInput.addEventListener("input", applyFilter);
+
+    loadNews();
+    // refresh every 10 minutes
+    setInterval(loadNews, 10 * 60 * 1000);
+  </script>
+</body>
+</html>
