@@ -604,3 +604,52 @@ body{
 .chatLogin{
   margin-top:10px;
 }
+/* =========================
+   CHAT — FINAL (OVERRIDES)
+   (safe to paste at end)
+   ========================= */
+
+/* Make both rows behave consistently */
+.chatLoginRow,
+.chatInputRow{
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+  align-items:flex-start;
+  flex-wrap:wrap;
+}
+
+/* Inputs should expand nicely inside the row */
+.chatLoginRow .input,
+.chatInputRow .input{
+  flex: 1 1 220px;
+  min-width: 180px;
+}
+
+/* Buttons stay sized, not stretched */
+.chatLoginRow .btn,
+.chatInputRow .btn{
+  flex: 0 0 auto;
+}
+
+/* Chat log: consistent terminal “panel” look */
+.chatMessages{
+  height:240px;              /* slightly smaller than your 260 for balance */
+  overflow-y:auto;
+  padding:10px;
+  border:1px dashed rgba(141,255,176,.35);
+  background:rgba(0,0,0,.35);
+  box-shadow: var(--glow);
+  font-size:12px;
+  line-height:1.35;
+}
+
+/* Optional: make scrollbar less ugly on webkit browsers */
+.chatMessages::-webkit-scrollbar{ width: 10px; }
+.chatMessages::-webkit-scrollbar-thumb{
+  background: rgba(141,255,176,.25);
+  border: 2px solid rgba(0,0,0,.35);
+}
+.chatMessages::-webkit-scrollbar-track{
+  background: rgba(0,0,0,.25);
+}
