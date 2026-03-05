@@ -3,14 +3,14 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-1TRDZNXK6S"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-1TRDZNXK6S"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-1TRDZNXK6S');
+  </script>
 
-  gtag('config', 'G-1TRDZNXK6S');
-</script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Wasteland Terminal</title>
@@ -24,12 +24,12 @@
   <main class="screen">
 
     <!-- ===== ANNOUNCEMENT MARQUEE (MOVED TO TOP) ===== -->
-  <div class="announcementBar">
-  <span class="announcementLabel">ANNOUNCEMENT:</span>
-  <span id="announcementText">
-    wasteland terminal is online, barely... I hope you enjoy the music & news... more functionality to come... stay tuned
-  </span>
-</div>
+    <div class="announcementBar">
+      <span class="announcementLabel">ANNOUNCEMENT:</span>
+      <span id="announcementText">
+        wasteland terminal is online, barely... I hope you enjoy the music & news... more functionality to come... stay tuned
+      </span>
+    </div>
 
     <div class="ruleDots"></div>
 
@@ -98,26 +98,32 @@
         <div class="h">&gt; COMMUNITY</div>
         <div class="ruleSmall">--------------------------------</div>
 
-        <!-- Live Chat (placeholder) -->
-       <div class="panelBox">
-  <div class="mono">LIVE CHAT</div>
+        <!-- Live Chat (Supabase) -->
+        <div class="panelBox">
+          <div class="mono">LIVE CHAT</div>
 
-  <!-- Always visible chat log -->
-  <div id="chatMessages" class="chatMessages" aria-live="polite"></div>
+          <!-- Always visible chat log -->
+          <div id="chatMessages" class="chatMessages" aria-live="polite">
+            <div class="tiny dim" style="margin-top:6px">LOADING CHAT…</div>
+          </div>
 
-  <!-- Callsign entry (only needed to send) -->
-  <div class="chatLoginRow" id="chatLoginRow">
-    <input id="callsignInput" class="input" placeholder="ENTER CALLSIGN" maxlength="24" />
-    <button id="joinChat" class="btn ghost" type="button">JOIN</button>
-    <span class="tiny dim" id="chatStatus" style="align-self:center;">READ-ONLY</span>
-  </div>
+          <!-- Callsign entry (only needed to send) -->
+          <div class="chatLoginRow" style="margin-top:10px">
+            <input id="callsignInput" class="input" placeholder="ENTER CALLSIGN" maxlength="24" />
+            <button id="joinChat" class="btn ghost" type="button">JOIN</button>
+            <span class="tiny dim" id="chatStatus" style="align-self:center;">READ-ONLY</span>
+          </div>
 
-  <!-- Message input (disabled until joined) -->
-  <div class="chatInputRow">
-    <input id="chatInput" class="input" placeholder="TRANSMIT MESSAGE..." maxlength="280" disabled />
-    <button id="chatSend" class="btn" type="button" disabled>SEND</button>
-  </div>
-</div>
+          <!-- Message input (disabled until joined) -->
+          <div class="chatInputRow" style="margin-top:10px">
+            <input id="chatInput" class="input" placeholder="TRANSMIT MESSAGE..." maxlength="280" disabled />
+            <button id="chatSend" class="btn" type="button" disabled>SEND</button>
+          </div>
+
+          <div class="row wrap" style="margin-top:10px">
+            <a class="btn ghost" href="/community/">COMMUNITY PAGE</a>
+          </div>
+        </div>
 
         <div class="ruleDots">::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::</div>
 
@@ -204,7 +210,10 @@
             </div>
           </div>
 
-    
+          <div class="row wrap" style="margin-top:12px">
+            <a class="btn" id="openLive" href="#" target="_blank" rel="noopener">OPEN LIVE CAM</a>
+            <a class="btn ghost" id="openArchives" href="#" target="_blank" rel="noopener">LIVE CAM ARCHIVES</a>
+            <button class="btn ghost" id="checkLive">CHECK SIGNAL</button>
           </div>
         </div>
       </section>
@@ -241,10 +250,11 @@
     tickClock();
 
     /********************
-     * COMMUNITY CHAT LINK
+     * COMMUNITY CHAT LINK (SAFE)
      ********************/
     // Optional: a community chat link (Discord invite, etc.)
-    document.getElementById("chatLink").href = "#";
+    const chatLink = document.getElementById("chatLink");
+    if (chatLink) chatLink.href = "#";
 
     /********************
      * RADIO CONTROLS
@@ -492,6 +502,129 @@
     checkLive.addEventListener("click", checkYouTubeLive);
     checkYouTubeLive();
     setInterval(checkYouTubeLive, 2 * 60 * 1000);
+
+    /********************
+     * LIVE CHAT (SUPABASE)
+     * - chat log always visible
+     * - callsign required only to send
+     ********************/
+    (function(){
+      const chatBox = document.getElementById("chatMessages");
+      const callsignInput = document.getElementById("callsignInput");
+      const joinChat = document.getElementById("joinChat");
+      const chatInput = document.getElementById("chatInput");
+      const chatSend = document.getElementById("chatSend");
+      const chatStatus = document.getElementById("chatStatus");
+
+      // If chat isn't present, do nothing (prevents breaking other pages)
+      if (!chatBox || !callsignInput || !joinChat || !chatInput || !chatSend) return;
+
+      const ROOM = "lobby";
+      const NAME_KEY = "wt_chat_name_v1";
+      let username = localStorage.getItem(NAME_KEY) || "";
+
+      function escapeHtml(s){
+        return String(s)
+          .replaceAll("&","&amp;")
+          .replaceAll("<","&lt;")
+          .replaceAll(">","&gt;")
+          .replaceAll('"',"&quot;")
+          .replaceAll("'","&#039;");
+      }
+
+      function renderMessage(msg){
+        const div = document.createElement("div");
+        div.className = "chatLine";
+        div.innerHTML = `
+          <span class="chatUser">${escapeHtml(msg.username || "WANDERER")}:</span>
+          <span>${escapeHtml(msg.message || "")}</span>
+        `;
+        chatBox.appendChild(div);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+
+      async function loadChat(){
+        try{
+          const { data, error } = await supabase
+            .from("chat_messages")
+            .select("*")
+            .eq("room", ROOM)
+            .order("created_at", { ascending: true })
+            .limit(50);
+
+          if (error) throw error;
+
+          chatBox.innerHTML = "";
+          (data || []).forEach(renderMessage);
+          chatBox.scrollTop = chatBox.scrollHeight;
+        }catch(e){
+          console.error("chat load error:", e);
+          chatBox.innerHTML = `<div class="tiny dim">CHAT OFFLINE</div>`;
+        }
+      }
+
+      function setReadOnly(){
+        chatInput.disabled = true;
+        chatSend.disabled = true;
+        if (chatStatus) chatStatus.textContent = "READ-ONLY";
+      }
+
+      function setJoined(){
+        chatInput.disabled = false;
+        chatSend.disabled = false;
+        if (chatStatus) chatStatus.textContent = `CALLSIGN: ${username}`;
+      }
+
+      async function sendChat(){
+        const message = chatInput.value.trim();
+        if (!username || !message) return;
+
+        try{
+          const { error } = await supabase
+            .from("chat_messages")
+            .insert({ room: ROOM, username, message });
+
+          if (error) throw error;
+
+          chatInput.value = "";
+        }catch(e){
+          console.error("chat send error:", e);
+        }
+      }
+
+      joinChat.addEventListener("click", () => {
+        const name = callsignInput.value.trim();
+        if (!name) return;
+        username = name.slice(0, 24);
+        localStorage.setItem(NAME_KEY, username);
+        callsignInput.value = "";
+        setJoined();
+      });
+
+      chatSend.addEventListener("click", sendChat);
+      chatInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") sendChat();
+      });
+
+      // Always show chat immediately
+      loadChat();
+
+      // Enable sending only if username already saved
+      if (username) setJoined();
+      else setReadOnly();
+
+      // Realtime updates
+      supabase
+        .channel("wt-chat-lobby")
+        .on(
+          "postgres_changes",
+          { event: "INSERT", schema: "public", table: "chat_messages" },
+          (payload) => {
+            if (payload?.new?.room === ROOM) renderMessage(payload.new);
+          }
+        )
+        .subscribe();
+    })();
   </script>
 </body>
 </html>
