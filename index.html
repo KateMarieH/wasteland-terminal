@@ -13,6 +13,21 @@
 
   <main class="screen">
 
+    <!-- ===== ANNOUNCEMENT MARQUEE (MOVED TO TOP) ===== -->
+    <div class="marquee">
+      <div class="marqueeTrack">
+
+        <span>
+          TERMINAL BUILD V0.1 ONLINE — COMMUNITY MODULES COMING NEXT — JOIN THE DISCORD —
+        </span>
+
+        <span aria-hidden="true">
+          TERMINAL BUILD V0.1 ONLINE — COMMUNITY MODULES COMING NEXT — JOIN THE DISCORD —
+        </span>
+
+      </div>
+    </div>
+
     <div class="ruleDots"></div>
 
     <!-- ===== TOP HEADER ===== -->
@@ -21,7 +36,11 @@
         <div class="titleRow">
           <div class="title">WASTELAND TERMINAL</div>
 
-      
+          <!-- Visitor Counter (local unless backend added later) -->
+          <div class="counterInline">
+            <span class="h dim">VISITORS</span>
+            <div class="flipCounter" id="flipCounter" aria-label="All-time visitors">
+              <!-- digits injected by JS -->
             </div>
 
             <a class="btn ghost" id="supportBtn" href="https://www.patreon.com/cw/wastelandterminal/membership" target="_blank" rel="noopener">
