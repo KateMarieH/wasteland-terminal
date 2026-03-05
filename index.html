@@ -105,7 +105,7 @@
         <div class="panelBox">
           <div class="mono">LIVE CHAT</div>
           <div class="tiny dim" style="margin-top:6px">
-            Chat module coming online. (When you’re ready, we can drop in an embedded chat provider.)
+            Chat module coming online.
           </div>
         </div>
 
@@ -139,6 +139,7 @@
 
           <div class="kv">
             <div><span class="k">STATUS:</span> <span class="v" id="radioStatus">STANDBY</span></div>
+
             <div>
               <span class="k">NOW PLAYING:</span>
               <span class="v">
@@ -147,15 +148,18 @@
                 <span class="cc_streaminfo" data-type="tracktitle" data-username="themysti">—</span>
               </span>
             </div>
+
             <div class="tiny dim" style="margin-top:6px">
               LISTENERS:
               <span class="cc_streaminfo" data-type="listeners" data-username="themysti">—</span>
               /
               <span class="cc_streaminfo" data-type="maxlisteners" data-username="themysti">—</span>
             </div>
+
+            <div class="tiny dim" id="radioMetaStatus" style="margin-top:6px">Metadata: awaiting…</div>
           </div>
 
-          <!-- Custom player (no white default controls) -->
+          <!-- Custom player -->
           <div class="radioPlayer">
             <button class="btn" id="radioPlay">[ PLAY ]</button>
             <button class="btn ghost" id="radioStop">[ STOP ]</button>
@@ -170,7 +174,6 @@
             </div>
           </div>
 
-          <!-- hidden audio element -->
           <audio id="radioAudio" preload="none" crossorigin="anonymous">
             <source src="https://radio.shoutcheap.com/proxy/themysti/stream" type="audio/mpeg">
           </audio>
@@ -270,7 +273,7 @@
     bumpCounter();
 
     /***********************
-     * NEWS: STATIC TOP 5 LIST
+     * NEWS: STATIC TOP 5 LIST (with timeout so it doesn't hang)
      ***********************/
     const newsStatus = document.getElementById("newsStatus");
     const newsList = document.getElementById("newsList");
@@ -318,13 +321,24 @@
       newsUpdated.textContent = stamp();
       newsList.innerHTML = "";
 
+      const controller = new AbortController();
+      const t = setTimeout(() => controller.abort(), 6000);
+
       try{
-        const r = await fetch("/.netlify/functions/fallout-news", { cache: "no-store" });
+        const r = await fetch("/.netlify/functions/fallout-news", {
+          cache: "no-store",
+          signal: controller.signal
+        });
+
+        // if function returns HTML/error, .json() will throw — we catch it below
         const d = await r.json();
+
         if (!r.ok) throw new Error(d?.error || "News function failed");
         renderNews(d.items || []);
       }catch(e){
         renderNews([]);
+      }finally{
+        clearTimeout(t);
       }
     }
 
@@ -339,11 +353,11 @@
     const radioStop = document.getElementById("radioStop");
     const radioVol = document.getElementById("radioVol");
     const radioStatus = document.getElementById("radioStatus");
+    const radioMetaStatus = document.getElementById("radioMetaStatus");
 
     function setRadioState(isPlaying){
       radioStatus.textContent = isPlaying ? "ONLINE" : "STANDBY";
       radioPlay.textContent = isPlaying ? "[ PAUSE ]" : "[ PLAY ]";
-      document.body.classList.toggle("radioPlaying", isPlaying);
       radioPlay.classList.toggle("isPlaying", isPlaying);
     }
 
@@ -366,13 +380,24 @@
 
     radioStop.addEventListener("click", () => {
       radioAudio.pause();
-      radioAudio.src = radioAudio.currentSrc || "https://radio.shoutcheap.com/proxy/themysti/stream";
+      // reset stream
+      const src = radioAudio.querySelector("source")?.getAttribute("src");
+      radioAudio.load();
+      if (src) radioAudio.querySelector("source").src = src;
       setRadioState(false);
     });
 
     radioAudio.addEventListener("playing", () => setRadioState(true));
     radioAudio.addEventListener("pause", () => setRadioState(false));
     radioAudio.addEventListener("error", () => setRadioState(false));
+
+    // tiny sanity check: if streaminfo.js is working, those spans will change from "—"
+    setTimeout(() => {
+      const any = document.querySelector('.cc_streaminfo[data-type="tracktitle"][data-username="themysti"]');
+      if (!any) return;
+      const txt = (any.textContent || "").trim();
+      radioMetaStatus.textContent = (txt && txt !== "—") ? "Metadata: online." : "Metadata: offline (widget not responding).";
+    }, 2500);
 
     /***********************
      * LIVE CAM: YouTube live detection (Netlify function)
