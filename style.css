@@ -576,3 +576,31 @@ body{
     width: auto; /* keep nav from becoming ridiculous if you want */
   }
 }
+.chatMessages{
+  margin-top:10px;
+  height:260px;
+  overflow-y:auto;
+  padding:8px;
+  border:1px dashed rgba(141,255,176,.35);
+  background:rgba(0,0,0,.35);
+  font-size:12px;
+}
+
+.chatLine{
+  margin-bottom:6px;
+}
+
+.chatUser{
+  color:var(--amber);
+  font-weight:900;
+}
+
+.chatInputRow{
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+}
+
+.chatLogin{
+  margin-top:10px;
+}
