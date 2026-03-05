@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Wasteland Terminal</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
@@ -567,5 +568,10 @@ const supabase = window.supabase.createClient(
     // check every 2 minutes
     setInterval(checkYouTubeLive, 2 * 60 * 1000);
   </script>
+        <script>
+  const SUPABASE_URL = "https://czpqsboqzwzxmhanfadh.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6cHFzYm9xend6eG1oYW5mYWRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2MzQyOTEsImV4cCI6MjA4ODIxMDI5MX0.YxlmlzWfjIV4GU8FpSzyqO8E9qAuSsJDzAj1eY3wXkA";
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+</script>
 </body>
 </html>
