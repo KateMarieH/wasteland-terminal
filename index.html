@@ -11,6 +11,27 @@
   <div class="crt"></div>
 
   <main class="screen">
+
+    <!-- ===== ANNOUNCEMENT MARQUEE (MOVED TO TOP) ===== -->
+    <section class="block">
+      <div class="h">[ANNOUNCEMENT]</div>
+      <div class="ruleSmall">--------------------------------</div>
+
+      <div class="marquee" aria-label="Announcement">
+        <div class="marqueeTrack">
+          <span id="announcementText">
+            TERMINAL BUILD V0.1 ONLINE — COMMUNITY MODULES COMING NEXT — JOIN THE DISCORD — SUPPORT THE TERMINAL —
+          </span>
+          <span class="marqueeGap"> • </span>
+          <span aria-hidden="true">
+            TERMINAL BUILD V0.1 ONLINE — COMMUNITY MODULES COMING NEXT — JOIN THE DISCORD — SUPPORT THE TERMINAL —
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <div class="rule">==============================================================</div>
+
     <!-- ===== TOP HEADER ===== -->
     <header class="topHeader">
       <div class="topHeader-left">
@@ -24,8 +45,12 @@
               <!-- digits injected by JS -->
             </div>
 
-            <a class="btn ghost" id="supportBtn" href="#" target="_blank" rel="noopener">
+            <a class="btn ghost" id="supportBtn" href="https://www.patreon.com/cw/wastelandterminal/membership" target="_blank" rel="noopener">
               SUPPORT THE TERMINAL
+            </a>
+
+            <a class="btn ghost" id="discordBtn" href="https://discord.gg/wvrMZ8xynD" target="_blank" rel="noopener">
+              JOIN THE DISCORD
             </a>
           </div>
         </div>
@@ -69,26 +94,6 @@
       </aside>
     </header>
 
-    <div class="rule">==============================================================</div>
-
-    <!-- ===== TERMINAL NEWS / UPDATES ===== -->
-    <section class="block">
-      <div class="h">&gt; TERMINAL NEWS</div>
-      <div class="ruleSmall">--------------------------------</div>
-
-      <!-- You can edit these lines anytime -->
-      <div class="terminalNews">
-        <div class="terminalNewsItem">
-          <span class="amber mono">[UPDATE]</span>
-          Terminal build v0.1 online. Community modules coming next.
-        </div>
-        <div class="terminalNewsItem">
-          <span class="amber mono">[NOTICE]</span>
-          If you see "NEWS FEED OFFLINE", we’re recalibrating the relay.
-        </div>
-      </div>
-    </section>
-
     <div class="ruleDots">::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::</div>
 
     <!-- ===== MAIN GRID ===== -->
@@ -117,9 +122,6 @@
         <!-- News Feed (Top 5 static list) -->
         <div class="panelBox">
           <div class="mono">FALLOUT HEADLINES</div>
-          <div class="tiny dim" style="margin-top:6px">
-            Newest story highlights amber; list refreshes automatically.
-          </div>
 
           <div class="newsList" id="newsList">
             <div class="newsItem">
@@ -186,9 +188,6 @@
         <!-- Wasteland Live Cam (YouTube Live scaffold) -->
         <div class="panelBox">
           <div class="mono">WASTELAND LIVE CAM</div>
-          <div class="tiny dim" style="margin-top:6px">
-            Auto-switches to LIVE when broadcast is detected.
-          </div>
 
           <div class="liveWrap">
             <div class="liveBadge" id="liveBadge" hidden>
@@ -269,12 +268,8 @@
     userNameEl.textContent = localStorage.getItem(NAME_KEY);
 
     /********************
-     * SUPPORT BUTTON LINK
+     * COMMUNITY CHAT LINK
      ********************/
-    // Put your Patreon link here when ready:
-    // e.g. https://patreon.com/YOURNAME
-    document.getElementById("supportBtn").href = "#";
-
     // Optional: a community chat link (Discord invite, etc.)
     document.getElementById("chatLink").href = "#";
 
