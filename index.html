@@ -255,18 +255,19 @@ const supabase = window.supabase.createClient(
     // Optional: a community chat link (Discord invite, etc.)
     document.getElementById("chatLink").href = "#";
 
-    /********************
+ /********************
  * VISITOR COUNTER (GLOBAL VIA SUPABASE)
  * - Shows immediately (no blank state)
  * - Updates to global unique count when Supabase responds
  ********************/
 const flipCounter = document.getElementById("flipCounter");
 
-// 1) Always render something immediately so it never "disappears"
+// Render digits
 function renderFlipNumber(num, digits = 6){
   if (!flipCounter) return;
   const s = String(num).padStart(digits, "0");
   flipCounter.innerHTML = "";
+
   [...s].forEach(ch => {
     const d = document.createElement("div");
     d.className = "flipDigit";
@@ -275,18 +276,21 @@ function renderFlipNumber(num, digits = 6){
   });
 }
 
-// Read current number from the DOM (so we can animate from current → new)
+// Read number currently displayed
 function readFlipNumber(){
   if (!flipCounter || !flipCounter.children.length) return 0;
+
   let s = "";
   [...flipCounter.children].forEach((el) => {
     const o = el.querySelector(".old");
     s += (o?.textContent ?? "0");
   });
+
   const n = Number(s);
   return Number.isFinite(n) ? n : 0;
 }
 
+// Flip animation
 function setFlipNumber(newNum){
   if (!flipCounter) return;
 
@@ -296,7 +300,6 @@ function setFlipNumber(newNum){
   const oldStr = String(oldNum).padStart(digits, "0");
   const newStr = String(newNum).padStart(digits, "0");
 
-  // If nothing rendered yet, render instantly
   if (!flipCounter.children.length){
     renderFlipNumber(newNum, digits);
     return;
@@ -311,8 +314,9 @@ function setFlipNumber(newNum){
       o.textContent = oldStr[i];
       n.textContent = newStr[i];
       el.classList.remove("flip");
-      void el.offsetWidth; // reflow
+      void el.offsetWidth;
       el.classList.add("flip");
+
       setTimeout(() => {
         o.textContent = newStr[i];
         el.classList.remove("flip");
@@ -324,7 +328,7 @@ function setFlipNumber(newNum){
   });
 }
 
-// Render placeholder immediately (prevents blank)
+// Show placeholder immediately
 renderFlipNumber(0, 6);
 
 /********************
@@ -334,49 +338,43 @@ const VISITOR_ID_KEY = "wt_visitor_id_v1";
 
 function getVisitorId(){
   let id = localStorage.getItem(VISITOR_ID_KEY);
+
   if(!id){
     id = crypto.randomUUID();
     localStorage.setItem(VISITOR_ID_KEY, id);
   }
+
   return id;
 }
 
 async function updateGlobalVisitorCounter(){
   try{
-    // If supabase isn't ready for some reason, keep placeholder and stop
+
     if (typeof supabase === "undefined"){
-      console.warn("Supabase client not found; leaving visitor counter at 000000");
+      console.warn("Supabase client not found");
       return;
     }
 
     const visitor_id = getVisitorId();
 
-    // Upsert visitor
-    const { error: upsertErr } = await supabase
-      .from("unique_visitors")
-      .upsert({ visitor_id }, { onConflict: "visitor_id" });
+    // call database function
+    const { data, error } = await supabase.rpc("track_unique_visitor", {
+      p_visitor_id: visitor_id
+    });
 
-    if (upsertErr){
-      console.error("unique_visitors upsert error:", upsertErr);
-      return;
-    }
-
-    // Fetch global count
-    const { data, error: rpcErr } = await supabase.rpc("get_unique_visitor_count");
-    if (rpcErr){
-      console.error("get_unique_visitor_count error:", rpcErr);
+    if (error){
+      console.error("track_unique_visitor error:", error);
       return;
     }
 
     setFlipNumber(Number(data));
+
   }catch(e){
     console.error("updateGlobalVisitorCounter failed:", e);
   }
 }
 
-// Call once on load
-updateGlobalVisitorCounter();
-
+// Run once on page load
 updateGlobalVisitorCounter();
     /********************
      * RADIO CONTROLS
