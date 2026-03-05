@@ -256,64 +256,81 @@ const supabase = window.supabase.createClient(
     document.getElementById("chatLink").href = "#";
 
     /********************
-     * VISITOR COUNTER (LOCAL)
-     * (Real global counter requires a backend later.)
-     ********************/
-    const COUNTER_KEY = "wt_local_visits_v1";
-    const flipCounter = document.getElementById("flipCounter");
+ * VISITOR COUNTER (GLOBAL VIA SUPABASE)
+ ********************/
+const flipCounter = document.getElementById("flipCounter");
 
-    function renderFlipNumber(num, digits=6){
-      const s = String(num).padStart(digits, "0");
-      flipCounter.innerHTML = "";
-      [...s].forEach(ch => {
-        const d = document.createElement("div");
-        d.className = "flipDigit";
-        d.innerHTML = `<div class="old">${ch}</div><div class="new">${ch}</div>`;
-        flipCounter.appendChild(d);
-      });
+function renderFlipNumber(num, digits=6){
+  const s = String(num).padStart(digits, "0");
+  flipCounter.innerHTML = "";
+  [...s].forEach(ch => {
+    const d = document.createElement("div");
+    d.className = "flipDigit";
+    d.innerHTML = `<div class="old">${ch}</div><div class="new">${ch}</div>`;
+    flipCounter.appendChild(d);
+  });
+}
+
+function setFlipNumber(newNum){
+  const digits = 6;
+
+  const oldStr = String(0).padStart(digits, "0");
+  const newStr = String(newNum).padStart(digits, "0");
+
+  if (!flipCounter.children.length){
+    renderFlipNumber(newNum, digits);
+    return;
+  }
+
+  [...flipCounter.children].forEach((el, i) => {
+    const o = el.querySelector(".old");
+    const n = el.querySelector(".new");
+    if (!o || !n) return;
+
+    if (oldStr[i] !== newStr[i]){
+      o.textContent = oldStr[i];
+      n.textContent = newStr[i];
+      el.classList.remove("flip");
+      void el.offsetWidth;
+      el.classList.add("flip");
+      setTimeout(() => {
+        o.textContent = newStr[i];
+        el.classList.remove("flip");
+      }, 360);
+    } else {
+      o.textContent = newStr[i];
+      n.textContent = newStr[i];
     }
+  });
+}
 
-    function setFlipNumber(newNum){
-      const digits = 6;
-      const old = Number(localStorage.getItem(COUNTER_KEY) || "0");
-      localStorage.setItem(COUNTER_KEY, String(newNum));
+/********************
+ * SUPABASE UNIQUE VISITOR LOGIC
+ ********************/
+const VISITOR_ID_KEY = "wt_visitor_id_v1";
 
-      const oldStr = String(old).padStart(digits, "0");
-      const newStr = String(newNum).padStart(digits, "0");
+function getVisitorId(){
+  let id = localStorage.getItem(VISITOR_ID_KEY);
+  if(!id){
+    id = crypto.randomUUID();
+    localStorage.setItem(VISITOR_ID_KEY, id);
+  }
+  return id;
+}
 
-      // initial render if empty
-      if (!flipCounter.children.length){
-        renderFlipNumber(old, digits);
-      }
+async function updateGlobalVisitorCounter(){
+  const visitor_id = getVisitorId();
 
-      [...flipCounter.children].forEach((el, i) => {
-        const o = el.querySelector(".old");
-        const n = el.querySelector(".new");
-        if (!o || !n) return;
+  await supabase
+    .from("unique_visitors")
+    .upsert({ visitor_id }, { onConflict: "visitor_id" });
 
-        if (oldStr[i] !== newStr[i]){
-          o.textContent = oldStr[i];
-          n.textContent = newStr[i];
-          el.classList.remove("flip");
-          void el.offsetWidth; // reflow
-          el.classList.add("flip");
-          setTimeout(() => {
-            o.textContent = newStr[i];
-            el.classList.remove("flip");
-          }, 360);
-        } else {
-          o.textContent = newStr[i];
-          n.textContent = newStr[i];
-        }
-      });
-    }
+  const { data } = await supabase.rpc("get_unique_visitor_count");
 
-    // increment once per browser/profile "visit"
-    (function bumpVisit(){
-      const v = Number(localStorage.getItem(COUNTER_KEY) || "0");
-      setFlipNumber(v + 1);
-    })();
+  setFlipNumber(Number(data));
+}
 
+updateGlobalVisitorCounter();
     /********************
      * RADIO CONTROLS
      ********************/
