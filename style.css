@@ -63,7 +63,7 @@ body{
 /* Header layout */
 .topHeader{
   display:grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 420px);
+  grid-template-columns: 1fr; /* full width when no right widget exists */
   gap: 18px;
   align-items:start;
 }
