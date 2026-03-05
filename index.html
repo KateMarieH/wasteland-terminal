@@ -12,7 +12,7 @@
 
   <main class="screen">
     <!-- ===== TOP HEADER ===== -->
-    <!-- NOTE: inline style forces single-column header so everything moves up -->
+    <!-- Only change here: force single-column so header content can move up -->
     <header class="topHeader" style="grid-template-columns: 1fr;">
       <div class="topHeader-left">
         <div class="titleRow">
@@ -25,12 +25,8 @@
               <!-- digits injected by JS -->
             </div>
 
-            <a class="btn ghost" id="supportBtn" href="https://www.patreon.com/cw/wastelandterminal/membership" target="_blank" rel="noopener">
+            <a class="btn ghost" id="supportBtn" href="#" target="_blank" rel="noopener">
               SUPPORT THE TERMINAL
-            </a>
-
-            <a class="btn ghost" id="discordBtn" href="https://discord.gg/wvrMZ8xynD" target="_blank" rel="noopener">
-              JOIN THE DISCORD
             </a>
           </div>
         </div>
@@ -54,6 +50,8 @@
           <a class="btn ghost" href="/outpost/">OUTPOST</a>
         </nav>
       </div>
+
+      <!-- Removed: Compact Weather Widget (top-right) -->
     </header>
 
     <div class="rule">==============================================================</div>
@@ -63,6 +61,7 @@
       <div class="h">&gt; TERMINAL NEWS</div>
       <div class="ruleSmall">--------------------------------</div>
 
+      <!-- You can edit these lines anytime -->
       <div class="terminalNews">
         <div class="terminalNewsItem">
           <span class="amber mono">[UPDATE]</span>
@@ -88,16 +87,19 @@
         <!-- Live Chat (placeholder) -->
         <div class="panelBox">
           <div class="mono">LIVE CHAT</div>
+          <div class="tiny dim" style="margin-top:6px">
+            Chat-on-page needs a chat provider (Discord embed is limited). We can wire this next.
+          </div>
 
           <div class="row wrap" style="margin-top:10px">
-            <a class="btn" id="chatLink" href="https://discord.gg/wvrMZ8xynD" target="_blank" rel="noopener">OPEN COMMUNITY CHAT</a>
+            <a class="btn" id="chatLink" href="#" target="_blank" rel="noopener">OPEN COMMUNITY CHAT</a>
             <a class="btn ghost" href="/community/">COMMUNITY PAGE</a>
           </div>
         </div>
 
         <div class="ruleDots">::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::</div>
 
-        <!-- Weather (MOVED HERE under Live Chat) -->
+        <!-- Moved here: Weather (was top-right) -->
         <div class="panelBox">
           <div class="mono">WASTELAND WEATHER</div>
           <div class="ruleSmall">--------------------------------</div>
@@ -118,6 +120,9 @@
         <!-- News Feed (Top 5 static list) -->
         <div class="panelBox">
           <div class="mono">FALLOUT HEADLINES</div>
+          <div class="tiny dim" style="margin-top:6px">
+            Newest story highlights amber; list refreshes automatically.
+          </div>
 
           <div class="newsList" id="newsList">
             <div class="newsItem">
@@ -145,6 +150,9 @@
         <!-- Radio (embedded player + now playing) -->
         <div class="panelBox">
           <div class="mono">MYSTIC BROADCAST RADIO</div>
+          <div class="tiny dim" style="margin-top:6px">
+            Streaming live from the wastes.
+          </div>
 
           <div class="kv">
             <span class="k">STATUS:</span> <span class="v">ONLINE</span>
@@ -181,6 +189,9 @@
         <!-- Wasteland Live Cam (YouTube Live scaffold) -->
         <div class="panelBox">
           <div class="mono">WASTELAND LIVE CAM</div>
+          <div class="tiny dim" style="margin-top:6px">
+            Auto-switches to LIVE when broadcast is detected.
+          </div>
 
           <div class="liveWrap">
             <div class="liveBadge" id="liveBadge" hidden>
@@ -204,7 +215,7 @@
           </div>
         </div>
 
-        <!-- WASTELAND TV REMOVED -->
+        <!-- Removed: Wasteland TV block -->
       </section>
     </section>
 
@@ -242,6 +253,16 @@
       localStorage.setItem(NAME_KEY, savedName.toUpperCase());
     }
     userNameEl.textContent = localStorage.getItem(NAME_KEY);
+
+    /********************
+     * SUPPORT BUTTON LINK
+     ********************/
+    // Put your Patreon link here when ready:
+    // e.g. https://patreon.com/YOURNAME
+    document.getElementById("supportBtn").href = "#";
+
+    // Optional: a community chat link (Discord invite, etc.)
+    document.getElementById("chatLink").href = "#";
 
     /********************
      * VISITOR COUNTER (LOCAL)
@@ -325,7 +346,7 @@
     });
 
     /********************
-     * WEATHER (MOVED UNDER LIVE CHAT)
+     * WEATHER (MOVED BELOW LIVE CHAT)
      ********************/
     const WX_KEY = "wt_weather_profile_v3";
     const miniWxLoc = document.getElementById("miniWxLoc");
@@ -493,6 +514,7 @@
     /********************
      * YOUTUBE LIVE CAM (SCAFFOLD)
      * Requires Netlify function later: /.netlify/functions/youtube-live
+     * For now: shows standby image + links to channel.
      ********************/
     const liveBadge = document.getElementById("liveBadge");
     const livePlayer = document.getElementById("livePlayer");
@@ -518,6 +540,7 @@
 
     function showLive(videoId){
       liveBadge.hidden = false;
+      // IMPORTANT: add your domain for embed to work reliably
       const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=0&mute=0`;
       livePlayer.innerHTML = `
         <div class="ytWrap">
@@ -532,6 +555,7 @@
     }
 
     async function checkYouTubeLive(){
+      // This will fail until the Netlify function exists — that’s okay.
       try{
         const r = await fetch("/.netlify/functions/youtube-live", { cache:"no-store" });
         const d = await r.json();
@@ -543,12 +567,14 @@
           showStandby();
         }
       }catch(e){
+        // keep standby if not configured yet
         showStandby();
       }
     }
 
     checkLive.addEventListener("click", checkYouTubeLive);
     checkYouTubeLive();
+    // check every 2 minutes
     setInterval(checkYouTubeLive, 2 * 60 * 1000);
   </script>
 </body>
