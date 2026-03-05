@@ -99,17 +99,25 @@
         <div class="ruleSmall">--------------------------------</div>
 
         <!-- Live Chat (placeholder) -->
-        <div class="panelBox">
-          <div class="mono">LIVE CHAT</div>
-          <div class="tiny dim" style="margin-top:6px">
-            Chat-on-page needs a chat provider (Discord embed is limited). We can wire this next.
-          </div>
+       <div class="panelBox">
+  <div class="mono">LIVE CHAT</div>
 
-          <div class="row wrap" style="margin-top:10px">
-            <a class="btn" id="chatLink" href="#" target="_blank" rel="noopener">OPEN COMMUNITY CHAT</a>
-            <a class="btn ghost" href="/community/">COMMUNITY PAGE</a>
-          </div>
-        </div>
+  <!-- Always visible chat log -->
+  <div id="chatMessages" class="chatMessages" aria-live="polite"></div>
+
+  <!-- Callsign entry (only needed to send) -->
+  <div class="chatLoginRow" id="chatLoginRow">
+    <input id="callsignInput" class="input" placeholder="ENTER CALLSIGN" maxlength="24" />
+    <button id="joinChat" class="btn ghost" type="button">JOIN</button>
+    <span class="tiny dim" id="chatStatus" style="align-self:center;">READ-ONLY</span>
+  </div>
+
+  <!-- Message input (disabled until joined) -->
+  <div class="chatInputRow">
+    <input id="chatInput" class="input" placeholder="TRANSMIT MESSAGE..." maxlength="280" disabled />
+    <button id="chatSend" class="btn" type="button" disabled>SEND</button>
+  </div>
+</div>
 
         <div class="ruleDots">::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::</div>
 
