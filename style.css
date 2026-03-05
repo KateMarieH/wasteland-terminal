@@ -68,7 +68,7 @@ body{
   align-items:start;
 }
 
-/* NEW: when the top-right widget is removed, let header fill full width */
+/* Optional: if you ever remove the right widget entirely */
 .topHeader.noRight{
   grid-template-columns: 1fr;
 }
@@ -77,6 +77,7 @@ body{
   .topHeader{ grid-template-columns: 1fr; }
 }
 
+/* Title row: title left, buttons right */
 .titleRow{
   display:flex;
   align-items:flex-end;
@@ -266,60 +267,13 @@ body{
   box-shadow: 0 0 18px rgba(255,204,102,.16);
 }
 
-/* Inline counter area */
+/* Buttons row container (was counterInline — still used for header buttons) */
 .counterInline{
   display:flex;
   align-items:center;
   gap: 10px;
   flex-wrap:wrap;
-}
-
-/* ===== Visitor flip counter ===== */
-.flipCounter{
-  display:inline-flex;
-  gap:6px;
-  align-items:center;
-  justify-content:flex-end;
-  filter: drop-shadow(var(--glow));
-}
-
-.flipDigit{
-  position:relative;
-  width: 18px;
-  height: 26px;
-  border: 1px dashed rgba(141,255,176,.45);
-  background: rgba(0,0,0,.55);
-  box-shadow: var(--glow);
-  overflow:hidden;
-}
-
-.flipDigit .old,
-.flipDigit .new{
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:900;
-  letter-spacing:.08em;
-  font-size:12px;
-}
-
-.flipDigit .new{
-  transform: translateY(-100%);
-  opacity: 0;
-}
-
-.flipDigit.flip .old{
-  transform: translateY(100%);
-  opacity: 0;
-  transition: transform 320ms ease, opacity 320ms ease;
-}
-
-.flipDigit.flip .new{
-  transform: translateY(0);
-  opacity: 1;
-  transition: transform 320ms ease, opacity 320ms ease;
+  justify-content:flex-end; /* NEW: keeps buttons neatly on the right */
 }
 
 /* ===== News list ===== */
@@ -486,10 +440,6 @@ body{
 }
 
 @keyframes marqueeScroll{
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
 }
