@@ -248,6 +248,119 @@
       SUPABASE_URL,
       SUPABASE_ANON
     );
+    /********************
+ WASTELAND CHAT
+********************/
+
+const chatLogin = document.getElementById("chatLogin");
+const chatRoom = document.getElementById("chatRoom");
+
+const callsignInput = document.getElementById("callsignInput");
+const joinChat = document.getElementById("joinChat");
+
+const chatBox = document.getElementById("chatMessages");
+const chatInput = document.getElementById("chatInput");
+const chatSend = document.getElementById("chatSend");
+
+let username = localStorage.getItem("wt_chat_name");
+
+/* join chat */
+joinChat.onclick = () => {
+
+  const name = callsignInput.value.trim();
+
+  if(!name) return;
+
+  username = name;
+
+  localStorage.setItem("wt_chat_name", name);
+
+  chatLogin.style.display = "none";
+  chatRoom.style.display = "block";
+
+  loadChat();
+};
+
+/* auto join if returning user */
+if(username){
+  chatLogin.style.display = "none";
+  chatRoom.style.display = "block";
+  loadChat();
+}
+
+/* render message */
+function renderMessage(msg){
+
+  const div = document.createElement("div");
+  div.className = "chatLine";
+
+  div.innerHTML = `
+    <span class="chatUser">${msg.username}:</span>
+    <span>${msg.message}</span>
+  `;
+
+  chatBox.appendChild(div);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+/* load messages */
+async function loadChat(){
+
+  const { data } = await supabase
+    .from("chat_messages")
+    .select("*")
+    .order("created_at",{ascending:true})
+    .limit(50);
+
+  if(!data) return;
+
+  chatBox.innerHTML="";
+
+  data.forEach(renderMessage);
+}
+
+/* send message */
+async function sendChat(){
+
+  const message = chatInput.value.trim();
+
+  if(!message) return;
+
+  await supabase
+    .from("chat_messages")
+    .insert({
+      room:"lobby",
+      username:username,
+      message:message
+    });
+
+  chatInput.value="";
+}
+
+chatSend.onclick = sendChat;
+
+chatInput.addEventListener("keypress",(e)=>{
+  if(e.key==="Enter"){
+    sendChat();
+  }
+});
+
+/* realtime updates */
+
+supabase
+.channel("chat-room")
+.on(
+  "postgres_changes",
+  {
+    event:"INSERT",
+    schema:"public",
+    table:"chat_messages"
+  },
+  payload=>{
+    renderMessage(payload.new);
+  }
+)
+.subscribe();
   </script>
 
   <!-- ===== CORE SCRIPTS ===== -->
