@@ -483,3 +483,10 @@ body{
   font-size: 11px;       /* slightly smaller */
   letter-spacing: .10em;
 }
+/* Keep header buttons in a single row when possible */
+.counterInline{
+  flex-wrap: nowrap;
+}
+@media (max-width: 620px){
+  .counterInline{ flex-wrap: wrap; }
+}
