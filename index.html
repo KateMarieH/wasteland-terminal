@@ -213,7 +213,17 @@
 
   <!-- ===== STREAM INFO WIDGETS (Shoutcheap) ===== -->
   <script src="https://radio.shoutcheap.com/system/streaminfo.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<script>
+const SUPABASE_URL = "https://czpqsboqzwzxmhanfadh.supabase.co";
+const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6cHFzYm9xend6eG1oYW5mYWRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2MzQyOTEsImV4cCI6MjA4ODIxMDI5MX0.YxlmlzWfjIV4GU8FpSzyqO8E9qAuSsJDzAj1eY3wXkA";
+
+const supabase = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON
+);
+</script>
   <!-- ===== CORE SCRIPTS ===== -->
   <script>
     /********************
