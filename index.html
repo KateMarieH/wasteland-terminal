@@ -30,7 +30,7 @@
     <div class="rule">==============================================================</div>
 
     <!-- ===== TOP HEADER ===== -->
-    <header class="topHeader noRight">
+    <header class="topHeader">
       <div class="topHeader-left">
         <div class="titleRow">
           <div class="title">WASTELAND TERMINAL</div>
@@ -72,7 +72,23 @@
         </nav>
       </div>
 
-      <!-- REMOVED: Compact Weather Widget (top-right) -->
+      <!-- Compact Weather Widget (top-right) -->
+      <aside class="topHeader-right">
+        <div class="miniWx">
+          <div class="h">WASTELAND WEATHER</div>
+          <div class="ruleSmall">--------------------------------</div>
+
+          <div class="miniWxLine" id="miniWxLoc">LOCATION: —</div>
+          <div class="miniWxLine bigLine" id="miniWxNow">NOW: —</div>
+          <div class="miniWxLine dim tiny" id="miniWxMeta">—</div>
+
+          <div class="loginBar" style="margin-top:10px">
+            <input id="miniWxInput" class="input" placeholder="City or ZIP — Enter">
+            <button class="btn ghost" id="miniWxUseLoc">USE MY LOCATION</button>
+            <button class="btn ghost" id="miniWxUseSaved">USE SAVED</button>
+          </div>
+        </div>
+      </aside>
     </header>
 
     <div class="ruleDots">::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::</div>
@@ -95,24 +111,6 @@
           <div class="row wrap" style="margin-top:10px">
             <a class="btn" id="chatLink" href="#" target="_blank" rel="noopener">OPEN COMMUNITY CHAT</a>
             <a class="btn ghost" href="/community/">COMMUNITY PAGE</a>
-          </div>
-        </div>
-
-        <div class="ruleDots">::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::</div>
-
-        <!-- MOVED HERE: Compact Weather Widget (was top-right) -->
-        <div class="panelBox">
-          <div class="mono">WASTELAND WEATHER</div>
-          <div class="ruleSmall">--------------------------------</div>
-
-          <div class="miniWxLine" id="miniWxLoc">LOCATION: —</div>
-          <div class="miniWxLine bigLine" id="miniWxNow">NOW: —</div>
-          <div class="miniWxLine dim tiny" id="miniWxMeta">—</div>
-
-          <div class="loginBar" style="margin-top:10px">
-            <input id="miniWxInput" class="input" placeholder="City or ZIP — Enter">
-            <button class="btn ghost" id="miniWxUseLoc">USE MY LOCATION</button>
-            <button class="btn ghost" id="miniWxUseSaved">USE SAVED</button>
           </div>
         </div>
 
@@ -212,7 +210,21 @@
 
         <div class="ruleDots">::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::</div>
 
-        <!-- REMOVED: WASTELAND TV (placeholder) -->
+        <!-- Wasteland TV (placeholder) -->
+        <div class="panelBox">
+          <div class="mono">WASTELAND TV</div>
+          <div class="tiny dim" style="margin-top:6px">
+            Rotating PSAs, public domain cartoons, and old films (coming soon).
+          </div>
+
+          <div class="kv" style="margin-top:10px">
+            <span class="k">STATUS:</span> <span class="v">STANDBY</span>
+          </div>
+
+          <div class="row wrap" style="margin-top:12px">
+            <a class="btn ghost" href="/tv/">OPEN WASTELAND TV</a>
+          </div>
+        </div>
 
       </section>
     </section>
