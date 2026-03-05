@@ -11,9 +11,26 @@
   <div class="crt"></div>
 
   <main class="screen">
+
+    <!-- ===== ANNOUNCEMENT MARQUEE (MOVED TO TOP) ===== -->
+
+      <div class="marquee" aria-label="Announcement">
+        <div class="marqueeTrack">
+          <span id="announcementText">
+            TERMINAL BUILD V0.1 ONLINE — COMMUNITY MODULES COMING NEXT — JOIN THE DISCORD —
+          </span>
+          <span class="marqueeGap"> • </span>
+          <span aria-hidden="true">
+            TERMINAL BUILD V0.1 ONLINE — COMMUNITY MODULES COMING NEXT — JOIN THE DISCORD —
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <div class="rule">==============================================================</div>
+
     <!-- ===== TOP HEADER ===== -->
-    <!-- Only change here: force single-column so header content can move up -->
-    <header class="topHeader" style="grid-template-columns: 1fr;">
+    <header class="topHeader">
       <div class="topHeader-left">
         <div class="titleRow">
           <div class="title">WASTELAND TERMINAL</div>
@@ -25,8 +42,12 @@
               <!-- digits injected by JS -->
             </div>
 
-            <a class="btn ghost" id="supportBtn" href="#" target="_blank" rel="noopener">
+            <a class="btn ghost" id="supportBtn" href="https://www.patreon.com/cw/wastelandterminal/membership" target="_blank" rel="noopener">
               SUPPORT THE TERMINAL
+            </a>
+
+            <a class="btn ghost" id="discordBtn" href="https://discord.gg/wvrMZ8xynD" target="_blank" rel="noopener">
+              JOIN THE DISCORD
             </a>
           </div>
         </div>
@@ -51,28 +72,24 @@
         </nav>
       </div>
 
-      <!-- Removed: Compact Weather Widget (top-right) -->
+      <!-- Compact Weather Widget (top-right) -->
+      <aside class="topHeader-right">
+        <div class="miniWx">
+          <div class="h">WASTELAND WEATHER</div>
+          <div class="ruleSmall">--------------------------------</div>
+
+          <div class="miniWxLine" id="miniWxLoc">LOCATION: —</div>
+          <div class="miniWxLine bigLine" id="miniWxNow">NOW: —</div>
+          <div class="miniWxLine dim tiny" id="miniWxMeta">—</div>
+
+          <div class="loginBar" style="margin-top:10px">
+            <input id="miniWxInput" class="input" placeholder="City or ZIP — Enter">
+            <button class="btn ghost" id="miniWxUseLoc">USE MY LOCATION</button>
+            <button class="btn ghost" id="miniWxUseSaved">USE SAVED</button>
+          </div>
+        </div>
+      </aside>
     </header>
-
-    <div class="rule">==============================================================</div>
-
-    <!-- ===== TERMINAL NEWS / UPDATES ===== -->
-    <section class="block">
-      <div class="h">&gt; TERMINAL NEWS</div>
-      <div class="ruleSmall">--------------------------------</div>
-
-      <!-- You can edit these lines anytime -->
-      <div class="terminalNews">
-        <div class="terminalNewsItem">
-          <span class="amber mono">[UPDATE]</span>
-          Terminal build v0.1 online. Community modules coming next.
-        </div>
-        <div class="terminalNewsItem">
-          <span class="amber mono">[NOTICE]</span>
-          If you see "NEWS FEED OFFLINE", we’re recalibrating the relay.
-        </div>
-      </div>
-    </section>
 
     <div class="ruleDots">::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::</div>
 
@@ -99,30 +116,9 @@
 
         <div class="ruleDots">::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::</div>
 
-        <!-- Moved here: Weather (was top-right) -->
-        <div class="panelBox">
-          <div class="mono">WASTELAND WEATHER</div>
-          <div class="ruleSmall">--------------------------------</div>
-
-          <div class="miniWxLine" id="miniWxLoc">LOCATION: —</div>
-          <div class="miniWxLine bigLine" id="miniWxNow">NOW: —</div>
-          <div class="miniWxLine dim tiny" id="miniWxMeta">—</div>
-
-          <div class="loginBar" style="margin-top:10px">
-            <input id="miniWxInput" class="input" placeholder="City or ZIP — Enter">
-            <button class="btn ghost" id="miniWxUseLoc">USE MY LOCATION</button>
-            <button class="btn ghost" id="miniWxUseSaved">USE SAVED</button>
-          </div>
-        </div>
-
-        <div class="ruleDots">::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::</div>
-
         <!-- News Feed (Top 5 static list) -->
         <div class="panelBox">
           <div class="mono">FALLOUT HEADLINES</div>
-          <div class="tiny dim" style="margin-top:6px">
-            Newest story highlights amber; list refreshes automatically.
-          </div>
 
           <div class="newsList" id="newsList">
             <div class="newsItem">
@@ -187,35 +183,49 @@
         <div class="ruleDots">::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::</div>
 
         <!-- Wasteland Live Cam (YouTube Live scaffold) -->
+<div class="panelBox">
+  <div class="mono">WASTELAND LIVE CAM</div>
+
+  <div class="liveWrap">
+    <div class="liveBadge" id="liveBadge" hidden>
+      <span class="dot"></span> LIVE NOW
+    </div>
+
+    <!-- When live, we inject an iframe into this container -->
+    <div id="livePlayer" class="livePlayer">
+      <!-- fallback image -->
+      <img id="standbyImg" class="standbyImg" src="/assets/standby.gif" alt="Please stand by">
+      <div class="tiny dim" style="margin-top:8px">
+        Standby. No broadcast detected.
+      </div>
+    </div>
+  </div>
+
+  <div class="row wrap" style="margin-top:12px">
+    <a class="btn" id="openLive" href="#" target="_blank" rel="noopener">OPEN LIVE CAM</a>
+    <a class="btn ghost" id="openArchives" href="#" target="_blank" rel="noopener">LIVE CAM ARCHIVES</a>
+    <button class="btn ghost" id="checkLive">CHECK SIGNAL</button>
+  </div>
+</div>
+
+        <div class="ruleDots">::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::</div>
+
+        <!-- Wasteland TV (placeholder) -->
         <div class="panelBox">
-          <div class="mono">WASTELAND LIVE CAM</div>
+          <div class="mono">WASTELAND TV</div>
           <div class="tiny dim" style="margin-top:6px">
-            Auto-switches to LIVE when broadcast is detected.
+            Rotating PSAs, public domain cartoons, and old films (coming soon).
           </div>
 
-          <div class="liveWrap">
-            <div class="liveBadge" id="liveBadge" hidden>
-              <span class="dot"></span> LIVE NOW
-            </div>
-
-            <!-- When live, we inject an iframe into this container -->
-            <div id="livePlayer" class="livePlayer">
-              <!-- fallback image -->
-              <img id="standbyImg" class="standbyImg" src="/assets/please-stand-by.png" alt="Please stand by">
-              <div class="tiny dim" style="margin-top:8px">
-                Standby. No broadcast detected.
-              </div>
-            </div>
+          <div class="kv" style="margin-top:10px">
+            <span class="k">STATUS:</span> <span class="v">STANDBY</span>
           </div>
 
           <div class="row wrap" style="margin-top:12px">
-            <a class="btn" id="openLive" href="#" target="_blank" rel="noopener">OPEN LIVE CAM</a>
-            <a class="btn ghost" id="openArchives" href="#" target="_blank" rel="noopener">LIVE CAM ARCHIVES</a>
-            <button class="btn ghost" id="checkLive">CHECK SIGNAL</button>
+            <a class="btn ghost" href="/tv/">OPEN WASTELAND TV</a>
           </div>
         </div>
 
-        <!-- Removed: Wasteland TV block -->
       </section>
     </section>
 
@@ -255,12 +265,8 @@
     userNameEl.textContent = localStorage.getItem(NAME_KEY);
 
     /********************
-     * SUPPORT BUTTON LINK
+     * COMMUNITY CHAT LINK
      ********************/
-    // Put your Patreon link here when ready:
-    // e.g. https://patreon.com/YOURNAME
-    document.getElementById("supportBtn").href = "#";
-
     // Optional: a community chat link (Discord invite, etc.)
     document.getElementById("chatLink").href = "#";
 
@@ -346,7 +352,7 @@
     });
 
     /********************
-     * WEATHER (MOVED BELOW LIVE CHAT)
+     * WEATHER (COMPACT TOP RIGHT)
      ********************/
     const WX_KEY = "wt_weather_profile_v3";
     const miniWxLoc = document.getElementById("miniWxLoc");
@@ -533,7 +539,7 @@
       liveBadge.hidden = true;
       // restore standby UI (don’t nuke your image)
       livePlayer.innerHTML = `
-        <img id="standbyImg" class="standbyImg" src="/assets/please-stand-by.png" alt="Please stand by">
+        <img id="standbyImg" class="standbyImg" src="/assets/standby.gif" alt="Please stand by">
         <div class="tiny dim" style="margin-top:8px">Standby. No broadcast detected.</div>
       `;
     }
