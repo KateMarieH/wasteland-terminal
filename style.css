@@ -63,10 +63,16 @@ body{
 /* Header layout */
 .topHeader{
   display:grid;
-  grid-template-columns: 1fr; /* full width when no right widget exists */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 420px);
   gap: 18px;
   align-items:start;
 }
+
+/* NEW: when the top-right widget is removed, let header fill full width */
+.topHeader.noRight{
+  grid-template-columns: 1fr;
+}
+
 @media (max-width: 1050px){
   .topHeader{ grid-template-columns: 1fr; }
 }
