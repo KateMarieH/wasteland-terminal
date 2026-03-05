@@ -100,46 +100,16 @@
 
         <!-- Live Chat (placeholder) -->
         <div class="panelBox">
-  <div class="mono">WASTELAND TERMINAL CHAT</div>
+          <div class="mono">LIVE CHAT</div>
+          <div class="tiny dim" style="margin-top:6px">
+            Chat-on-page needs a chat provider (Discord embed is limited). We can wire this next.
+          </div>
 
-  <!-- login / callsign -->
-  <div id="chatLogin" class="chatLogin">
-    <div class="tiny dim">ENTER CALLSIGN</div>
-
-    <div class="chatInputRow">
-      <input
-        id="callsignInput"
-        class="input"
-        placeholder="CALLSIGN..."
-        maxlength="24"
-      />
-
-      <button id="joinChat" class="btn">
-        JOIN
-      </button>
-    </div>
-  </div>
-
-  <!-- actual chat -->
-  <div id="chatRoom" style="display:none">
-
-    <div id="chatMessages" class="chatMessages"></div>
-
-    <div class="chatInputRow">
-      <input
-        id="chatInput"
-        class="input"
-        placeholder="TRANSMIT MESSAGE..."
-        maxlength="280"
-      />
-
-      <button id="chatSend" class="btn">
-        SEND
-      </button>
-    </div>
-
-  </div>
-</div>
+          <div class="row wrap" style="margin-top:10px">
+            <a class="btn" id="chatLink" href="#" target="_blank" rel="noopener">OPEN COMMUNITY CHAT</a>
+            <a class="btn ghost" href="/community/">COMMUNITY PAGE</a>
+          </div>
+        </div>
 
         <div class="ruleDots">::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::</div>
 
