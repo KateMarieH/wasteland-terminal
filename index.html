@@ -29,7 +29,7 @@
     </div>
 
     <div class="ruleDots"></div>
-    
+
     <!-- ===== TOP HEADER ===== -->
     <header class="topHeader">
       <div class="topHeader-left">
@@ -58,8 +58,6 @@
         </div>
 
         <div class="compactLine mono">
-          USER: <span id="userName">WANDERER</span>
-          <span class="sep"></span>
           LOCAL TIME: <span id="localTime">—</span>
         </div>
 
@@ -227,26 +225,17 @@
   <!-- ===== CORE SCRIPTS ===== -->
   <script>
     /********************
-     * USER NAME + CLOCK
+     * CLOCK ONLY
      ********************/
-    const NAME_KEY = "wt_user_name_v1";
-    const userNameEl = document.getElementById("userName");
     const localTimeEl = document.getElementById("localTime");
 
     function tickClock(){
-      localTimeEl.textContent = new Date().toLocaleString();
+      if (localTimeEl){
+        localTimeEl.textContent = new Date().toLocaleString();
+      }
     }
     setInterval(tickClock, 1000);
     tickClock();
-
-    // Simple inline name prompt (only if missing)
-    let savedName = localStorage.getItem(NAME_KEY);
-    if (!savedName){
-      savedName = prompt("ENTER USER NAME (ALIAS):") || "WANDERER";
-      savedName = savedName.trim().slice(0, 18) || "WANDERER";
-      localStorage.setItem(NAME_KEY, savedName.toUpperCase());
-    }
-    userNameEl.textContent = localStorage.getItem(NAME_KEY);
 
     /********************
      * COMMUNITY CHAT LINK
@@ -571,6 +560,7 @@
     const openArchives = document.getElementById("openArchives");
     const checkLive = document.getElementById("checkLive");
 
+    // TODO: set these to your channel URLs
     const YT_CHANNEL_URL = "https://www.youtube.com/@YOURCHANNEL";
     const YT_ARCHIVE_URL = "https://www.youtube.com/@YOURCHANNEL/videos";
 
@@ -579,6 +569,7 @@
 
     function showStandby(){
       liveBadge.hidden = true;
+      // restore standby UI (don’t nuke your image)
       livePlayer.innerHTML = `
         <img id="standbyImg" class="standbyImg" src="/assets/standby.gif" alt="Please stand by">
         <div class="tiny dim" style="margin-top:8px">Standby. No broadcast detected.</div>
@@ -587,6 +578,7 @@
 
     function showLive(videoId){
       liveBadge.hidden = false;
+      // IMPORTANT: add your domain for embed to work reliably
       const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=0&mute=0`;
       livePlayer.innerHTML = `
         <div class="ytWrap">
@@ -601,6 +593,7 @@
     }
 
     async function checkYouTubeLive(){
+      // This will fail until the Netlify function exists — that’s okay.
       try{
         const r = await fetch("/.netlify/functions/youtube-live", { cache:"no-store" });
         const d = await r.json();
@@ -612,12 +605,14 @@
           showStandby();
         }
       }catch(e){
+        // keep standby if not configured yet
         showStandby();
       }
     }
 
     checkLive.addEventListener("click", checkYouTubeLive);
     checkYouTubeLive();
+    // check every 2 minutes
     setInterval(checkYouTubeLive, 2 * 60 * 1000);
   </script>
 </body>
