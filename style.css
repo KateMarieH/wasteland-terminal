@@ -490,3 +490,89 @@ body{
 @media (max-width: 620px){
   .counterInline{ flex-wrap: wrap; }
 }
+/* =========================
+   MOBILE LAYOUT PATCH
+   ========================= */
+@media (max-width: 720px){
+
+  /* reduce overall spacing so it doesn't feel "stretched" */
+  body{
+    letter-spacing: .03em; /* was .06em globally */
+  }
+
+  .screen{
+    width: calc(100% - 18px);
+    margin: 12px auto 24px;
+    padding: 14px 12px 16px;
+  }
+
+  /* Header becomes 1 column */
+  .topHeader{
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+  }
+
+  /* Title block */
+  .title{
+    font-size: 18px;
+    letter-spacing: .18em; /* was .26em */
+  }
+  .sub{
+    font-size: 11px;
+    letter-spacing: .08em;
+  }
+
+  /* Make top nav buttons easier on mobile */
+  .topMenu{
+    gap: 8px;
+  }
+
+  .btn{
+    font-size: 10px;
+    padding: 10px 10px; /* bigger tap target */
+  }
+
+  /* Make “header button row” stack nicely */
+  .counterInline{
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  /* Make weather box not feel cramped */
+  .miniWx{
+    padding: 10px 10px;
+  }
+  .miniWxLine{
+    font-size: 11px;
+    letter-spacing: .08em;
+  }
+
+  /* Main grid → single column */
+  .grid{
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+  }
+
+  /* Tighten big ASCII rules a bit on mobile */
+  .rule, .ruleSmall, .ruleDots{
+    letter-spacing: .02em;
+  }
+}
+
+/* Extra-small phones */
+@media (max-width: 380px){
+  .title{
+    font-size: 16px;
+    letter-spacing: .14em;
+  }
+
+  /* Buttons go full width for tiny screens */
+  .btn{
+    width: 100%;
+    text-align: center;
+  }
+
+  .topMenu .btn{
+    width: auto; /* keep nav from becoming ridiculous if you want */
+  }
+}
