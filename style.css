@@ -460,3 +460,31 @@ body{
     52% { opacity: .992; }
   }
 }
+
+/* ===== Announcement marquee ===== */
+.marquee{
+  border: 1px dashed rgba(141,255,176,.35);
+  background: rgba(0,0,0,.28);
+  box-shadow: var(--glow);
+  padding: 10px 12px;
+  overflow: hidden;
+}
+
+.marqueeTrack{
+  display: inline-flex;
+  gap: 18px;
+  white-space: nowrap;
+  will-change: transform;
+  animation: marquee 28s linear infinite;
+  font-weight: 900;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.marqueeGap{ opacity: .55; }
+
+@keyframes marquee{
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
