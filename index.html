@@ -18,13 +18,37 @@
 
   <!-- Supabase v2 -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Small inline styles for YouTube live + announcement pulse -->
+  <style>
+    #youtubeBtn.live {
+      color: #ff4444;
+      border-color: #ff4444;
+      box-shadow: 0 0 8px #ff4444;
+      animation: ytPulse 1.6s infinite ease-in-out;
+    }
+    @keyframes ytPulse {
+      0% { box-shadow: 0 0 4px #ff4444; }
+      50% { box-shadow: 0 0 12px #ff4444; }
+      100% { box-shadow: 0 0 4px #ff4444; }
+    }
+
+    .announcementBar.live {
+      color: #ff4444;
+      animation: annPulse 1.6s infinite ease-in-out;
+    }
+    @keyframes annPulse {
+      0% { opacity: 0.7; }
+      50% { opacity: 1; }
+      100% { opacity: 0.7; }
+    }
+  </style>
 </head>
 
 <body>
   <div class="crt"></div>
 
   <main class="screen">
-
     <!-- ===== ANNOUNCEMENT MARQUEE (MOVED TO TOP) ===== -->
     <div class="announcementBar">
       <span class="announcementLabel">ANNOUNCEMENT:</span>
@@ -41,14 +65,25 @@
         <div class="titleRow">
           <div class="title">WASTELAND TERMINAL</div>
 
-          <!-- Buttons (counter removed) -->
+          <!-- Buttons -->
           <div class="counterInline">
-            <a class="btn ghost" id="supportBtn" href="https://www.patreon.com/cw/wastelandterminal/membership" target="_blank" rel="noopener">
+            <a class="btn ghost" id="supportBtn"
+               href="https://www.patreon.com/cw/wastelandterminal/membership"
+               target="_blank" rel="noopener">
               SUPPORT THE TERMINAL
             </a>
 
-            <a class="btn ghost" id="discordBtn" href="https://discord.gg/wvrMZ8xynD" target="_blank" rel="noopener">
+            <a class="btn ghost" id="discordBtn"
+               href="https://discord.gg/wvrMZ8xynD"
+               target="_blank" rel="noopener">
               JOIN THE DISCORD
+            </a>
+
+            <!-- New YouTube button -->
+            <a class="btn ghost" id="youtubeBtn"
+               href="https://www.youtube.com/@themysticbroadcast/live"
+               target="_blank" rel="noopener">
+              YOUTUBE
             </a>
           </div>
         </div>
@@ -76,7 +111,6 @@
         <div class="miniWx">
           <div class="h">WASTELAND WEATHER</div>
           <div class="ruleSmall">--------------------------------</div>
-
           <div class="miniWxLine" id="miniWxLoc">LOCATION: —</div>
           <div class="miniWxLine bigLine" id="miniWxNow">NOW: —</div>
           <div class="miniWxLine dim tiny" id="miniWxMeta">—</div>
@@ -94,7 +128,6 @@
 
     <!-- ===== MAIN GRID ===== -->
     <section class="grid">
-
       <!-- ===== COMMUNITY ===== -->
       <section class="block">
         <div class="h">&gt; COMMUNITY</div>
@@ -168,11 +201,33 @@
           <div class="bigLine" style="margin-top:10px">
             NOW PLAYING:
           </div>
+
           <div class="bigLine" style="letter-spacing:.08em">
             <span class="cc_streaminfo" data-type="song" data-username="themysti">Loading ...</span>
           </div>
 
-          <div class="kv">
+          <!-- Album art -->
+          <div style="margin-top:10px; text-align:center;">
+            <img class="cc_streaminfo"
+                 data-type="trackimageurl"
+                 data-username="themysti"
+                 style="max-width:100%; border-radius:4px;" />
+          </div>
+
+          <!-- Buy link -->
+          <div class="kv" style="margin-top:10px">
+            <span class="k">BUY:</span>
+            <a class="cc_streaminfo" data-type="trackbuyurl" data-username="themysti">
+              Buy this album
+            </a>
+          </div>
+
+          <!-- Recently played -->
+          <div class="cc_recenttracks_list" data-username="themysti" style="margin-top:10px;">
+            Loading recent tracks...
+          </div>
+
+          <div class="kv" style="margin-top:10px">
             <span class="k">LISTENERS:</span>
             <span class="cc_streaminfo" data-type="listeners" data-username="themysti"></span>
             <span class="dim"> / MAX </span>
@@ -184,50 +239,33 @@
             <button class="btn ghost" id="radioStop">STOP</button>
           </div>
 
+          <!-- Volume slider -->
+          <div class="radioVolume" style="margin-top:10px">
+            <input id="radioVolume" type="range" min="0" max="1" step="0.01" value="1">
+          </div>
+
           <audio id="radioAudio" preload="none" crossorigin="anonymous">
             <source src="https://radio.shoutcheap.com/proxy/themysti/stream" type="audio/mpeg">
           </audio>
+
+          <!-- Pip-Boy style visualizer -->
+          <canvas id="radioViz" width="300" height="60" style="margin-top:10px; width:100%;"></canvas>
         </div>
 
         <div class="ruleDots">::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::</div>
-
-        <!-- Wasteland Live Cam -->
-        <div class="panelBox">
-          <div class="mono">WASTELAND LIVE CAM</div>
-
-          <div class="liveWrap">
-            <div class="liveBadge" id="liveBadge" hidden>
-              <span class="dot"></span> LIVE NOW
-            </div>
-
-            <div id="livePlayer" class="livePlayer">
-              <img id="standbyImg" class="standbyImg" src="/assets/standby.gif" alt="Please stand by">
-              <div class="tiny dim" style="margin-top:8px">
-                Standby. No broadcast detected.
-              </div>
-            </div>
-          </div>
-
-          <div class="row wrap" style="margin-top:12px">
-            <a class="btn" id="openLive" href="https://www.youtube.com/@themysticbroadcast/live" target="_blank" rel="noopener">OPEN LIVE CAM</a>
-            <a class="btn ghost" id="openArchives" href="https://www.youtube.com/@themysticbroadcast" target="_blank" rel="noopener">LIVE CAM ARCHIVES</a>
-            <button class="btn ghost" id="checkLive">CHECK SIGNAL</button>
-          </div>
-        </div>
+        <!-- Live Cam panel removed -->
       </section>
     </section>
-
   </main>
 
   <!-- ===== STREAM INFO WIDGETS (Shoutcheap) ===== -->
   <script src="https://radio.shoutcheap.com/system/streaminfo.js"></script>
+  <script src="https://radio.shoutcheap.com/system/recenttracks.js"></script>
 
   <!-- ✅ Create ONE Supabase client, and DO NOT name it "supabase" -->
   <script>
     const SUPABASE_URL = "https://czpqsboqzwzxmhanfadh.supabase.co";
     const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6cHFzYm9xend6eG1oYW5mYWRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2MzQyOTEsImV4cCI6MjA4ODIxMDI5MX0.YxlmlzWfjIV4GU8FpSzyqO8E9qAuSsJDzAj1eY3wXkA";
-
-    // store client on window so it can't be redeclared
     window.sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
   </script>
 
@@ -246,16 +284,81 @@
     tickClock();
 
     /********************
-     * RADIO CONTROLS
+     * RADIO CONTROLS + VOLUME + VISUALIZER
      ********************/
     const radioAudio = document.getElementById("radioAudio");
     const radioPlay = document.getElementById("radioPlay");
     const radioStop = document.getElementById("radioStop");
+    const radioVolume = document.getElementById("radioVolume");
+
+    let audioCtx = null;
+    let analyser = null;
+    let sourceNode = null;
+
+    const vizCanvas = document.getElementById("radioViz");
+    const vizCtx = vizCanvas.getContext("2d");
+
+    function initVisualizer(){
+      if (audioCtx || !radioAudio) return;
+
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 1024;
+
+      sourceNode = audioCtx.createMediaElementSource(radioAudio);
+      sourceNode.connect(analyser);
+      analyser.connect(audioCtx.destination);
+
+      drawPipboyVisualizer();
+    }
+
+    function drawPipboyVisualizer(){
+      if (!analyser) return;
+      requestAnimationFrame(drawPipboyVisualizer);
+
+      const bufferLength = analyser.fftSize;
+      const dataArray = new Uint8Array(bufferLength);
+      analyser.getByteTimeDomainData(dataArray);
+
+      const w = vizCanvas.width;
+      const h = vizCanvas.height;
+
+      vizCtx.clearRect(0, 0, w, h);
+
+      vizCtx.strokeStyle = "#33ff99";
+      vizCtx.lineWidth = 2;
+      vizCtx.shadowColor = "#33ff99";
+      vizCtx.shadowBlur = 8;
+
+      vizCtx.beginPath();
+
+      const slice = w / bufferLength;
+      let x = 0;
+
+      for (let i = 0; i < bufferLength; i++){
+        const v = dataArray[i] / 128.0;
+        const jitter = (Math.random() - 0.5) * 1.2;
+        const y = (v * h) / 2 + jitter;
+
+        if (i === 0) vizCtx.moveTo(x, y);
+        else vizCtx.lineTo(x, y);
+
+        x += slice;
+      }
+
+      vizCtx.stroke();
+
+      vizCtx.fillStyle = "rgba(0,0,0,0.15)";
+      for (let i = 0; i < h; i += 4){
+        vizCtx.fillRect(0, i, w, 1);
+      }
+    }
 
     radioPlay.addEventListener("click", async () => {
       try{
         await radioAudio.play();
         radioPlay.classList.add("isPlaying");
+        initVisualizer();
       }catch(e){
         alert("Autoplay blocked. Tap PLAY again, or check mute settings.");
       }
@@ -266,6 +369,13 @@
       radioAudio.currentTime = 0;
       radioPlay.classList.remove("isPlaying");
     });
+
+    if (radioVolume) {
+      radioAudio.volume = parseFloat(radioVolume.value || "1");
+      radioVolume.addEventListener("input", () => {
+        radioAudio.volume = parseFloat(radioVolume.value || "1");
+      });
+    }
 
     /********************
      * WEATHER (COMPACT TOP RIGHT)
@@ -303,11 +413,9 @@
       miniWxLoc.textContent = `LOCATION: ${p.name}`;
       miniWxNow.textContent = `NOW: LOADING…`;
       miniWxMeta.textContent = `—`;
-
       try{
         const d = await wxFetch(p.latitude, p.longitude);
         const cw = d.current_weather;
-
         const cond = mapWasteland(cw.weathercode);
         const temp = Math.round(cw.temperature);
         const wind = Math.round(cw.windspeed);
@@ -316,7 +424,6 @@
 
         const sr = new Date(d.daily.sunrise[0]).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
         const ss = new Date(d.daily.sunset[0]).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
-
         miniWxMeta.textContent = `SUNRISE ${sr} • SUNSET ${ss}`;
       }catch(e){
         miniWxNow.textContent = `NOW: FEED OFFLINE`;
@@ -385,7 +492,6 @@
       const safeTitle = (item.title || "").replace(/</g,"&lt;").replace(/>/g,"&gt;");
       const safeSource = (item.source || "SOURCE").toUpperCase();
       const link = item.link || "#";
-
       return `
         <div class="newsItem ${isNewest ? "newest" : ""}">
           <a href="${link}" target="_blank" rel="noopener">
@@ -431,60 +537,44 @@
     setInterval(loadNews, 10 * 60 * 1000);
 
     /********************
-     * YOUTUBE LIVE CAM (SCAFFOLD)
+     * YOUTUBE LIVE STATUS (NO PANEL)
      ********************/
-    const liveBadge = document.getElementById("liveBadge");
-    const livePlayer = document.getElementById("livePlayer");
-    const openLive = document.getElementById("openLive");
-    const openArchives = document.getElementById("openArchives");
-    const checkLive = document.getElementById("checkLive");
+    const YT_CHANNEL_URL = "https://www.youtube.com/@themysticbroadcast/live";
 
-    const YT_CHANNEL_URL = "https://www.youtube.com/@themysticbroadcast";
-    const YT_ARCHIVE_URL = "https://www.youtube.com/@themysticbroadcast/live";
+    async function checkYouTubeLive() {
+      const youtubeBtn = document.getElementById("youtubeBtn");
+      const announcementBar = document.querySelector(".announcementBar");
+      const announcementText = document.getElementById("announcementText");
 
-    openLive.href = YT_CHANNEL_URL;
-    openArchives.href = YT_ARCHIVE_URL;
+      if (!youtubeBtn || !announcementBar || !announcementText) return;
 
-    function showStandby(){
-      liveBadge.hidden = true;
-      livePlayer.innerHTML = `
-        <img id="standbyImg" class="standbyImg" src="/assets/standby.gif" alt="Please stand by">
-        <div class="tiny dim" style="margin-top:8px">Standby. No broadcast detected.</div>
-      `;
-    }
-
-    function showLive(videoId){
-      liveBadge.hidden = false;
-      const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=0&mute=0`;
-      livePlayer.innerHTML = `
-        <div class="ytWrap">
-          <iframe
-            src="${embedUrl}"
-            title="Wasteland Live Cam"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowfullscreen></iframe>
-        </div>
-      `;
-    }
-
-    async function checkYouTubeLive(){
-      try{
-        const r = await fetch("/.netlify/functions/youtube-live", { cache:"no-store" });
+      try {
+        const r = await fetch("/.netlify/functions/youtube-live", { cache: "no-store" });
         const d = await r.json();
-        if(!r.ok) throw new Error("no signal");
-        if(d.isLive && d.videoId){
-          showLive(d.videoId);
-          openLive.href = d.liveUrl || YT_CHANNEL_URL;
-        }else{
-          showStandby();
+
+        if (d.isLive && d.videoId) {
+          youtubeBtn.classList.add("live");
+          youtubeBtn.href = d.liveUrl || YT_CHANNEL_URL;
+
+          announcementBar.classList.add("live");
+          announcementText.innerHTML = `
+            wasteland terminal is online, barely... there will be bugs (but remember, those are features...) Enjoy the news and music, more to come...
+            <span style="margin-left:10px;">• LIVE NOW — WASTELAND CAM ACTIVE</span>
+          `;
+        } else {
+          youtubeBtn.classList.remove("live");
+          youtubeBtn.href = YT_CHANNEL_URL;
+
+          announcementBar.classList.remove("live");
+          announcementText.textContent =
+            "wasteland terminal is online, barely... there will be bugs (but remember, those are features...) Enjoy the news and music, more to come...";
         }
-      }catch(e){
-        showStandby();
+      } catch (e) {
+        youtubeBtn.classList.remove("live");
+        announcementBar.classList.remove("live");
       }
     }
 
-    checkLive.addEventListener("click", checkYouTubeLive);
     checkYouTubeLive();
     setInterval(checkYouTubeLive, 2 * 60 * 1000);
 
@@ -492,7 +582,7 @@
      * LIVE CHAT (SUPABASE) — uses window.sb
      ********************/
     (function(){
-      const sb = window.sb; // ✅ client
+      const sb = window.sb;
       const chatBox = document.getElementById("chatMessages");
       const callsignInput = document.getElementById("callsignInput");
       const joinChat = document.getElementById("joinChat");
@@ -524,47 +614,46 @@
       function normalizeName(s){
         return String(s || "").trim().toUpperCase().slice(0, 24);
       }
-      function colorForUser(name){
-  const colors = ["#7fffd4", "#ffb347", "#87cefa", "#ff6f91", "#f5f5dc", "#98fb98"];
-  let hash = 0;
-  for (let i = 0; i < name.length; i++){
-    hash = (hash + name.charCodeAt(i) * 17) % colors.length;
-  }
-  return colors[hash];
-}
-function formatTime(ts){
-  const d = new Date(ts);
-  return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-}
 
+      function colorForUser(name){
+        const colors = ["#7fffd4", "#ffb347", "#87cefa", "#ff6f91", "#f5f5dc", "#98fb98"];
+        let hash = 0;
+        for (let i = 0; i < name.length; i++){
+          hash = (hash + name.charCodeAt(i) * 17) % colors.length;
+        }
+        return colors[hash];
+      }
+
+      function formatTime(ts){
+        const d = new Date(ts);
+        return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      }
 
       function normalizeMsg(s){
         return String(s || "").trim().slice(0, 280);
       }
 
-    function renderMessage(msg){
-  const div = document.createElement("div");
-  div.className = "chatLine";
+      function renderMessage(msg){
+        const div = document.createElement("div");
+        div.className = "chatLine";
 
-  const user = msg.username || "WANDERER";
-  const userColor = colorForUser(user);
-  const time = formatTime(msg.created_at);
+        const user = msg.username || "WANDERER";
+        const userColor = colorForUser(user);
+        const time = formatTime(msg.created_at);
 
-  div.innerHTML = `
-    <span class="chatTime dim">[${time}]</span>
-    <span class="chatUser" style="color:${userColor}">${escapeHtml(user)}:</span>
-    <span>${escapeHtml(msg.message || "")}</span>
-  `;
+        div.innerHTML = `
+          <span class="chatTime dim">[${time}]</span>
+          <span class="chatUser" style="color:${userColor}">${escapeHtml(user)}:</span>
+          <span>${escapeHtml(msg.message || "")}</span>
+        `;
 
-  chatBox.appendChild(div);
-  chatBox.scrollTop = chatBox.scrollHeight;
+        chatBox.appendChild(div);
+        chatBox.scrollTop = chatBox.scrollHeight;
 
-  // optional: auto-trim to last 100 messages
-  if (chatBox.children.length > 100){
-    chatBox.removeChild(chatBox.firstChild);
-  }
-}
-
+        if (chatBox.children.length > 100){
+          chatBox.removeChild(chatBox.firstChild);
+        }
+      }
 
       async function loadChat(){
         try{
@@ -604,12 +693,10 @@ function formatTime(ts){
 
       async function sendChat(e){
         if (e && typeof e.preventDefault === "function") e.preventDefault();
-
         const message = normalizeMsg(chatInput.value);
         if (!username || !message) return;
 
         chatSend.disabled = true;
-
         try{
           const { error } = await sb
             .from("chat_messages")
@@ -633,13 +720,10 @@ function formatTime(ts){
 
       joinChat.addEventListener("click", (e) => {
         e.preventDefault();
-
         const name = normalizeName(callsignInput.value);
         if (!name) return;
-
         username = name;
         localStorage.setItem(NAME_KEY, username);
-
         callsignInput.value = "";
         setJoined();
         chatInput.focus();
