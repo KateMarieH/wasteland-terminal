@@ -729,4 +729,70 @@ body{
   box-shadow: var(--glow);
   margin-top: 10px;
 }
+/* === RADIO SYSTEM SAFETY === */
+
+.radioNowPlaying {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.radioNowPlaying img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.radioControls,
+.radioControlRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.radioControlRow input[type="range"] {
+  flex: 1;
+}
+
+.hidden {
+  display: none;
+}
+/* === RADIO SYSTEM SAFETY === */
+
+.radioNowPlaying {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.radioNowPlaying img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.radioControls,
+.radioControlRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.radioControlRow input[type="range"] {
+  flex: 1;
+}
+
+.hidden {
+  display: none;
+}
+.radioNowPlaying .bigLine {
+  margin-bottom: 2px;
+}
+
+#radioViz {
+  background: rgba(0,0,0,0.15);
+  border-radius: 2px;
+}
 
