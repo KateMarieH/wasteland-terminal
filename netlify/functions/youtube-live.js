@@ -6,17 +6,21 @@ const CHANNEL_ID = "UCPtQT6_4aXqaLT8oOHtBkIA";
 export async function handler() {
   try {
     const url =
-      `https://www.googleapis.com/youtube/v3/search` +
-      `?part=snippet&channelId=${CHANNEL_ID}` +
-      `&eventType=live&type=video&key=${API_KEY}`;
+      `https://www.googleapis.com/youtube/v3/liveBroadcasts` +
+      `?part=snippet` +
+      `&broadcastStatus=active` +
+      `&broadcastType=all` +
+      `&key=${API_KEY}`;
 
     const r = await fetch(url);
     const data = await r.json();
 
-    const liveVideo = data.items?.[0];
+    const live = data.items?.find(
+      item => item.snippet?.channelId === CHANNEL_ID
+    );
 
-    if (liveVideo) {
-      const videoId = liveVideo.id.videoId;
+    if (live) {
+      const videoId = live.id;
       return {
         statusCode: 200,
         body: JSON.stringify({
