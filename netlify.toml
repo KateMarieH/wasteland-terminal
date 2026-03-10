@@ -6,3 +6,5 @@
   to = "/welcome.html"
   status = 302
   force = true
+[functions]
+directory = "netlify/functions"
