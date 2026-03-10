@@ -524,21 +524,47 @@
       function normalizeName(s){
         return String(s || "").trim().toUpperCase().slice(0, 24);
       }
+      function colorForUser(name){
+  const colors = ["#7fffd4", "#ffb347", "#87cefa", "#ff6f91", "#f5f5dc", "#98fb98"];
+  let hash = 0;
+  for (let i = 0; i < name.length; i++){
+    hash = (hash + name.charCodeAt(i) * 17) % colors.length;
+  }
+  return colors[hash];
+}
+function formatTime(ts){
+  const d = new Date(ts);
+  return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
 
       function normalizeMsg(s){
         return String(s || "").trim().slice(0, 280);
       }
 
-      function renderMessage(msg){
-        const div = document.createElement("div");
-        div.className = "chatLine";
-        div.innerHTML = `
-          <span class="chatUser">${escapeHtml(msg.username || "WANDERER")}:</span>
-          <span>${escapeHtml(msg.message || "")}</span>
-        `;
-        chatBox.appendChild(div);
-        chatBox.scrollTop = chatBox.scrollHeight;
-      }
+    function renderMessage(msg){
+  const div = document.createElement("div");
+  div.className = "chatLine";
+
+  const user = msg.username || "WANDERER";
+  const userColor = colorForUser(user);
+  const time = formatTime(msg.created_at);
+
+  div.innerHTML = `
+    <span class="chatTime dim">[${time}]</span>
+    <span class="chatUser" style="color:${userColor}">${escapeHtml(user)}:</span>
+    <span>${escapeHtml(msg.message || "")}</span>
+  `;
+
+  chatBox.appendChild(div);
+  chatBox.scrollTop = chatBox.scrollHeight;
+
+  // optional: auto-trim to last 100 messages
+  if (chatBox.children.length > 100){
+    chatBox.removeChild(chatBox.firstChild);
+  }
+}
+
 
       async function loadChat(){
         try{
