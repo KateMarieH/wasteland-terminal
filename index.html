@@ -1,232 +1,757 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta charset="utf-8">
-<title>Wasteland Terminal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-1TRDZNXK6S"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-1TRDZNXK6S');
+  </script>
 
-<link rel="stylesheet" href="style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Wasteland Terminal</title>
+  <link rel="stylesheet" href="style.css">
 
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-1TRDZNXK6S"></script>
-<script>
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', 'G-1TRDZNXK6S');
-</script>
+  <!-- Supabase v2 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Small inline styles for YouTube live + announcement pulse -->
+  <style>
+    #youtubeBtn.live {
+      color: #ff4444;
+      border-color: #ff4444;
+      box-shadow: 0 0 8px #ff4444;
+      animation: ytPulse 1.6s infinite ease-in-out;
+    }
+    @keyframes ytPulse {
+      0% { box-shadow: 0 0 4px #ff4444; }
+      50% { box-shadow: 0 0 12px #ff4444; }
+      100% { box-shadow: 0 0 4px #ff4444; }
+    }
 
-<style>
-#youtubeBtn.live {
-  color:#ff4444;
-  border-color:#ff4444;
-  box-shadow:0 0 8px #ff4444;
-  animation:ytPulse 1.6s infinite ease-in-out;
-}
-@keyframes ytPulse {
-  0%{box-shadow:0 0 4px #ff4444;}
-  50%{box-shadow:0 0 12px #ff4444;}
-  100%{box-shadow:0 0 4px #ff4444;}
-}
-.announcementBar.live {
-  color:#ff4444;
-  animation:annPulse 1.6s infinite ease-in-out;
-}
-@keyframes annPulse {
-  0%{opacity:.7;}
-  50%{opacity:1;}
-  100%{opacity:.7;}
-}
-
-/* RADIO UPGRADES */
-.radioNowPlaying {
-  display:flex;
-  gap:12px;
-  align-items:center;
-}
-.radioNowPlaying img {
-  width:72px;
-  height:72px;
-  object-fit:cover;
-  border-radius:4px;
-}
-.radioMeta .songTitle {
-  letter-spacing:.08em;
-}
-.radioControlRow {
-  display:flex;
-  gap:10px;
-  align-items:center;
-}
-.radioControlRow input {
-  flex:1;
-}
-.hidden { display:none; }
-</style>
+    .announcementBar.live {
+      color: #ff4444;
+      animation: annPulse 1.6s infinite ease-in-out;
+    }
+    @keyframes annPulse {
+      0% { opacity: 0.7; }
+      50% { opacity: 1; }
+      100% { opacity: 0.7; }
+    }
+  </style>
 </head>
 
 <body>
-<div class="crt"></div>
-<main class="screen">
+  <div class="crt"></div>
 
-<!-- ANNOUNCEMENT -->
-<div class="announcementBar">
-<span class="announcementLabel">ANNOUNCEMENT:</span>
-<span id="announcementText">
-wasteland terminal is online, barely... there will be bugs (but remember, those are features...)
-</span>
-</div>
+  <main class="screen">
+    <!-- ===== ANNOUNCEMENT MARQUEE (MOVED TO TOP) ===== -->
+    <div class="announcementBar">
+      <span class="announcementLabel">ANNOUNCEMENT:</span>
+      <span id="announcementText">
+        wasteland terminal is online, barely... there will be bugs (but remember, those are features...) Enjoy the news and music, more to come...
+      </span>
+    </div>
 
-<div class="ruleDots"></div>
+    <div class="ruleDots"></div>
 
-<header class="topHeader">
-<div class="topHeader-left">
-<div class="titleRow">
-<div class="title">WASTELAND TERMINAL</div>
-<div class="counterInline">
-<a class="btn ghost" href="https://www.patreon.com/cw/wastelandterminal/membership" target="_blank">SUPPORT</a>
-<a class="btn ghost" href="https://discord.gg/wvrMZ8xynD" target="_blank">DISCORD</a>
-<a class="btn ghost" id="youtubeBtn" href="https://www.youtube.com/@themysticbroadcast/live" target="_blank">YOUTUBE</a>
-</div>
-</div>
-<div class="sub">YOUR GO TO TERMINAL FOR NEWS, WEATHER, MUSIC, & MORE.</div>
-<div class="compactLine mono">LOCAL TIME: <span id="localTime">—</span></div>
-<nav class="topMenu">
-<a class="btn ghost" href="/about/">ABOUT</a>
-<a class="btn ghost" href="/community/">COMMUNITY</a>
-<a class="btn ghost" href="/news/">NEWS</a>
-<a class="btn ghost" href="/weather/">WEATHER</a>
-<a class="btn ghost" href="/outpost/">OUTPOST</a>
-</nav>
-</div>
-</header>
+    <!-- ===== TOP HEADER ===== -->
+    <header class="topHeader">
+      <div class="topHeader-left">
+        <div class="titleRow">
+          <div class="title">WASTELAND TERMINAL</div>
 
-<div class="ruleDots"></div>
+          <!-- Buttons -->
+          <div class="counterInline">
+            <a class="btn ghost" id="supportBtn"
+               href="https://www.patreon.com/cw/wastelandterminal/membership"
+               target="_blank" rel="noopener">
+              SUPPORT THE TERMINAL
+            </a>
 
-<section class="grid">
+            <a class="btn ghost" id="discordBtn"
+               href="https://discord.gg/wvrMZ8xynD"
+               target="_blank" rel="noopener">
+              JOIN THE DISCORD
+            </a>
 
-<section class="block">
-<div class="h">&gt; STATIONS</div>
-<div class="ruleSmall">--------------------------------</div>
+            <!-- New YouTube button -->
+            <a class="btn ghost" id="youtubeBtn"
+               href="https://www.youtube.com/@themysticbroadcast/live"
+               target="_blank" rel="noopener">
+              YOUTUBE
+            </a>
+          </div>
+        </div>
 
-<div class="panelBox">
-<div class="mono">MYSTIC BROADCAST RADIO</div>
+        <div class="sub">
+          YOUR GO TO TERMINAL FOR NEWS, WEATHER, MUSIC, &amp; MORE.
+        </div>
 
-<div class="kv"><span class="k">STATUS:</span> <span class="v">ONLINE</span></div>
+        <div class="compactLine mono">
+          LOCAL TIME: <span id="localTime">—</span>
+        </div>
 
-<!-- NOW PLAYING -->
-<div class="radioNowPlaying" style="margin-top:10px;">
-<img class="cc_streaminfo" data-type="trackimageurl" data-username="themysti" />
-<div class="radioMeta">
-<div class="bigLine">NOW PLAYING:</div>
-<div class="bigLine songTitle">
-<span class="cc_streaminfo" data-type="song" data-username="themysti">Loading…</span>
-</div>
-</div>
-</div>
+        <!-- NAV BUTTONS -->
+        <nav class="topMenu">
+          <a class="btn ghost" href="/about/">ABOUT</a>
+          <a class="btn ghost" href="/community/">COMMUNITY</a>
+          <a class="btn ghost" href="/news/">NEWS ARCHIVE</a>
+          <a class="btn ghost" href="/weather/">WEATHER</a>
+          <a class="btn ghost" href="/outpost/">OUTPOST</a>
+        </nav>
+      </div>
 
-<!-- BUY -->
-<div class="kv" style="margin-top:10px">
-<span class="k">BUY:</span>
-<a class="cc_streaminfo" data-type="trackbuyurl" data-username="themysti">Album</a>
-</div>
+      <!-- Compact Weather Widget (top-right) -->
+      <aside class="topHeader-right">
+        <div class="miniWx">
+          <div class="h">WASTELAND WEATHER</div>
+          <div class="ruleSmall">--------------------------------</div>
+          <div class="miniWxLine" id="miniWxLoc">LOCATION: —</div>
+          <div class="miniWxLine bigLine" id="miniWxNow">NOW: —</div>
+          <div class="miniWxLine dim tiny" id="miniWxMeta">—</div>
 
-<!-- LISTENERS -->
-<div class="kv">
-<span class="k">LISTENERS:</span>
-<span class="cc_streaminfo" data-type="listeners" data-username="themysti"></span>
-<span class="dim"> / </span>
-<span class="cc_streaminfo" data-type="maxlisteners" data-username="themysti"></span>
-</div>
+          <div class="loginBar" style="margin-top:10px">
+            <input id="miniWxInput" class="input" placeholder="City or ZIP — Enter">
+            <button class="btn ghost" id="miniWxUseLoc">USE MY LOCATION</button>
+            <button class="btn ghost" id="miniWxUseSaved">USE SAVED</button>
+          </div>
+        </div>
+      </aside>
+    </header>
 
-<!-- CONTROLS -->
-<div class="radioControlRow" style="margin-top:10px">
-<button class="btn" id="radioPlay">PLAY</button>
-<button class="btn ghost" id="radioStop">STOP</button>
-<input id="radioVolume" type="range" min="0" max="1" step="0.01" value="1">
-</div>
+    <div class="ruleDots"></div>
 
-<audio id="radioAudio" preload="none" crossorigin="anonymous">
-<source src="https://radio.shoutcheap.com/proxy/themysti/stream" type="audio/mpeg">
-</audio>
+    <!-- ===== MAIN GRID ===== -->
+    <section class="grid">
+      <!-- ===== COMMUNITY ===== -->
+      <section class="block">
+        <div class="h">&gt; COMMUNITY</div>
+        <div class="ruleSmall">--------------------------------</div>
 
-<!-- VISUALIZER -->
-<div class="tiny dim mono" style="margin-top:10px">AUDIO SCOPE</div>
-<canvas id="radioViz" width="300" height="60" style="width:100%;"></canvas>
+        <!-- Live Chat (Supabase) -->
+        <div class="panelBox">
+          <div class="mono">LIVE CHAT</div>
 
-<!-- RECENT TRACKS -->
-<button class="btn ghost" id="toggleRecent" style="margin-top:10px">RECENT TRACKS</button>
-<div id="recentTracks" class="cc_recenttracks_list hidden" data-username="themysti">
-Loading recent tracks…
-</div>
+          <!-- Always visible chat log -->
+          <div id="chatMessages" class="chatMessages" aria-live="polite">
+            <div class="tiny dim" style="margin-top:6px">LOADING CHAT…</div>
+          </div>
 
-</div>
-</section>
-</section>
-</main>
+          <!-- Callsign entry (only needed to send) -->
+          <div class="chatLoginRow" style="margin-top:10px">
+            <input id="callsignInput" class="input" placeholder="ENTER CALLSIGN" maxlength="24" />
+            <button id="joinChat" class="btn ghost" type="button">JOIN</button>
+            <span class="tiny dim" id="chatStatus" style="align-self:center;">READ-ONLY</span>
+          </div>
 
-<script src="https://radio.shoutcheap.com/system/streaminfo.js"></script>
-<script src="https://radio.shoutcheap.com/system/recenttracks.js"></script>
+          <!-- Message input (disabled until joined) -->
+          <div class="chatInputRow" style="margin-top:10px">
+            <input id="chatInput" class="input" placeholder="TRANSMIT MESSAGE..." maxlength="280" disabled />
+            <button id="chatSend" class="btn" type="button" disabled>SEND</button>
+          </div>
 
-<script>
-const radioAudio = document.getElementById("radioAudio");
-const radioPlay = document.getElementById("radioPlay");
-const radioStop = document.getElementById("radioStop");
-const radioVolume = document.getElementById("radioVolume");
-const toggleRecent = document.getElementById("toggleRecent");
-const recentTracks = document.getElementById("recentTracks");
+          <div class="row wrap" style="margin-top:10px">
+            <a class="btn ghost" href="/community/">COMMUNITY PAGE</a>
+          </div>
+        </div>
 
-let audioCtx, analyser, sourceNode;
-const viz = document.getElementById("radioViz");
-const vctx = viz.getContext("2d");
+        <div class="ruleDots">::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::</div>
 
-function initViz(){
-if(audioCtx) return;
-audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-analyser = audioCtx.createAnalyser();
-analyser.fftSize = 1024;
-sourceNode = audioCtx.createMediaElementSource(radioAudio);
-sourceNode.connect(analyser);
-analyser.connect(audioCtx.destination);
-drawViz();
-}
+        <!-- News Feed (Top 5 static list) -->
+        <div class="panelBox">
+          <div class="mono">FALLOUT HEADLINES</div>
 
-function drawViz(){
-requestAnimationFrame(drawViz);
-if(!analyser) return;
-const data = new Uint8Array(analyser.fftSize);
-analyser.getByteTimeDomainData(data);
-vctx.clearRect(0,0,viz.width,viz.height);
-vctx.strokeStyle="#33ff99";
-vctx.shadowColor="#33ff99";
-vctx.shadowBlur=8;
-vctx.beginPath();
-let x=0;
-const slice=viz.width/data.length;
-data.forEach((v,i)=>{
-const y=(v/128)*viz.height/2;
-i? vctx.lineTo(x,y):vctx.moveTo(x,y);
-x+=slice;
-});
-vctx.stroke();
-}
+          <div class="newsList" id="newsList">
+            <div class="newsItem">
+              <div class="headline">LOADING FALLOUT HEADLINES…</div>
+              <div class="meta">SOURCE: —</div>
+            </div>
+          </div>
 
-radioPlay.onclick = async ()=>{
-await radioAudio.play();
-if(audioCtx?.state==="suspended") audioCtx.resume();
-initViz();
-};
+          <div class="row wrap" style="margin-top:12px">
+            <a class="btn" id="openNewest" href="#" target="_blank" rel="noopener">OPEN NEWEST</a>
+            <button class="btn ghost" id="newsRefresh">REFRESH</button>
+          </div>
 
-radioStop.onclick = ()=>{
-radioAudio.pause();
-radioAudio.currentTime=0;
-};
+          <div class="kv">
+            <span class="k">LAST UPDATE:</span> <span id="newsUpdated">—</span>
+          </div>
+        </div>
+      </section>
 
-radioVolume.oninput = ()=> radioAudio.volume = radioVolume.value;
+      <!-- ===== STATIONS ===== -->
+      <section class="block">
+        <div class="h">&gt; STATIONS</div>
+        <div class="ruleSmall">--------------------------------</div>
 
-toggleRecent.onclick = ()=> recentTracks.classList.toggle("hidden");
-</script>
+        <!-- Radio (embedded player + now playing) -->
+        <div class="panelBox">
+          <div class="mono">MYSTIC BROADCAST RADIO</div>
+          <div class="tiny dim" style="margin-top:6px"></div>
 
+          <div class="kv">
+            <span class="k">STATUS:</span> <span class="v">ONLINE</span>
+          </div>
+
+          <div class="bigLine" style="margin-top:10px">
+            NOW PLAYING:
+          </div>
+
+          <div class="bigLine" style="letter-spacing:.08em">
+            <span class="cc_streaminfo" data-type="song" data-username="themysti">Loading ...</span>
+          </div>
+
+          <!-- Album art -->
+          <div style="margin-top:10px; text-align:center;">
+            <img class="cc_streaminfo"
+                 data-type="trackimageurl"
+                 data-username="themysti"
+                 style="max-width:100%; border-radius:4px;" />
+          </div>
+
+          <!-- Buy link -->
+          <div class="kv" style="margin-top:10px">
+            <span class="k">BUY:</span>
+            <a class="cc_streaminfo" data-type="trackbuyurl" data-username="themysti">
+              Buy this album
+            </a>
+          </div>
+
+          <!-- Recently played -->
+          <div class="cc_recenttracks_list" data-username="themysti" style="margin-top:10px;">
+            Loading recent tracks...
+          </div>
+
+          <div class="kv" style="margin-top:10px">
+            <span class="k">LISTENERS:</span>
+            <span class="cc_streaminfo" data-type="listeners" data-username="themysti"></span>
+            <span class="dim"> / MAX </span>
+            <span class="cc_streaminfo" data-type="maxlisteners" data-username="themysti"></span>
+          </div>
+
+          <div class="radioControls">
+            <button class="btn" id="radioPlay">PLAY</button>
+            <button class="btn ghost" id="radioStop">STOP</button>
+          </div>
+
+          <!-- Volume slider -->
+          <div class="radioVolume" style="margin-top:10px">
+            <input id="radioVolume" type="range" min="0" max="1" step="0.01" value="1">
+          </div>
+
+          <audio id="radioAudio" preload="none" crossorigin="anonymous">
+            <source src="https://radio.shoutcheap.com/proxy/themysti/stream" type="audio/mpeg">
+          </audio>
+
+          <!-- Pip-Boy style visualizer -->
+          <canvas id="radioViz" width="300" height="60" style="margin-top:10px; width:100%;"></canvas>
+        </div>
+
+        <div class="ruleDots">::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::</div>
+        <!-- Live Cam panel removed -->
+      </section>
+    </section>
+  </main>
+
+  <!-- ===== STREAM INFO WIDGETS (Shoutcheap) ===== -->
+  <script src="https://radio.shoutcheap.com/system/streaminfo.js"></script>
+  <script src="https://radio.shoutcheap.com/system/recenttracks.js"></script>
+
+  <!-- ✅ Create ONE Supabase client, and DO NOT name it "supabase" -->
+  <script>
+    const SUPABASE_URL = "https://czpqsboqzwzxmhanfadh.supabase.co";
+    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6cHFzYm9xend6eG1oYW5mYWRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2MzQyOTEsImV4cCI6MjA4ODIxMDI5MX0.YxlmlzWfjIV4GU8FpSzyqO8E9qAuSsJDzAj1eY3wXkA";
+    window.sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+  </script>
+
+  <!-- ===== CORE SCRIPTS ===== -->
+  <script>
+    /********************
+     * CLOCK ONLY
+     ********************/
+    const localTimeEl = document.getElementById("localTime");
+    function tickClock(){
+      if (localTimeEl){
+        localTimeEl.textContent = new Date().toLocaleString();
+      }
+    }
+    setInterval(tickClock, 1000);
+    tickClock();
+
+    /********************
+     * RADIO CONTROLS + VOLUME + VISUALIZER
+     ********************/
+    const radioAudio = document.getElementById("radioAudio");
+    const radioPlay = document.getElementById("radioPlay");
+    const radioStop = document.getElementById("radioStop");
+    const radioVolume = document.getElementById("radioVolume");
+
+    let audioCtx = null;
+    let analyser = null;
+    let sourceNode = null;
+
+    const vizCanvas = document.getElementById("radioViz");
+    const vizCtx = vizCanvas.getContext("2d");
+
+    function initVisualizer(){
+      if (audioCtx || !radioAudio) return;
+
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 1024;
+
+      sourceNode = audioCtx.createMediaElementSource(radioAudio);
+      sourceNode.connect(analyser);
+      analyser.connect(audioCtx.destination);
+
+      drawPipboyVisualizer();
+    }
+
+    function drawPipboyVisualizer(){
+      if (!analyser) return;
+      requestAnimationFrame(drawPipboyVisualizer);
+
+      const bufferLength = analyser.fftSize;
+      const dataArray = new Uint8Array(bufferLength);
+      analyser.getByteTimeDomainData(dataArray);
+
+      const w = vizCanvas.width;
+      const h = vizCanvas.height;
+
+      vizCtx.clearRect(0, 0, w, h);
+
+      vizCtx.strokeStyle = "#33ff99";
+      vizCtx.lineWidth = 2;
+      vizCtx.shadowColor = "#33ff99";
+      vizCtx.shadowBlur = 8;
+
+      vizCtx.beginPath();
+
+      const slice = w / bufferLength;
+      let x = 0;
+
+      for (let i = 0; i < bufferLength; i++){
+        const v = dataArray[i] / 128.0;
+        const jitter = (Math.random() - 0.5) * 1.2;
+        const y = (v * h) / 2 + jitter;
+
+        if (i === 0) vizCtx.moveTo(x, y);
+        else vizCtx.lineTo(x, y);
+
+        x += slice;
+      }
+
+      vizCtx.stroke();
+
+      vizCtx.fillStyle = "rgba(0,0,0,0.15)";
+      for (let i = 0; i < h; i += 4){
+        vizCtx.fillRect(0, i, w, 1);
+      }
+    }
+
+    radioPlay.addEventListener("click", async () => {
+      try{
+        await radioAudio.play();
+        radioPlay.classList.add("isPlaying");
+        initVisualizer();
+      }catch(e){
+        alert("Autoplay blocked. Tap PLAY again, or check mute settings.");
+      }
+    });
+
+    radioStop.addEventListener("click", () => {
+      radioAudio.pause();
+      radioAudio.currentTime = 0;
+      radioPlay.classList.remove("isPlaying");
+    });
+
+    if (radioVolume) {
+      radioAudio.volume = parseFloat(radioVolume.value || "1");
+      radioVolume.addEventListener("input", () => {
+        radioAudio.volume = parseFloat(radioVolume.value || "1");
+      });
+    }
+
+    /********************
+     * WEATHER (COMPACT TOP RIGHT)
+     ********************/
+    const WX_KEY = "wt_weather_profile_v3";
+    const miniWxLoc = document.getElementById("miniWxLoc");
+    const miniWxNow = document.getElementById("miniWxNow");
+    const miniWxMeta = document.getElementById("miniWxMeta");
+    const miniWxInput = document.getElementById("miniWxInput");
+    const miniWxUseLoc = document.getElementById("miniWxUseLoc");
+    const miniWxUseSaved = document.getElementById("miniWxUseSaved");
+
+    function wxSave(p){ localStorage.setItem(WX_KEY, JSON.stringify(p)); }
+    function wxLoad(){ try{ return JSON.parse(localStorage.getItem(WX_KEY)); }catch{ return null; } }
+
+    function mapWasteland(code){
+      if([95,96,99].includes(code)) return "RADSTORM";
+      if([61,63,65,80,81,82].includes(code)) return "ACID RAIN";
+      if([45,48].includes(code)) return "RADCLOUDS";
+      if([71,73,75,77].includes(code)) return "ASHFALL";
+      if([0,1].includes(code)) return "CLEAR";
+      if([2,3].includes(code)) return "CLOUDY";
+      if([51,53,55].includes(code)) return "MIST";
+      return "ATMOSPHERIC";
+    }
+
+    async function wxFetch(lat, lon){
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=sunrise,sunset&temperature_unit=fahrenheit&windspeed_unit=mph&timezone=auto`;
+      const r = await fetch(url);
+      if(!r.ok) throw new Error("weather fetch failed");
+      return r.json();
+    }
+
+    async function wxRender(p){
+      miniWxLoc.textContent = `LOCATION: ${p.name}`;
+      miniWxNow.textContent = `NOW: LOADING…`;
+      miniWxMeta.textContent = `—`;
+      try{
+        const d = await wxFetch(p.latitude, p.longitude);
+        const cw = d.current_weather;
+        const cond = mapWasteland(cw.weathercode);
+        const temp = Math.round(cw.temperature);
+        const wind = Math.round(cw.windspeed);
+
+        miniWxNow.textContent = `NOW: ${cond} • ${temp}°F • WIND ${wind} MPH`;
+
+        const sr = new Date(d.daily.sunrise[0]).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+        const ss = new Date(d.daily.sunset[0]).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+        miniWxMeta.textContent = `SUNRISE ${sr} • SUNSET ${ss}`;
+      }catch(e){
+        miniWxNow.textContent = `NOW: FEED OFFLINE`;
+        miniWxMeta.textContent = `—`;
+      }
+    }
+
+    async function wxGeocode(q){
+      const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=1&format=json`;
+      const r = await fetch(url);
+      const j = await r.json();
+      if(!j.results?.length) return null;
+      const g = j.results[0];
+      return { name: `${g.name}, ${g.country}`, latitude: g.latitude, longitude: g.longitude };
+    }
+
+    miniWxInput.addEventListener("keydown", async (e) => {
+      if(e.key === "Enter"){
+        const q = miniWxInput.value.trim();
+        if(!q) return;
+        miniWxInput.value = "";
+        const p = await wxGeocode(q);
+        if(!p){
+          miniWxNow.textContent = "NOW: LOCATION NOT FOUND";
+          return;
+        }
+        wxSave(p);
+        wxRender(p);
+      }
+    });
+
+    miniWxUseLoc.addEventListener("click", () => {
+      if(!navigator.geolocation){
+        miniWxNow.textContent = "NOW: GEO NOT AVAILABLE";
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        const p = { name: "MY LOCATION", latitude: pos.coords.latitude, longitude: pos.coords.longitude };
+        wxSave(p);
+        wxRender(p);
+      }, () => {
+        miniWxNow.textContent = "NOW: LOCATION DENIED";
+      });
+    });
+
+    miniWxUseSaved.addEventListener("click", () => {
+      const p = wxLoad();
+      if(p) wxRender(p);
+    });
+
+    const wxInit = wxLoad();
+    if(wxInit) wxRender(wxInit);
+    else miniWxNow.textContent = "NOW: ENTER LOCATION";
+
+    /********************
+     * NEWS TOP 5 LIST
+     ********************/
+    const newsList = document.getElementById("newsList");
+    const newsUpdated = document.getElementById("newsUpdated");
+    const openNewest = document.getElementById("openNewest");
+    const newsRefresh = document.getElementById("newsRefresh");
+
+    function stamp(){ return new Date().toLocaleString(); }
+
+    function itemHtml(item, isNewest){
+      const safeTitle = (item.title || "").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+      const safeSource = (item.source || "SOURCE").toUpperCase();
+      const link = item.link || "#";
+      return `
+        <div class="newsItem ${isNewest ? "newest" : ""}">
+          <a href="${link}" target="_blank" rel="noopener">
+            <div class="headline">${safeTitle}</div>
+            <div class="meta">SOURCE: ${safeSource}</div>
+          </a>
+        </div>
+      `;
+    }
+
+    async function loadNews(){
+      newsList.innerHTML = `
+        <div class="newsItem">
+          <div class="headline">LOADING FALLOUT HEADLINES…</div>
+          <div class="meta">SOURCE: —</div>
+        </div>
+      `;
+      newsUpdated.textContent = stamp();
+      openNewest.href = "#";
+
+      try{
+        const r = await fetch("/.netlify/functions/fallout-news", { cache: "no-store" });
+        const d = await r.json();
+        if(!r.ok || !d.items?.length) throw new Error(d.error || "no headlines");
+
+        const items = d.items.slice(0, 5);
+        newsList.innerHTML = items.map((it, i) => itemHtml(it, i === 0)).join("");
+        openNewest.href = items[0].link || "#";
+        newsUpdated.textContent = stamp();
+      }catch(e){
+        newsList.innerHTML = `
+          <div class="newsItem">
+            <div class="headline amber mono">NEWS FEED OFFLINE</div>
+            <div class="meta">SOURCE: SYSTEM</div>
+          </div>
+        `;
+        newsUpdated.textContent = stamp();
+      }
+    }
+
+    newsRefresh.addEventListener("click", loadNews);
+    loadNews();
+    setInterval(loadNews, 10 * 60 * 1000);
+
+    /********************
+     * YOUTUBE LIVE STATUS (NO PANEL)
+     ********************/
+    const YT_CHANNEL_URL = "https://www.youtube.com/@themysticbroadcast/live";
+
+    async function checkYouTubeLive() {
+      const youtubeBtn = document.getElementById("youtubeBtn");
+      const announcementBar = document.querySelector(".announcementBar");
+      const announcementText = document.getElementById("announcementText");
+
+      if (!youtubeBtn || !announcementBar || !announcementText) return;
+
+      try {
+        const r = await fetch("/.netlify/functions/youtube-live", { cache: "no-store" });
+        const d = await r.json();
+
+        if (d.isLive && d.videoId) {
+          youtubeBtn.classList.add("live");
+          youtubeBtn.href = d.liveUrl || YT_CHANNEL_URL;
+
+          announcementBar.classList.add("live");
+          announcementText.innerHTML = `
+            wasteland terminal is online, barely... there will be bugs (but remember, those are features...) Enjoy the news and music, more to come...
+            <span style="margin-left:10px;">• LIVE NOW — WASTELAND CAM ACTIVE</span>
+          `;
+        } else {
+          youtubeBtn.classList.remove("live");
+          youtubeBtn.href = YT_CHANNEL_URL;
+
+          announcementBar.classList.remove("live");
+          announcementText.textContent =
+            "wasteland terminal is online, barely... there will be bugs (but remember, those are features...) Enjoy the news and music, more to come...";
+        }
+      } catch (e) {
+        youtubeBtn.classList.remove("live");
+        announcementBar.classList.remove("live");
+      }
+    }
+
+    checkYouTubeLive();
+    setInterval(checkYouTubeLive, 2 * 60 * 1000);
+
+    /********************
+     * LIVE CHAT (SUPABASE) — uses window.sb
+     ********************/
+    (function(){
+      const sb = window.sb;
+      const chatBox = document.getElementById("chatMessages");
+      const callsignInput = document.getElementById("callsignInput");
+      const joinChat = document.getElementById("joinChat");
+      const chatInput = document.getElementById("chatInput");
+      const chatSend = document.getElementById("chatSend");
+      const chatStatus = document.getElementById("chatStatus");
+
+      if (!sb){
+        console.warn("[CHAT] Supabase client missing (window.sb)");
+        if (chatBox) chatBox.innerHTML = `<div class="tiny dim">CHAT OFFLINE</div>`;
+        return;
+      }
+
+      if (!chatBox || !callsignInput || !joinChat || !chatInput || !chatSend) return;
+
+      const ROOM = "lobby";
+      const NAME_KEY = "wt_chat_name_v1";
+      let username = localStorage.getItem(NAME_KEY) || "";
+
+      function escapeHtml(s){
+        return String(s)
+          .replaceAll("&","&amp;")
+          .replaceAll("<","&lt;")
+          .replaceAll(">","&gt;")
+          .replaceAll('"',"&quot;")
+          .replaceAll("'","&#039;");
+      }
+
+      function normalizeName(s){
+        return String(s || "").trim().toUpperCase().slice(0, 24);
+      }
+
+      function colorForUser(name){
+        const colors = ["#7fffd4", "#ffb347", "#87cefa", "#ff6f91", "#f5f5dc", "#98fb98"];
+        let hash = 0;
+        for (let i = 0; i < name.length; i++){
+          hash = (hash + name.charCodeAt(i) * 17) % colors.length;
+        }
+        return colors[hash];
+      }
+
+      function formatTime(ts){
+        const d = new Date(ts);
+        return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      }
+
+      function normalizeMsg(s){
+        return String(s || "").trim().slice(0, 280);
+      }
+
+      function renderMessage(msg){
+        const div = document.createElement("div");
+        div.className = "chatLine";
+
+        const user = msg.username || "WANDERER";
+        const userColor = colorForUser(user);
+        const time = formatTime(msg.created_at);
+
+        div.innerHTML = `
+          <span class="chatTime dim">[${time}]</span>
+          <span class="chatUser" style="color:${userColor}">${escapeHtml(user)}:</span>
+          <span>${escapeHtml(msg.message || "")}</span>
+        `;
+
+        chatBox.appendChild(div);
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        if (chatBox.children.length > 100){
+          chatBox.removeChild(chatBox.firstChild);
+        }
+      }
+
+      async function loadChat(){
+        try{
+          const { data, error } = await sb
+            .from("chat_messages")
+            .select("*")
+            .eq("room", ROOM)
+            .order("created_at", { ascending: true })
+            .limit(50);
+
+          if (error){
+            console.error("[CHAT] load error:", error);
+            chatBox.innerHTML = `<div class="tiny dim">CHAT OFFLINE</div>`;
+            return;
+          }
+
+          chatBox.innerHTML = "";
+          (data || []).forEach(renderMessage);
+          chatBox.scrollTop = chatBox.scrollHeight;
+        }catch(e){
+          console.error("[CHAT] load failed:", e);
+          chatBox.innerHTML = `<div class="tiny dim">CHAT OFFLINE</div>`;
+        }
+      }
+
+      function setReadOnly(){
+        chatInput.disabled = true;
+        chatSend.disabled = true;
+        if (chatStatus) chatStatus.textContent = "READ-ONLY";
+      }
+
+      function setJoined(){
+        chatInput.disabled = false;
+        chatSend.disabled = false;
+        if (chatStatus) chatStatus.textContent = `CALLSIGN: ${username}`;
+      }
+
+      async function sendChat(e){
+        if (e && typeof e.preventDefault === "function") e.preventDefault();
+        const message = normalizeMsg(chatInput.value);
+        if (!username || !message) return;
+
+        chatSend.disabled = true;
+        try{
+          const { error } = await sb
+            .from("chat_messages")
+            .insert({ room: ROOM, username, message });
+
+          if (error){
+            console.error("[CHAT] insert error:", error);
+            alert(`CHAT SEND FAILED: ${error.message}`);
+            return;
+          }
+
+          chatInput.value = "";
+          chatInput.focus();
+        }catch(err){
+          console.error("[CHAT] send failed:", err);
+          alert("CHAT SEND FAILED: check console for details.");
+        } finally{
+          chatSend.disabled = false;
+        }
+      }
+
+      joinChat.addEventListener("click", (e) => {
+        e.preventDefault();
+        const name = normalizeName(callsignInput.value);
+        if (!name) return;
+        username = name;
+        localStorage.setItem(NAME_KEY, username);
+        callsignInput.value = "";
+        setJoined();
+        chatInput.focus();
+      });
+
+      chatSend.addEventListener("click", sendChat);
+      chatInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") sendChat(e);
+      });
+
+      loadChat();
+
+      username = normalizeName(username);
+      if (username) setJoined();
+      else setReadOnly();
+
+      sb
+        .channel("wt-chat-lobby")
+        .on(
+          "postgres_changes",
+          { event: "INSERT", schema: "public", table: "chat_messages", filter: "room=eq.lobby" },
+          (payload) => {
+            if (payload?.new?.room === ROOM) renderMessage(payload.new);
+          }
+        )
+        .subscribe();
+    })();
+  </script>
 </body>
 </html>
+
