@@ -1,8 +1,7 @@
 // netlify/functions/youtube-live.js
-import fetch from "node-fetch";
 
-const API_KEY = process.env.YT_API_KEY; // store in Netlify env vars
-const CHANNEL_ID = "UCPtQT6_4aXqaLT8oOHtBkIA"; // your real channel ID
+const API_KEY = process.env.YT_API_KEY;
+const CHANNEL_ID = "UCPtQT6_4aXqaLT8oOHtBkIA";
 
 export async function handler() {
   try {
