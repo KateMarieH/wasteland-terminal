@@ -430,54 +430,63 @@
     loadNews();
     setInterval(loadNews, 10 * 60 * 1000);
 
-    <script>
-/********************
- * YOUTUBE LIVE STATUS (CLEAN VERSION)
- ********************/
+    /********************
+     * YOUTUBE LIVE CAM (SCAFFOLD)
+     ********************/
+    const liveBadge = document.getElementById("liveBadge");
+    const livePlayer = document.getElementById("livePlayer");
+    const openLive = document.getElementById("openLive");
+    const openArchives = document.getElementById("openArchives");
+    const checkLive = document.getElementById("checkLive");
 
-const YT_CHANNEL_URL = "https://www.youtube.com/@themysticbroadcast/live";
+    const YT_CHANNEL_URL = "https://www.youtube.com/@themysticbroadcast";
+    const YT_ARCHIVE_URL = "https://www.youtube.com/@themysticbroadcast/live";
 
-async function checkYouTubeLive() {
-  const youtubeBtn = document.getElementById("youtubeBtn");
-  const announcementBar = document.querySelector(".announcementBar");
-  const announcementText = document.getElementById("announcementText");
+    openLive.href = YT_CHANNEL_URL;
+    openArchives.href = YT_ARCHIVE_URL;
 
-  try {
-    const r = await fetch("/.netlify/functions/youtube-live", { cache: "no-store" });
-    const d = await r.json();
-
-    if (d.isLive && d.videoId) {
-      // Button pulses red
-      youtubeBtn.classList.add("live");
-      youtubeBtn.href = d.liveUrl || YT_CHANNEL_URL;
-
-      // Announcement bar shows BOTH your message + live alert
-      announcementBar.classList.add("live");
-      announcementText.innerHTML = `
-        wasteland terminal is online, barely ... there will be bugs ...
-        <span style="margin-left:10px;">• LIVE NOW — WASTELAND CAM ACTIVE</span>
+    function showStandby(){
+      liveBadge.hidden = true;
+      livePlayer.innerHTML = `
+        <img id="standbyImg" class="standbyImg" src="/assets/standby.gif" alt="Please stand by">
+        <div class="tiny dim" style="margin-top:8px">Standby. No broadcast detected.</div>
       `;
-    } else {
-      // Reset button
-      youtubeBtn.classList.remove("live");
-      youtubeBtn.href = YT_CHANNEL_URL;
-
-      // Reset announcement bar
-      announcementBar.classList.remove("live");
-      announcementText.textContent =
-        "wasteland terminal is online, barely ... there will be bugs (but remember, those are features ... ) Enjoy the news and music, more to come ...";
     }
-  } catch (e) {
-    // Fail-safe: never break the rest of the script
-    youtubeBtn.classList.remove("live");
-    announcementBar.classList.remove("live");
-  }
-}
 
-// Run immediately + every 2 minutes
-checkYouTubeLive();
-setInterval(checkYouTubeLive, 2 * 60 * 1000);
-</script>
+    function showLive(videoId){
+      liveBadge.hidden = false;
+      const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=0&mute=0`;
+      livePlayer.innerHTML = `
+        <div class="ytWrap">
+          <iframe
+            src="${embedUrl}"
+            title="Wasteland Live Cam"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen></iframe>
+        </div>
+      `;
+    }
+
+    async function checkYouTubeLive(){
+      try{
+        const r = await fetch("/.netlify/functions/youtube-live", { cache:"no-store" });
+        const d = await r.json();
+        if(!r.ok) throw new Error("no signal");
+        if(d.isLive && d.videoId){
+          showLive(d.videoId);
+          openLive.href = d.liveUrl || YT_CHANNEL_URL;
+        }else{
+          showStandby();
+        }
+      }catch(e){
+        showStandby();
+      }
+    }
+
+    checkLive.addEventListener("click", checkYouTubeLive);
+    checkYouTubeLive();
+    setInterval(checkYouTubeLive, 2 * 60 * 1000);
 
     /********************
      * LIVE CHAT (SUPABASE) — uses window.sb
