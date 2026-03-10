@@ -191,66 +191,65 @@
 
         <!-- Radio (embedded player + now playing) -->
         <div class="panelBox">
-          <div class="mono">MYSTIC BROADCAST RADIO</div>
-          <div class="tiny dim" style="margin-top:6px"></div>
 
-          <div class="kv">
-            <span class="k">STATUS:</span> <span class="v">ONLINE</span>
-          </div>
+<div class="mono">MYSTIC BROADCAST RADIO</div>
 
-          <div class="bigLine" style="margin-top:10px">
-            NOW PLAYING:
-          </div>
+<div class="kv">
+<span class="k">STATUS:</span> <span class="v">ONLINE</span>
+</div>
 
-          <div class="bigLine" style="letter-spacing:.08em">
-            <span class="cc_streaminfo" data-type="song" data-username="themysti">Loading ...</span>
-          </div>
+<!-- NOW PLAYING -->
+<div class="radioNowPlaying" style="margin-top:10px; display:flex; gap:12px; align-items:center;">
+<img class="cc_streaminfo"
+     data-type="trackimageurl"
+     data-username="themysti"
+     style="width:72px;height:72px;object-fit:cover;border-radius:4px;" />
 
-          <!-- Album art -->
-          <div style="margin-top:10px; text-align:center;">
-            <img class="cc_streaminfo"
-                 data-type="trackimageurl"
-                 data-username="themysti"
-                 style="max-width:100%; border-radius:4px;" />
-          </div>
+<div>
+<div class="bigLine">NOW PLAYING:</div>
+<div class="bigLine" style="letter-spacing:.08em">
+<span class="cc_streaminfo" data-type="song" data-username="themysti">Loading…</span>
+</div>
+</div>
+</div>
 
-          <!-- Buy link -->
-          <div class="kv" style="margin-top:10px">
-            <span class="k">BUY:</span>
-            <a class="cc_streaminfo" data-type="trackbuyurl" data-username="themysti">
-              Buy this album
-            </a>
-          </div>
+<!-- BUY -->
+<div class="kv" style="margin-top:10px">
+<span class="k">BUY:</span>
+<a class="cc_streaminfo" data-type="trackbuyurl" data-username="themysti">Album</a>
+</div>
 
-          <!-- Recently played -->
-          <div class="cc_recenttracks_list" data-username="themysti" style="margin-top:10px;">
-            Loading recent tracks...
-          </div>
+<!-- LISTENERS -->
+<div class="kv">
+<span class="k">LISTENERS:</span>
+<span class="cc_streaminfo" data-type="listeners" data-username="themysti"></span>
+<span class="dim"> / </span>
+<span class="cc_streaminfo" data-type="maxlisteners" data-username="themysti"></span>
+</div>
 
-          <div class="kv" style="margin-top:10px">
-            <span class="k">LISTENERS:</span>
-            <span class="cc_streaminfo" data-type="listeners" data-username="themysti"></span>
-            <span class="dim"> / MAX </span>
-            <span class="cc_streaminfo" data-type="maxlisteners" data-username="themysti"></span>
-          </div>
+<!-- CONTROLS -->
+<div style="display:flex;gap:10px;align-items:center;margin-top:10px;">
+<button class="btn" id="radioPlay">PLAY</button>
+<button class="btn ghost" id="radioStop">STOP</button>
+<input id="radioVolume" type="range" min="0" max="1" step="0.01" value="1" style="flex:1;">
+</div>
 
-          <div class="radioControls">
-            <button class="btn" id="radioPlay">PLAY</button>
-            <button class="btn ghost" id="radioStop">STOP</button>
-          </div>
+<audio id="radioAudio" preload="none" crossorigin="anonymous">
+<source src="https://radio.shoutcheap.com/proxy/themysti/stream" type="audio/mpeg">
+</audio>
 
-          <!-- Volume slider -->
-          <div class="radioVolume" style="margin-top:10px">
-            <input id="radioVolume" type="range" min="0" max="1" step="0.01" value="1">
-          </div>
+<!-- VISUALIZER -->
+<div class="tiny dim mono" style="margin-top:10px">AUDIO SCOPE</div>
+<canvas id="radioViz" width="300" height="60" style="width:100%;"></canvas>
 
-          <audio id="radioAudio" preload="none" crossorigin="anonymous">
-            <source src="https://radio.shoutcheap.com/proxy/themysti/stream" type="audio/mpeg">
-          </audio>
+<!-- RECENT TRACKS -->
+<button class="btn ghost" id="toggleRecent" style="margin-top:10px">RECENT TRACKS</button>
+<div id="recentTracks" class="cc_recenttracks_list hidden" data-username="themysti">
+Loading recent tracks…
+</div>
 
-          <!-- Pip-Boy style visualizer -->
-          <canvas id="radioViz" width="300" height="60" style="margin-top:10px; width:100%;"></canvas>
-        </div>
+</div>
+
 
         <div class="ruleDots">::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::</div>
         <!-- Live Cam panel removed -->
@@ -284,98 +283,92 @@
     tickClock();
 
     /********************
-     * RADIO CONTROLS + VOLUME + VISUALIZER
-     ********************/
-    const radioAudio = document.getElementById("radioAudio");
-    const radioPlay = document.getElementById("radioPlay");
-    const radioStop = document.getElementById("radioStop");
-    const radioVolume = document.getElementById("radioVolume");
+ * RADIO CONTROLS + VOLUME + VISUALIZER
+ ********************/
 
-    let audioCtx = null;
-    let analyser = null;
-    let sourceNode = null;
+const radioAudio = document.getElementById("radioAudio");
+const radioPlay = document.getElementById("radioPlay");
+const radioStop = document.getElementById("radioStop");
+const radioVolume = document.getElementById("radioVolume");
+const toggleRecent = document.getElementById("toggleRecent");
+const recentTracks = document.getElementById("recentTracks");
 
-    const vizCanvas = document.getElementById("radioViz");
-    const vizCtx = vizCanvas.getContext("2d");
+let audioCtx = null;
+let analyser = null;
+let sourceNode = null;
 
-    function initVisualizer(){
-      if (audioCtx || !radioAudio) return;
+const vizCanvas = document.getElementById("radioViz");
+const vizCtx = vizCanvas.getContext("2d");
 
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 1024;
+function initVisualizer(){
+if (audioCtx || !radioAudio) return;
 
-      sourceNode = audioCtx.createMediaElementSource(radioAudio);
-      sourceNode.connect(analyser);
-      analyser.connect(audioCtx.destination);
+audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+analyser = audioCtx.createAnalyser();
+analyser.fftSize = 1024;
 
-      drawPipboyVisualizer();
-    }
+sourceNode = audioCtx.createMediaElementSource(radioAudio);
+sourceNode.connect(analyser);
+analyser.connect(audioCtx.destination);
 
-    function drawPipboyVisualizer(){
-      if (!analyser) return;
-      requestAnimationFrame(drawPipboyVisualizer);
+drawPipboyVisualizer();
+}
 
-      const bufferLength = analyser.fftSize;
-      const dataArray = new Uint8Array(bufferLength);
-      analyser.getByteTimeDomainData(dataArray);
+function drawPipboyVisualizer(){
+if (!analyser) return;
+requestAnimationFrame(drawPipboyVisualizer);
 
-      const w = vizCanvas.width;
-      const h = vizCanvas.height;
+const bufferLength = analyser.fftSize;
+const dataArray = new Uint8Array(bufferLength);
 
-      vizCtx.clearRect(0, 0, w, h);
+analyser.getByteTimeDomainData(dataArray);
 
-      vizCtx.strokeStyle = "#33ff99";
-      vizCtx.lineWidth = 2;
-      vizCtx.shadowColor = "#33ff99";
-      vizCtx.shadowBlur = 8;
+const w = vizCanvas.width;
+const h = vizCanvas.height;
 
-      vizCtx.beginPath();
+vizCtx.clearRect(0, 0, w, h);
+vizCtx.strokeStyle = "#33ff99";
+vizCtx.lineWidth = 2;
+vizCtx.shadowColor = "#33ff99";
+vizCtx.shadowBlur = 8;
 
-      const slice = w / bufferLength;
-      let x = 0;
+vizCtx.beginPath();
+const slice = w / bufferLength;
+let x = 0;
 
-      for (let i = 0; i < bufferLength; i++){
-        const v = dataArray[i] / 128.0;
-        const jitter = (Math.random() - 0.5) * 1.2;
-        const y = (v * h) / 2 + jitter;
+for (let i = 0; i < bufferLength; i++){
+const v = dataArray[i] / 128.0;
+const y = (v * h) / 2;
+i === 0 ? vizCtx.moveTo(x, y) : vizCtx.lineTo(x, y);
+x += slice;
+}
 
-        if (i === 0) vizCtx.moveTo(x, y);
-        else vizCtx.lineTo(x, y);
+vizCtx.stroke();
+}
 
-        x += slice;
-      }
+radioPlay.addEventListener("click", async () => {
+try{
+await radioAudio.play();
+if (audioCtx?.state === "suspended") audioCtx.resume();
+initVisualizer();
+}catch{
+alert("Autoplay blocked. Tap PLAY again.");
+}
+});
 
-      vizCtx.stroke();
+radioStop.addEventListener("click", () => {
+radioAudio.pause();
+radioAudio.currentTime = 0;
+});
 
-      vizCtx.fillStyle = "rgba(0,0,0,0.15)";
-      for (let i = 0; i < h; i += 4){
-        vizCtx.fillRect(0, i, w, 1);
-      }
-    }
+radioVolume.addEventListener("input", () => {
+radioAudio.volume = parseFloat(radioVolume.value || "1");
+});
 
-    radioPlay.addEventListener("click", async () => {
-      try{
-        await radioAudio.play();
-        radioPlay.classList.add("isPlaying");
-        initVisualizer();
-      }catch(e){
-        alert("Autoplay blocked. Tap PLAY again, or check mute settings.");
-      }
-    });
+toggleRecent.addEventListener("click", () => {
+recentTracks.classList.toggle("hidden");
+});
 
-    radioStop.addEventListener("click", () => {
-      radioAudio.pause();
-      radioAudio.currentTime = 0;
-      radioPlay.classList.remove("isPlaying");
-    });
-
-    if (radioVolume) {
-      radioAudio.volume = parseFloat(radioVolume.value || "1");
-      radioVolume.addEventListener("input", () => {
-        radioAudio.volume = parseFloat(radioVolume.value || "1");
-      });
-    }
 
     /********************
      * WEATHER (COMPACT TOP RIGHT)
