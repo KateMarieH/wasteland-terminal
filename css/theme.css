@@ -63,3 +63,23 @@ a:hover {
 #weather button:hover {
   background-color: rgba(0, 255, 100, 0.15);
 }
+/* Radio Module */
+#radio {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+#radio-title {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+#radio audio {
+  width: 100%;
+  margin-top: 0.5rem;
+  background: black;
+  border: 1px solid #33ff66;
+  filter: invert(70%) hue-rotate(70deg);
+}
+
