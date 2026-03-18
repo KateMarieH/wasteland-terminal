@@ -32,29 +32,27 @@ a:hover {
   text-transform: uppercase;
   letter-spacing: 1px;
 }
-#weather {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-#weather input {
-  background: black;
+/* Weather input + buttons */
+#weather input,
+#weather button {
+  background-color: #000;
   border: 1px solid #33ff66;
   color: #33ff66;
-  padding: 0.3rem;
+  padding: 0.4rem 0.6rem;
+  font-family: "Courier New", monospace;
+  font-size: 0.9rem;
+  text-shadow: 0 0 4px #33ff66;
+}
+
+#weather input::placeholder {
+  color: #33ff66;
+  opacity: 0.6;
 }
 
 #weather button {
-  background: black;
-  border: 1px solid #33ff66;
-  color: #33ff66;
-  padding: 0.3rem;
   cursor: pointer;
 }
 
 #weather button:hover {
-  background: rgba(0,255,100,0.1);
+  background-color: rgba(0, 255, 100, 0.15);
 }
-
-
