@@ -1,1 +1,13 @@
+body {
+  margin: 2rem auto;
+  max-width: 1200px;
+  padding: 0 1rem;
+}
 
+header {
+  margin-bottom: 2rem;
+}
+
+section {
+  margin-bottom: 2rem;
+}
