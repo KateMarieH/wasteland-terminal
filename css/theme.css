@@ -64,6 +64,7 @@ a:hover {
   background-color: rgba(0, 255, 100, 0.15);
 }
 /* Radio Module */
+/* Radio Module Layout */
 #radio {
   display: flex;
   flex-direction: column;
@@ -75,21 +76,26 @@ a:hover {
   font-size: 1.1rem;
 }
 
-#radio audio {
-  width: 100%;
-  margin-top: 0.5rem;
-  background: black;
-  border: 1px solid #33ff66;
-  filter: invert(70%) hue-rotate(70deg);
-}
-/* Radio audio player styling */
+/* Force audio player to match terminal theme */
 #radio-player {
   width: 100%;
-  background: #000;
   border: 1px solid #33ff66;
-  height: 32px;
-  filter: invert(70%) hue-rotate(70deg) brightness(1.2);
+  background: #000 !important;
   border-radius: 0;
+  height: 32px;
 }
 
+/* Chrome / Edge / Safari control bar */
+#radio-player::-webkit-media-controls-panel {
+  background-color: #000 !important;
+  border-radius: 0 !important;
+}
+
+/* Tint icons green */
+#radio-player::-webkit-media-controls-play-button,
+#radio-player::-webkit-media-controls-mute-button,
+#radio-player::-webkit-media-controls-volume-slider,
+#radio-player::-webkit-media-controls-timeline {
+  filter: invert(70%) hue-rotate(70deg) brightness(1.3);
+}
 
