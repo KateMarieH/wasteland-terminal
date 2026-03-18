@@ -82,4 +82,14 @@ a:hover {
   border: 1px solid #33ff66;
   filter: invert(70%) hue-rotate(70deg);
 }
+/* Radio audio player styling */
+#radio-player {
+  width: 100%;
+  background: #000;
+  border: 1px solid #33ff66;
+  height: 32px;
+  filter: invert(70%) hue-rotate(70deg) brightness(1.2);
+  border-radius: 0;
+}
+
 
