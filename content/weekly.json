@@ -1,5 +1,22 @@
 {
-  "fanArt": {},
-  "mysticRec": {},
-  "archiveFind": {}
+  "fanArt": {
+    "image": "/content/images/fanart.jpg",
+    "title": "Vault Dweller Portrait",
+    "artist": "NovaSketch",
+    "link": "https://instagram.com/novasketch",
+    "caption": "Hand‑inked portrait inspired by Fallout 1."
+  },
+  "mysticRec": {
+    "image": "/content/images/rec.jpg",
+    "title": "The Wasteland Survival Guide",
+    "link": "https://example.com/book",
+    "caption": "A classic post‑war field manual."
+  },
+  "archiveFind": {
+    "image": "/content/images/archive.jpg",
+    "title": "1930s Radio Broadcast",
+    "link": "https://archive.org/details/oldradio",
+    "caption": "A dusty gem from the pre‑war airwaves."
+  }
 }
+
