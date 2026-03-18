@@ -5,6 +5,7 @@ async function loadJSON(path) {
   return res.json();
 }
 
+
 // Weather code → description
 function weatherDescription(code) {
   const map = {
@@ -28,6 +29,7 @@ function weatherDescription(code) {
   return map[code] || "Unknown";
 }
 
+
 // Weather code → icon
 function getWeatherIcon(code) {
   if (code === 0) return "https://openweathermap.org/img/wn/01d.png";
@@ -38,4 +40,3 @@ function getWeatherIcon(code) {
   if (code === 95) return "https://openweathermap.org/img/wn/11d.png";
   return "https://openweathermap.org/img/wn/03d.png";
 }
-
