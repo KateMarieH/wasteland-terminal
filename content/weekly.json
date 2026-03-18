@@ -7,10 +7,10 @@
     "caption": "Fallout Fan-Art found on tumblr"
   },
   "mysticRec": {
-    "image": "/content/images/rec.jpg",
-    "title": "The Wasteland Survival Guide",
-    "link": "https://example.com/book",
-    "caption": "A classic post‑war field manual."
+    "image": "images/recs/rec.jpg",
+    "title": "Startling Stories",
+    "link": "https://archive.org/details/StartlingStoriesV01n01193901/mode/2up",
+    "caption": "A Novel of the future complete in this issue! Featuring The Black Flame."
   },
   "archiveFind": {
     "image": "images/archive/peckspaste.jpg",
