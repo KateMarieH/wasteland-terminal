@@ -1,1 +1,32 @@
+/* Fallout Terminal Theme */
+
+body {
+  background-color: #0c0c0c;
+  color: #33ff66;
+  font-family: "Courier New", monospace;
+  line-height: 1.4;
+}
+
+a {
+  color: #33ff66;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.panel {
+  background-color: rgba(0, 255, 100, 0.05);
+  border: 1px solid #33ff66;
+}
+
+#header h1 {
+  margin-bottom: 0.5rem;
+  letter-spacing: 2px;
+}
+
+#subnav a {
+  margin-right: 1rem;
+}
 
