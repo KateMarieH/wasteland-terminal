@@ -58,27 +58,19 @@
     <span class="cc_streaminfo" data-type="trackplaylist" data-username="themysti"></span>
   </div>
 
+  <!-- Optional waveform visualizer -->
+  <canvas id="radio-viz" width="260" height="40"></canvas>
+
+  <!-- Custom radio controls -->
   <div id="radio-controls">
-  <button id="radio-toggle">▶ PLAY</button>
+    <button id="radio-toggle">▶ PLAY</button>
+    <input id="radio-volume" type="range" min="0" max="1" step="0.01" value="0.2">
+  </div>
 
-  <input id="radio-volume" type="range" min="0" max="1" step="0.01" value="0.2">
-</div>
-
-<!-- Optional waveform visualizer (recommended) -->
-<canvas id="radio-viz" width="260" height="40"></canvas>
-
-<!-- Custom radio controls -->
-<div id="radio-controls">
-  <button id="radio-toggle">▶ PLAY</button>
-  <input id="radio-volume" type="range" min="0" max="1" step="0.01" value="0.2">
-</div>
-
-<!-- Hidden native audio element -->
-<audio id="radio-player" preload="none">
-  <source src="https://radio.shoutcheap.com/proxy/themysti/stream" type="audio/mpeg">
-</audio>
-
-
+  <!-- Hidden native audio element -->
+  <audio id="radio-player" preload="none">
+    <source src="https://radio.shoutcheap.com/proxy/themysti/stream" type="audio/mpeg">
+  </audio>
 </div>
 
 
