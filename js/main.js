@@ -164,3 +164,39 @@ radioToggle.addEventListener("click", () => {
 radioVolume.addEventListener("input", () => {
   radioPlayer.volume = radioVolume.value;
 });
+
+// -------------------------
+// RADIO SCHEDULE (PST)
+// -------------------------
+
+const radioSchedule = [
+  { name: "Wasteland Wakeup", start: 5, end: 14 },
+  { name: "Dusty Afternoon Jazz", start: 14, end: 21 },
+  { name: "After Dark in the Wastes", start: 21, end: 24 },
+  { name: "After Dark in the Wastes", start: 0, end: 5 }
+];
+
+function formatTime(hour) {
+  const suffix = hour >= 12 ? "PM" : "AM";
+  const h = hour % 12 || 12;
+  return `${h}:00 ${suffix}`;
+}
+
+function updateRadioSchedule() {
+  const now = new Date();
+  const pstHour = parseInt(
+    now.toLocaleString("en-US", { timeZone: "America/Los_Angeles", hour: "numeric", hour12: false })
+  );
+
+  let currentBlock = radioSchedule.find(b => pstHour >= b.start && pstHour < b.end);
+  let currentIndex = radioSchedule.indexOf(currentBlock);
+  let nextBlock = radioSchedule[(currentIndex + 1) % radioSchedule.length];
+
+  document.getElementById("radio-block").innerHTML =
+    `PROGRAM: <span>${currentBlock.name}</span>`;
+
+  document.getElementById("radio-upnext-name").textContent = nextBlock.name;
+  document.getElementById("radio-upnext-time").textContent = formatTime(nextBlock.start);
+}
+
+updateRadioSchedule();
