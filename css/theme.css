@@ -4,6 +4,7 @@ body {
   background-color: #0c0c0c;
   color: #33ff66;
   font-family: "Courier New", monospace;
+  text-shadow: 0 0 4px #33ff66;
   line-height: 1.4;
 }
 
@@ -21,12 +22,13 @@ a:hover {
   border: 1px solid #33ff66;
 }
 
-#header h1 {
-  margin-bottom: 0.5rem;
-  letter-spacing: 2px;
+/* Announcement Bar */
+#announcement-bar {
+  background-color: rgba(0, 255, 100, 0.1);
+  border: 1px solid #33ff66;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
-
-#subnav a {
-  margin-right: 1rem;
-}
-
