@@ -255,3 +255,35 @@ newsRefresh.addEventListener("click", loadNews);
 loadNews();
 
 
+async function loadWeeklyFeatures() {
+  try {
+    const resp = await fetch("/content/weekly.json");
+    const data = await resp.json();
+
+    // Fan Art
+    document.getElementById("fanArtImage").src = data.fanArt.image;
+    document.getElementById("fanArtTitle").textContent = data.fanArt.title;
+    document.getElementById("fanArtLink").href = data.fanArt.link;
+    document.getElementById("fanArtLink").textContent = data.fanArt.artist;
+    document.getElementById("fanArtCaption").textContent = data.fanArt.caption;
+
+    // Mystic’s Rec
+    document.getElementById("recImage").src = data.mysticRec.image;
+    document.getElementById("recTitle").textContent = data.mysticRec.title;
+    document.getElementById("recLink").href = data.mysticRec.link;
+    document.getElementById("recLink").textContent = "View Recommendation";
+    document.getElementById("recCaption").textContent = data.mysticRec.caption;
+
+    // Archive Find
+    document.getElementById("archiveImage").src = data.archiveFind.image;
+    document.getElementById("archiveTitle").textContent = data.archiveFind.title;
+    document.getElementById("archiveLink").href = data.archiveFind.link;
+    document.getElementById("archiveLink").textContent = "Open Archive";
+    document.getElementById("archiveCaption").textContent = data.archiveFind.caption;
+
+  } catch (err) {
+    console.error("Weekly features failed to load:", err);
+  }
+}
+
+loadWeeklyFeatures();
