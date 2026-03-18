@@ -201,3 +201,50 @@ function updateRadioSchedule() {
 
 updateRadioSchedule();
 
+// -------------------------
+// WASTELAND BULLETIN (Top 3)
+// -------------------------
+
+const NEWS_ENDPOINT = "/.netlify/functions/fallout-news";
+
+const newsList = document.getElementById("newsList");
+const newsSource = document.getElementById("newsSource");
+const newsUpdated = document.getElementById("newsUpdated");
+const newsRefresh = document.getElementById("newsRefresh");
+
+async function loadNews() {
+  try {
+    const resp = await fetch(NEWS_ENDPOINT);
+    const data = await resp.json();
+
+    if (!data.items || !Array.isArray(data.items)) {
+      throw new Error("Invalid news format");
+    }
+
+    const top3 = data.items.slice(0, 3);
+
+    newsList.innerHTML = "";
+    top3.forEach(item => {
+      const li = document.createElement("li");
+      li.textContent = item.title;
+      li.title = item.title;
+      newsList.appendChild(li);
+    });
+
+    newsSource.textContent = top3[0]?.source || "Google News";
+
+    const now = new Date();
+    newsUpdated.textContent =
+      `Updated ${now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+
+  } catch (err) {
+    newsList.innerHTML = "<li>NEWS FEED OFFLINE</li>";
+    newsSource.textContent = "SYSTEM";
+    newsUpdated.textContent = "—";
+  }
+}
+
+newsRefresh.addEventListener("click", loadNews);
+loadNews();
+
+
