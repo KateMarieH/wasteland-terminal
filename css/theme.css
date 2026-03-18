@@ -48,6 +48,13 @@ a:hover {
   color: #33ff66;
   opacity: 0.6;
 }
+/* Weather layout spacing */
+#weather {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem; /* controls spacing between all elements */
+}
+
 
 #weather button {
   cursor: pointer;
