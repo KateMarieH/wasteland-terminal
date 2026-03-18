@@ -179,17 +179,17 @@ a:hover {
 #news {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.2rem; /* slightly tighter */
 }
 
 /* Title */
 #news-title {
-  font-size: 1.1rem;
+  font-size: 1.05rem; /* slightly smaller to match panel density */
   font-weight: bold;
   letter-spacing: 1px;
   border-bottom: 1px solid rgba(51, 255, 102, 0.3);
-  padding-bottom: 0.2rem;
-  margin-bottom: 0.2rem;
+  padding-bottom: 0.15rem;
+  margin-bottom: 0.15rem;
 }
 
 /* Headlines list */
@@ -199,15 +199,16 @@ a:hover {
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0.15rem; /* tighter vertical rhythm */
 }
 
 #newsList li {
-  font-size: 0.95rem;
-  line-height: 1.25;
+  font-size: 0.9rem;
+  line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  opacity: 0.95; /* slight dim for terminal feel */
 }
 
 /* Metadata footer */
@@ -215,10 +216,10 @@ a:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 0.3rem;
-  padding-top: 0.3rem;
+  margin-top: 0.2rem;
+  padding-top: 0.2rem;
   border-top: 1px solid rgba(51, 255, 102, 0.2);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   opacity: 0.75;
 }
 
@@ -227,7 +228,7 @@ a:hover {
   background: #000;
   border: 1px solid #33ff66;
   color: #33ff66;
-  padding: 0.2rem 0.5rem;
+  padding: 0.15rem 0.45rem; /* tighter */
   font-family: "Courier New", monospace;
   cursor: pointer;
   text-shadow: 0 0 4px #33ff66;
@@ -236,5 +237,3 @@ a:hover {
 #newsRefresh:hover {
   background: rgba(0,255,100,0.15);
 }
-
-
