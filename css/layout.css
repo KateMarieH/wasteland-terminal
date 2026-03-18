@@ -29,11 +29,6 @@ section {
   margin-top: 2rem;
 }
 
-/* Panel baseline */
-.panel {
-  padding: 1rem;
-  min-height: 150px;
-}
 
 /* Mobile layout */
 @media (max-width: 800px) {
