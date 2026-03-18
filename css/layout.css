@@ -1,30 +1,77 @@
 /* Page container */
 body {
-  margin: 0.75rem auto;   /* tighter top spacing */
+  margin: 0.75rem auto;
   max-width: 1200px;
   padding: 0 1rem;
 }
 
-/* Header structure */
+/* ============================
+   HEADER LAYOUT (NEW STRUCTURE)
+   ============================ */
+
+/* Header wrapper */
 #header {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;           /* tighter spacing between title + nav */
-  margin-bottom: 0.75rem; /* pulls content up */
+  gap: 0.5rem;              /* space between header-row and announcement bar */
+  margin-bottom: 0.75rem;   /* space before live-systems */
 }
 
-#top-links,
+/* Top row: title on left, buttons on right */
+#header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Title */
+#header-row h1 {
+  margin: 0;
+  font-size: 1.6rem;        /* slightly larger for hierarchy */
+}
+
+/* Buttons row */
+#top-links {
+  display: flex;
+  gap: 0.75rem;             /* spacing between SUPPORT / DISCORD / YOUTUBE */
+}
+
+/* Subnav (if used later) */
 #subnav {
   display: flex;
-  gap: 0.75rem;           /* tighter spacing between buttons */
+  gap: 0.75rem;
 }
 
-/* Section spacing */
+/* ============================
+   SECTION SPACING
+   ============================ */
+
 section {
-  margin-bottom: 1.25rem; /* was 2rem */
+  margin-bottom: 1.25rem;
 }
 
 #live-systems,
 #weekly-features {
-  margin-top: 0.75rem;    /* was 2rem */
+  margin-top: 0.75rem;
+}
+
+/* ============================
+   MOBILE
+   ============================ */
+
+@media (max-width: 800px) {
+  #header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+  }
+
+  #top-links {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .grid-3 {
+    grid-template-columns: 1fr;
+  }
 }
