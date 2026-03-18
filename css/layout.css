@@ -1,13 +1,38 @@
+/* Page container */
 body {
   margin: 2rem auto;
   max-width: 1200px;
   padding: 0 1rem;
 }
 
-header {
+/* Header structure */
+#header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   margin-bottom: 2rem;
 }
 
+#top-links,
+#subnav {
+  display: flex;
+  gap: 1rem;
+}
+
+/* Section spacing */
 section {
   margin-bottom: 2rem;
+}
+
+/* Panel baseline */
+.panel {
+  padding: 1rem;
+  min-height: 150px;
+}
+
+/* Mobile layout */
+@media (max-width: 800px) {
+  .grid-3 {
+    grid-template-columns: 1fr;
+  }
 }
