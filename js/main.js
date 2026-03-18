@@ -132,6 +132,25 @@ else wxNow.textContent = "NOW: ENTER LOCATION";
 // -------------------------
 
 const radioPlayer = document.getElementById("radio-player");
-radioPlayer.volume = 0.2; // 20% volume
+const radioToggle = document.getElementById("radio-toggle");
+const radioVolume = document.getElementById("radio-volume");
+
+// Start at comfortable volume
+radioPlayer.volume = 0.2;
+
+radioToggle.addEventListener("click", () => {
+  if (radioPlayer.paused) {
+    radioPlayer.play();
+    radioToggle.textContent = "■ STOP";
+  } else {
+    radioPlayer.pause();
+    radioToggle.textContent = "▶ PLAY";
+  }
+});
+
+radioVolume.addEventListener("input", () => {
+  radioPlayer.volume = radioVolume.value;
+});
+
 
 
