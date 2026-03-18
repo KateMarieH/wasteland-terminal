@@ -158,3 +158,9 @@ a:hover {
   opacity: 0.9;
   margin-top: 0.1rem;
 }
+#radio-viz {
+  width: 100%;
+  height: 40px;
+  background: #000;
+  border: 1px solid rgba(51, 255, 102, 0.3);
+}
