@@ -152,9 +152,12 @@ let vizStarted = false;
 function initAudioGraph() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    // Create analyser
     analyser = audioCtx.createAnalyser();
     analyser.fftSize = 256;
 
+    // Connect audio element → analyser → speakers
     source = audioCtx.createMediaElementSource(radioPlayer);
     source.connect(analyser);
     analyser.connect(audioCtx.destination);
@@ -168,6 +171,7 @@ function initAudioGraph() {
 radioToggle.addEventListener("click", async () => {
   initAudioGraph();
 
+  // Required for Chrome autoplay policy
   if (audioCtx.state === "suspended") {
     await audioCtx.resume();
   }
