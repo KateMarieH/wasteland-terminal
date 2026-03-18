@@ -134,56 +134,23 @@ else wxNow.textContent = "NOW: ENTER LOCATION";
 const radioPlayer = document.getElementById("radio-player");
 const radioToggle = document.getElementById("radio-toggle");
 const radioVolume = document.getElementById("radio-volume");
-const canvas = document.getElementById("radio-viz");
-const ctx = canvas.getContext("2d");
+
+// Safety check
+console.log("radioPlayer:", radioPlayer);
+console.log("radioToggle:", radioToggle);
+console.log("radioVolume:", radioVolume);
 
 // Start at comfortable volume
 radioPlayer.volume = 0.2;
 
 // -------------------------
-// AUDIO CONTEXT (lazy init)
-// -------------------------
-
-let audioCtx = null;
-let analyser = null;
-let source = null;
-let vizStarted = false;
-
-function initAudioGraph() {
-  if (!audioCtx) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-    // Create analyser
-    analyser = audioCtx.createAnalyser();
-    analyser.fftSize = 256;
-
-    // Connect audio element → analyser → speakers
-    source = audioCtx.createMediaElementSource(radioPlayer);
-    source.connect(analyser);
-    analyser.connect(audioCtx.destination);
-  }
-}
-
-// -------------------------
 // PLAY / STOP BUTTON
 // -------------------------
 
-radioToggle.addEventListener("click", async () => {
-  initAudioGraph();
-
-  // Required for Chrome autoplay policy
-  if (audioCtx.state === "suspended") {
-    await audioCtx.resume();
-  }
-
+radioToggle.addEventListener("click", () => {
   if (radioPlayer.paused) {
     radioPlayer.play();
     radioToggle.textContent = "■ STOP";
-
-    if (!vizStarted) {
-      vizStarted = true;
-      drawVisualizer();
-    }
   } else {
     radioPlayer.pause();
     radioToggle.textContent = "▶ PLAY";
@@ -197,33 +164,3 @@ radioToggle.addEventListener("click", async () => {
 radioVolume.addEventListener("input", () => {
   radioPlayer.volume = radioVolume.value;
 });
-
-// -------------------------
-// VISUALIZER
-// -------------------------
-
-function drawVisualizer() {
-  const bufferLength = analyser.frequencyBinCount;
-  const dataArray = new Uint8Array(bufferLength);
-
-  function draw() {
-    requestAnimationFrame(draw);
-
-    analyser.getByteFrequencyData(dataArray);
-
-    ctx.fillStyle = "#000";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    const barWidth = (canvas.width / bufferLength) * 2.5;
-    let x = 0;
-
-    for (let i = 0; i < bufferLength; i++) {
-      const barHeight = dataArray[i] / 6;
-      ctx.fillStyle = "#33ff66";
-      ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
-      x += barWidth + 1;
-    }
-  }
-
-  draw();
-}
