@@ -33,7 +33,16 @@
 
   <!-- Row 1: Live Systems -->
   <section id="live-systems" class="grid-3">
-    <div id="weather" class="panel">Weather</div>
+    <div id="weather" class="panel">
+  <div id="wx-location">LOCATION: —</div>
+  <div id="wx-now">NOW: —</div>
+  <div id="wx-meta">—</div>
+
+  <input id="wx-input" type="text" placeholder="Enter city or ZIP">
+  <button id="wx-use-loc">Use My Location</button>
+  <button id="wx-use-saved">Use Saved</button>
+</div>
+
     <div id="radio" class="panel">Radio</div>
     <div id="news" class="panel">News</div>
   </section>
