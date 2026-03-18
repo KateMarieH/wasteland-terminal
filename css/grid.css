@@ -1,10 +1,11 @@
 .grid-3 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
+  gap: 1rem; /* was 1.5rem */
 }
 
 .panel {
-  padding: 1rem;
+  padding: 0.75rem; /* was 1rem */
   border: 1px solid #33ff66;
 }
+
