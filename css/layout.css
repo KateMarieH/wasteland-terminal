@@ -24,6 +24,11 @@ section {
   margin-bottom: 2rem;
 }
 
+#live-systems,
+#weekly-features {
+  margin-top: 2rem;
+}
+
 /* Panel baseline */
 .panel {
   padding: 1rem;
