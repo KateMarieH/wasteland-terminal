@@ -32,26 +32,29 @@ a:hover {
   text-transform: uppercase;
   letter-spacing: 1px;
 }
-/* Weather Module */
 #weather {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
-.weather-temp {
-  font-size: 1.8rem;
-  font-weight: bold;
+#weather input {
+  background: black;
+  border: 1px solid #33ff66;
+  color: #33ff66;
+  padding: 0.3rem;
 }
 
-.weather-desc {
-  font-size: 1rem;
-  opacity: 0.9;
+#weather button {
+  background: black;
+  border: 1px solid #33ff66;
+  color: #33ff66;
+  padding: 0.3rem;
+  cursor: pointer;
 }
 
-.weather-icon {
-  width: 48px;
-  height: 48px;
-  filter: brightness(0) saturate(100%) invert(70%) sepia(60%) hue-rotate(70deg);
+#weather button:hover {
+  background: rgba(0,255,100,0.1);
 }
+
 
