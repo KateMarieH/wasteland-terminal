@@ -32,6 +32,7 @@ a:hover {
   text-transform: uppercase;
   letter-spacing: 1px;
 }
+
 /* Weather input + buttons */
 #weather input,
 #weather button {
@@ -48,13 +49,13 @@ a:hover {
   color: #33ff66;
   opacity: 0.6;
 }
+
 /* Weather layout spacing */
 #weather {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem; /* controls spacing between all elements */
+  gap: 0.6rem;
 }
-
 
 #weather button {
   cursor: pointer;
@@ -64,11 +65,14 @@ a:hover {
   background-color: rgba(0, 255, 100, 0.15);
 }
 
-/* Radio Module Layout */
+/* -------------------------------- */
+/* RADIO MODULE                     */
+/* -------------------------------- */
+
 #radio {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.25rem; /* tighter spacing */
 }
 
 /* Title + divider */
@@ -77,8 +81,8 @@ a:hover {
   font-weight: bold;
   letter-spacing: 1px;
   border-bottom: 1px solid rgba(51, 255, 102, 0.3);
-  padding-bottom: 0.2rem;
-  margin-bottom: 0.4rem;
+  padding-bottom: 0.15rem;
+  margin-bottom: 0.25rem;
 }
 
 /* Blinking ON AIR indicator */
@@ -93,37 +97,47 @@ a:hover {
   61%, 100% { opacity: 0.2; }
 }
 
-/* Now Playing line */
+/* NOW PLAYING */
 #radio-now {
   font-size: 1.15rem;
-  line-height: 1.3;
+  line-height: 1.25;
 }
 
-/* Program/Block line */
+/* PROGRAM */
 #radio-block {
   font-size: 1rem;
   opacity: 0.9;
-  margin-top: 0.1rem;
+  margin-top: 0.05rem;
 }
 
-/* UP NEXT line */
+/* UP NEXT */
 #radio-upnext {
-  font-size: 0.9rem;
-  opacity: 0.75;
-  margin-top: 0.2rem;
-  padding-top: 0.2rem;
+  font-size: 1rem; /* slightly larger */
+  opacity: 0.8;
+  margin-top: 0.15rem;
+  padding-top: 0.15rem;
   border-top: 1px solid rgba(51, 255, 102, 0.2);
 }
 
-/* Custom radio controls container */
+/* Broadcast footer */
+#radio-footer {
+  font-size: 0.8rem;
+  opacity: 0.5;
+  margin-top: 0.25rem;
+  padding-top: 0.25rem;
+  letter-spacing: 1px;
+  border-top: 1px solid rgba(51, 255, 102, 0.15);
+}
+
+/* Controls container */
 #radio-controls {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  margin-top: 0.4rem;
+  margin-top: 0.3rem;
 }
 
-/* Custom PLAY/STOP button */
+/* PLAY/STOP button */
 #radio-toggle {
   background: #000;
   border: 1px solid #33ff66;
@@ -138,10 +152,10 @@ a:hover {
   background: rgba(0,255,100,0.15);
 }
 
-/* Custom volume slider */
+/* Volume slider */
 #radio-volume {
   -webkit-appearance: none;
-  width: 100px;
+  width: 110px;
   height: 4px;
   background: #003300;
   border: 1px solid #33ff66;
