@@ -134,57 +134,96 @@ else wxNow.textContent = "NOW: ENTER LOCATION";
 const radioPlayer = document.getElementById("radio-player");
 const radioToggle = document.getElementById("radio-toggle");
 const radioVolume = document.getElementById("radio-volume");
+const canvas = document.getElementById("radio-viz");
+const ctx = canvas.getContext("2d");
 
 // Start at comfortable volume
 radioPlayer.volume = 0.2;
 
-radioToggle.addEventListener("click", () => {
+// -------------------------
+// AUDIO CONTEXT (lazy init)
+// -------------------------
+
+let audioCtx;
+let analyser;
+let source;
+let vizStarted = false;
+
+function initAudioContext() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 256;
+
+    source = audioCtx.createMediaElementSource(radioPlayer);
+    source.connect(analyser);
+    analyser.connect(audioCtx.destination);
+  }
+}
+
+// -------------------------
+// PLAY / STOP BUTTON
+// -------------------------
+
+radioToggle.addEventListener("click", async () => {
+  initAudioContext();
+
+  // Required for Chrome autoplay policy
+  if (audioCtx.state === "suspended") {
+    await audioCtx.resume();
+  }
+
   if (radioPlayer.paused) {
     radioPlayer.play();
     radioToggle.textContent = "■ STOP";
+
+    if (!vizStarted) {
+      vizStarted = true;
+      drawVisualizer();
+    }
   } else {
     radioPlayer.pause();
     radioToggle.textContent = "▶ PLAY";
   }
 });
 
+// -------------------------
+// VOLUME SLIDER
+// -------------------------
+
 radioVolume.addEventListener("input", () => {
   radioPlayer.volume = radioVolume.value;
 });
 
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-const source = audioCtx.createMediaElementSource(radioPlayer);
-const analyser = audioCtx.createAnalyser();
-source.connect(analyser);
-analyser.connect(audioCtx.destination);
-analyser.fftSize = 256;
+// -------------------------
+// VISUALIZER
+// -------------------------
 
-const bufferLength = analyser.frequencyBinCount;
-const dataArray = new Uint8Array(bufferLength);
+function drawVisualizer() {
+  const bufferLength = analyser.frequencyBinCount;
+  const dataArray = new Uint8Array(bufferLength);
 
-const canvas = document.getElementById("radio-viz");
-const ctx = canvas.getContext("2d");
+  function draw() {
+    requestAnimationFrame(draw);
 
-function draw() {
-  requestAnimationFrame(draw);
-  analyser.getByteFrequencyData(dataArray);
+    analyser.getByteFrequencyData(dataArray);
 
-  ctx.fillStyle = "#000";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  const barWidth = (canvas.width / bufferLength) * 2.5;
-  let x = 0;
+    const barWidth = (canvas.width / bufferLength) * 2.5;
+    let x = 0;
 
-  for (let i = 0; i < bufferLength; i++) {
-    const barHeight = dataArray[i] / 6;
-    ctx.fillStyle = "#33ff66";
-    ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
-    x += barWidth + 1;
+    for (let i = 0; i < bufferLength; i++) {
+      const barHeight = dataArray[i] / 6;
+      ctx.fillStyle = "#33ff66";
+      ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+      x += barWidth + 1;
+    }
   }
+
+  draw();
 }
-
-draw();
-
 
 
 
