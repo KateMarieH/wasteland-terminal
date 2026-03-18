@@ -225,11 +225,18 @@ async function loadNews() {
 
     newsList.innerHTML = "";
     top3.forEach(item => {
-      const li = document.createElement("li");
-      li.textContent = item.title;
-      li.title = item.title;
-      newsList.appendChild(li);
-    });
+  const li = document.createElement("li");
+
+  const a = document.createElement("a");
+  a.href = item.link;
+  a.target = "_blank";
+  a.rel = "noopener noreferrer";
+  a.textContent = item.title;
+
+  li.appendChild(a);
+  newsList.appendChild(li);
+});
+
 
     newsSource.textContent = top3[0]?.source || "Google News";
 
