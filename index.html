@@ -43,7 +43,29 @@
   <button id="wx-use-saved">Use Saved</button>
 </div>
 
-    <div id="radio" class="panel">Radio</div>
+    <div id="radio" class="panel">
+  <div id="radio-title">RADIO STREAM</div>
+
+  <div id="radio-now">
+    NOW PLAYING:
+    <span class="cc_streaminfo" data-type="song" data-username="themysti">Loading…</span>
+  </div>
+
+  <div id="radio-artist">
+    ARTIST:
+    <span class="cc_streaminfo" data-type="trackartist" data-username="themysti"></span>
+  </div>
+
+  <div id="radio-playlist">
+    PLAYLIST:
+    <span class="cc_streaminfo" data-type="trackplaylist" data-username="themysti"></span>
+  </div>
+
+  <audio id="radio-player" controls preload="none">
+    <source src="https://radio.shoutcheap.com/proxy/themysti/stream" type="audio/mpeg">
+  </audio>
+</div>
+
     <div id="news" class="panel">News</div>
   </section>
 
