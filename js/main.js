@@ -144,12 +144,12 @@ radioPlayer.volume = 0.2;
 // AUDIO CONTEXT (lazy init)
 // -------------------------
 
-let audioCtx;
-let analyser;
-let source;
+let audioCtx = null;
+let analyser = null;
+let source = null;
 let vizStarted = false;
 
-function initAudioContext() {
+function initAudioGraph() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     analyser = audioCtx.createAnalyser();
@@ -166,9 +166,8 @@ function initAudioContext() {
 // -------------------------
 
 radioToggle.addEventListener("click", async () => {
-  initAudioContext();
+  initAudioGraph();
 
-  // Required for Chrome autoplay policy
   if (audioCtx.state === "suspended") {
     await audioCtx.resume();
   }
@@ -224,6 +223,3 @@ function drawVisualizer() {
 
   draw();
 }
-
-
-
