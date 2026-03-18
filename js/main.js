@@ -126,3 +126,12 @@ wxUseSaved.addEventListener("click", () => {
 const wxInit = wxLoad();
 if(wxInit) wxRender(wxInit);
 else wxNow.textContent = "NOW: ENTER LOCATION";
+
+// -------------------------
+// RADIO ELEMENTS
+// -------------------------
+
+const radioPlayer = document.getElementById("radio-player");
+radioPlayer.volume = 0.2; // 20% volume
+
+
