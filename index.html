@@ -58,9 +58,16 @@
     <span class="cc_streaminfo" data-type="trackplaylist" data-username="themysti"></span>
   </div>
 
-  <audio id="radio-player" controls preload="none">
-    <source src="https://radio.shoutcheap.com/proxy/themysti/stream" type="audio/mpeg">
-  </audio>
+  <div id="radio-controls">
+  <button id="radio-toggle">▶ PLAY</button>
+
+  <input id="radio-volume" type="range" min="0" max="1" step="0.01" value="0.2">
+</div>
+
+<audio id="radio-player" preload="none">
+  <source src="https://radio.shoutcheap.com/proxy/themysti/stream" type="audio/mpeg">
+</audio>
+
 </div>
 
 
