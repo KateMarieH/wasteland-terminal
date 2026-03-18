@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wasteland Terminal</title>
+
+  <!-- New CSS structure -->
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/grid.css">
+</head>
+
+<body>
+
+  <!-- Announcement Bar -->
+  <div id="announcement-bar"></div>
+
+  <!-- Header -->
+  <header id="header">
+    <h1>WASTELAND TERMINAL</h1>
+    <nav id="top-links">
+      <a href="#">Patreon</a>
+      <a href="#">Discord</a>
+      <a href="#">YouTube</a>
+    </nav>
+    <nav id="subnav">
+      <a href="index.html">Terminal</a>
+      <a href="about.html">About</a>
+    </nav>
+  </header>
+
+  <!-- Row 1: Live Systems -->
+  <section id="live-systems" class="grid-3">
+    <div id="weather" class="panel">Weather</div>
+    <div id="radio" class="panel">Radio</div>
+    <div id="news" class="panel">News</div>
+  </section>
+
+  <!-- Row 2: Weekly Features -->
+  <section id="weekly-features" class="grid-3">
+    <div id="fan-art" class="panel">Fan Art</div>
+    <div id="mystic-rec" class="panel">Mystic’s Rec</div>
+    <div id="archive-find" class="panel">Archive Find</div>
+  </section>
+
+  <!-- JS -->
+  <script src="js/utils.js" defer></script>
+  <script src="js/main.js" defer></script>
+
+</body>
+</html>
