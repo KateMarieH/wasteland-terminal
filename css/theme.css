@@ -68,21 +68,50 @@ a:hover {
 #radio {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 
+/* Title + divider */
 #radio-title {
+  font-size: 1.2rem;
   font-weight: bold;
-  font-size: 1.1rem;
+  letter-spacing: 1px;
+  border-bottom: 1px solid rgba(51, 255, 102, 0.3);
+  padding-bottom: 0.2rem;
+  margin-bottom: 0.4rem;
 }
 
-/* Force audio player to match terminal theme */
+/* Blinking ON AIR indicator */
+#on-air {
+  color: #33ff66;
+  margin-left: 6px;
+  animation: blink 1.2s infinite;
+}
+
+@keyframes blink {
+  0%, 60% { opacity: 1; }
+  61%, 100% { opacity: 0.2; }
+}
+
+/* Now Playing line */
+#radio-now {
+  font-size: 1rem;
+}
+
+/* Program/Block line */
+#radio-block {
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+/* Audio Player Styling */
 #radio-player {
   width: 100%;
+  height: 26px;
   border: 1px solid #33ff66;
   background: #000 !important;
   border-radius: 0;
-  height: 32px;
+  margin-top: 0.4rem;
 }
 
 /* Chrome / Edge / Safari control bar */
@@ -98,4 +127,3 @@ a:hover {
 #radio-player::-webkit-media-controls-timeline {
   filter: invert(70%) hue-rotate(70deg) brightness(1.3);
 }
-
