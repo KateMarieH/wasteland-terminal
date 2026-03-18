@@ -9,5 +9,10 @@
   border: 1px solid #33ff66;
   min-height: unset; /* remove forced height */
 }
+#weekly-features .grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
 
 
