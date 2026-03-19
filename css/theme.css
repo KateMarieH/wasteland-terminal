@@ -252,3 +252,34 @@ a:hover {
   font-size: var(--font-sm);
   opacity: 0.8;
 }
+
+/* MOBILE -------------------------------------------- */
+
+@media (max-width: 800px) {
+
+  /* Slightly smaller base font */
+  .panel {
+    font-size: 0.9rem;
+    padding: 0.6rem;
+    gap: 0.3rem;
+  }
+
+  /* Title scales down */
+  .panel-title,
+  #radio-title,
+  #news-title {
+    font-size: 1rem;
+  }
+
+  /* Weekly images get rounded corners for nicer mobile look */
+  .weekly-image {
+    border-radius: 2px;
+  }
+
+  /* Announcement bar tighter */
+  #announcement-bar {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+  }
+}
+
