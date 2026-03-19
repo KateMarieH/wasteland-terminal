@@ -60,18 +60,34 @@ section {
    ============================ */
 
 @media (max-width: 800px) {
+
+  /* Header stacks cleanly */
   #header-row {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.35rem;
   }
 
+  /* Buttons wrap nicely */
   #top-links {
     flex-wrap: wrap;
     gap: 0.5rem;
   }
 
+  /* Grid becomes single column with tighter spacing */
   .grid-3 {
     grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  /* Reduce section spacing */
+  section {
+    margin-bottom: 1rem;
+  }
+
+  #live-systems,
+  #weekly-features {
+    margin-top: 0.5rem;
   }
 }
+
