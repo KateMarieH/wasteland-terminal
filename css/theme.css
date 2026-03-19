@@ -255,31 +255,44 @@ a:hover {
 
 /* MOBILE -------------------------------------------- */
 
-@media (max-width: 800px) {
+@media (max-width: 420px) {
 
-  /* Slightly smaller base font */
-  .panel {
-    font-size: 0.9rem;
-    padding: 0.6rem;
-    gap: 0.3rem;
+  /* Pip-Boy compact mode */
+  body {
+    padding: 0.5rem;
   }
 
-  /* Title scales down */
+  #header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  #top-links {
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .panel {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+    gap: 0.25rem;
+  }
+
   .panel-title,
   #radio-title,
   #news-title {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
 
-  /* Weekly images get rounded corners for nicer mobile look */
+  #announcement-bar {
+    padding: 0.35rem 0.5rem;
+    font-size: 0.75rem;
+  }
+
   .weekly-image {
     border-radius: 2px;
   }
-
-  /* Announcement bar tighter */
-  #announcement-bar {
-    padding: 0.4rem 0.75rem;
-    font-size: 0.8rem;
-  }
 }
+
 
