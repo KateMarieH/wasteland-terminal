@@ -57,21 +57,27 @@
     PROGRAM:
     <span class="cc_streaminfo" data-type="trackplaylist" data-username="themysti"></span>
   </div>
-      <div id="radio-upnext">
-  UP NEXT (PST): <span id="radio-upnext-name">—</span> at <span id="radio-upnext-time">—</span>
-</div>
 
-  <!-- Custom radio controls -->
+  <div id="radio-upnext">
+    UP NEXT (PST): <span id="radio-upnext-name">—</span> at <span id="radio-upnext-time">—</span>
+  </div>
+
+  <!-- NEW: Current listeners -->
+  <div id="radio-listeners">
+    LISTENERS:
+    <span class="cc_streaminfo" data-type="listeners" data-username="themysti"></span>
+  </div>
+
   <div id="radio-controls">
     <button id="radio-toggle">▶ PLAY</button>
     <input id="radio-volume" type="range" min="0" max="1" step="0.01" value="0.2">
   </div>
 
-  <!-- Hidden native audio element -->
   <audio id="radio-player" preload="none">
     <source src="https://radio.shoutcheap.com/proxy/themysti/stream" type="audio/mpeg">
   </audio>
 </div>
+
 
 
 
