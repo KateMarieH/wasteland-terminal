@@ -287,3 +287,34 @@ async function loadWeeklyFeatures() {
 }
 
 loadWeeklyFeatures();
+
+// -------------------------
+// YOUTUBE & PATREON
+// -------------------------
+async function loadSupporterTicker() {
+  const el = document.getElementById("supporter-ticker-inner");
+
+  const [ytRes, patRes] = await Promise.all([
+    fetch('/.netlify/functions/youtube-subs'),
+    fetch('/.netlify/functions/patreon-members')
+  ]);
+
+  const yt = await ytRes.json();
+  const pat = await patRes.json();
+
+  const combined = [...yt, ...pat].sort(
+    (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
+  );
+
+  if (!combined.length) {
+    el.textContent = "0 new supporters this week — want to keep the Terminal broadcasting? Select SUPPORT THE TERMINAL above.";
+    return;
+  }
+
+  const entries = combined.map(s => `[ ${s.source}: ${s.name} ]`).join("   ");
+
+  el.textContent = entries + "   " + entries;
+}
+
+loadSupporterTicker();
+
