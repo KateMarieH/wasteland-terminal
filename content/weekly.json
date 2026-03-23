@@ -20,6 +20,3 @@
   }
 }
 
-#add Youtube embedd video "media": "<iframe width='100%' height='200' src='VIDEO LINK HERE' frameborder='0' allowfullscreen></iframe>"
-#add LOCAL file "media": "<video controls width='100%'><source src='FILE NAME' type='video/mp4'></video>"
-
