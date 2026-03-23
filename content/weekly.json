@@ -1,22 +1,25 @@
 {
   "fanArt": {
-    "image": "images/fanart/fanart-3-18.jpg.jpg",
+    "media": "<img src='images/fanart/fanart-3-18.jpg' alt='Fan Art' />",
     "title": "The Wasteland Provides",
     "artist": "Mouse - tumblr link",
     "link": "https://www.tumblr.com/itsafreetrialofdeath",
     "caption": "This week’s feature comes from the incredibly talented mouse! They’re currently creating within the worlds of Fallout 4, Skyrim, and Baldur’s Gate 3—basically living in all the best universes at once. Go show them some love on Tumblr and support their work 💛"
   },
   "mysticRec": {
-    "image": "images/recs/rec.jpg",
-    "title": "Startling Stories",
-    "link": "https://archive.org/details/StartlingStoriesV01n01193901/mode/2up",
-    "caption": "A Novel of the future complete in this issue! Featuring The Black Flame."
+    "media": "<img src='images/recs/rec.jpg' alt='Mystic Rec' />",
+    "title": "Fallout Inspired Jet Chem Pipe",
+    "link": "https://www.etsy.com/listing/1269415346",
+    "caption": "Are you serious?!? Look at this handmade Jet Chem pipe on Etsy!"
   },
   "archiveFind": {
-    "image": "images/archive/peckspaste.jpg",
+    "media": "<img src='images/archive/peckspaste.jpg' alt='Archive Find' />",
     "title": "Vintage Ad for Pecks Pastes",
     "link": "https://archive.org/details/1950-advertisement-for-pecks-pastes_202102",
     "caption": "I don't know about you, but I didn't know I needed meat paste."
   }
 }
+
+#add Youtube embedd video "media": "<iframe width='100%' height='200' src='VIDEO LINK HERE' frameborder='0' allowfullscreen></iframe>"
+#add LOCAL file "media": "<video controls width='100%'><source src='FILE NAME' type='video/mp4'></video>"
 
